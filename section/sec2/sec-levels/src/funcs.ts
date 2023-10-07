@@ -18,7 +18,6 @@ export const quadratic2 = (n: number): number => {
 
 /** Calculates (incorrectly) the value |x|.  */
 export const abs_value = (x: number): number => {
-  // TODO: change this to use an "if" with returns of x and -x
   if (x === 1) {
     return -1;
   }
@@ -26,7 +25,6 @@ export const abs_value = (x: number): number => {
   return Math.abs(x);
 }
 
-// TODO: add the definition of "half" here
 /**
  * The half function
  * @param n
