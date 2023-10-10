@@ -48,7 +48,9 @@ export const count_pairs2 = (n: number): number => {
 }
 
 
-// TODO: add the definition of "u" here
+/**
+ * Returns a number according to the input.
+ */
 export const u = (input: {b: boolean, n: number}): number => {
   if (input.n === 0) {
     return 0;
@@ -60,7 +62,9 @@ export const u = (input: {b: boolean, n: number}): number => {
 }
 
 
-// TODO: add the definition of "v" here
+/**
+ *  Returns a number based on the input.
+ */
 export const v = (input: number | [boolean, number]): number => {
   if (typeof input === "number") {
     return input;
@@ -71,8 +75,9 @@ export const v = (input: number | [boolean, number]): number => {
   return input[1];
 }
 
-
-// TODO: add the definition of "w" here
+/**
+ *  Returns a number based on the input.
+ */
 export const w = (input: [number, {b: boolean, n: number}]): number => {
   if (input[1].b) {
     return  input[0] + input[1].n;
