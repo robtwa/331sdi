@@ -55,7 +55,6 @@ describe('funcs', function() {
     assert.notStrictEqual(count_pairs2(5), 2);
   });
 
-// TODO: uncomment these when you have implemented and imported "u"
  it('u', function() {
    assert.strictEqual(u({b: true, n: 0}), 0);
    assert.strictEqual(u({b: false, n: 0}), 0);
@@ -65,7 +64,6 @@ describe('funcs', function() {
    assert.strictEqual(u({b: false, n: 22}), -22);
  });
 
-// TODO: uncomment these when you have implemented and imported "v"
  it('v', function() {
    assert.strictEqual(v(0), 0);
    assert.strictEqual(v(5), 5);
@@ -75,7 +73,6 @@ describe('funcs', function() {
    assert.strictEqual(v([false, 3]), 3);
  });
 
-// TODO: uncomment these when you have implemented and imported "w"
  it('w', function() {
    assert.strictEqual(w([2, {b: true, n: 4}]), 6);
    assert.strictEqual(w([2, {b: false, n: 4}]), -2);
