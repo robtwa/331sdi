@@ -1,0 +1,42 @@
+import React from 'react';
+import { RED, Square, Row, Quilt } from './quilt';
+import { JsxList, jnil, jcompact } from './jsx_list';
+
+
+/** Returns a TD that displays the square orientation as text. */
+export const SquareTableElem = (props: {square: Square, key: number}): JSX.Element => {
+  if (props.square.color == RED) {
+    return <td key={props.key} className="sq-red">{props.square.corner}</td>;
+  } else {
+    return <td key={props.key} className="sq-green">{props.square.corner}</td>;
+  }
+}
+
+
+/** Returns a list of TDs displaying each of the given squares. */
+export const RowTableElems = (props: {row: Row, key: number}): JsxList => {
+  console.log(props); // TODO: remove
+  return jnil;        // TODO: replace
+}
+
+
+/** Returns a TR displaying the given row. */
+export const RowTableElem = (props: {row: Row, key: number}): JSX.Element => {
+  return (<tr key={props.key}>
+      {jcompact(RowTableElems({row: props.row, key: 0}))}
+    </tr>);
+};
+
+
+/** Returns a list of TRs displaying each of the given rows. */
+export const QuiltTableElems = (props: {quilt: Quilt, key: number}): JsxList => {
+  console.log(props); // TODO: remove
+  return jnil;        // TODO: replace
+}
+
+
+/** Returns a TABLE displaying the given quilt. */
+export const QuiltTableElem = (props: {quilt: Quilt}): JSX.Element => {
+  console.log(props); // TODO: remove
+  return <p>TODO: replace with a table</p>;
+};
