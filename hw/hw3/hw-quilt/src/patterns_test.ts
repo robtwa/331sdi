@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import {NW, GREEN, RED, ROUND, Square, Row, rnil, rcons, qnil, qcons, STRAIGHT, SE, SW, NE} from './quilt';
-import { PatternA, PatternB, PatternC, PatternD } from './patterns';
+import { PatternA, PatternB, PatternC, PatternD, PatternE } from './patterns';
 
 
 describe('patterns', function() {
@@ -385,6 +385,43 @@ describe('patterns', function() {
       qcons(row2, qcons(row1,
         qcons(row2, qcons(row1,
           qcons(row2, qcons(row1, qnil)))))));
+  });
+
+  it('PatternE - Green', function() {
+    const row1 = rcons(nw_straight_green_test, rcons(se_straight_green_test, rnil));
+    const row2 = rcons(se_straight_green_test, rcons(nw_straight_green_test, rnil));
+
+    // throw an error if rows === undefined
+    assert.throws(() => PatternE(undefined, GREEN), Error);
+
+    // throw an error if rows < 0
+    assert.throws(() => PatternE(-1, GREEN), Error);
+
+    // 0-1-many heuristic: base case 0
+    assert.deepStrictEqual(PatternE(0, GREEN), qnil);
+
+    // 0-1-many heuristic: base case 1
+    assert.deepStrictEqual(PatternE(1, GREEN),
+      qcons(row1, qnil));
+
+    // 0-1-many heuristic: 1 recursive call
+    assert.deepStrictEqual(PatternE(2, GREEN),
+      qcons(row1, qcons(row2, qnil)));
+
+    // 0-1-many heuristic: more than 1 recursive call (1st)
+    assert.deepStrictEqual(PatternE(3, GREEN),
+      qcons(row1, qcons(row2, qcons(row1, qnil))));
+
+    // 0-1-many heuristic: more than 1 recursive call (2nd)
+    assert.deepStrictEqual(PatternE(4, GREEN),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2, qnil)))));
+
+    // 0-1-many heuristic: more than 1 recursive call (3rd)
+    assert.deepStrictEqual(PatternE(6, GREEN),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2,
+          qcons(row1, qcons(row2, qnil)))))));
   });
 });
 

@@ -139,12 +139,12 @@ export const PatternE = (rows: number | undefined, color: Color | undefined): Qu
     // sc := {shape : STRAIGHT, color : c, corner : NW}
     // tc := {shape : STRAIGHT, color : c, corner : SE}
     if(color === RED) {
-      const row = rcons(nw_straight_red, rcons(se_straight_red, rnil));
-      return qcons(row, qnil);
+      const row1 = rcons(nw_straight_red, rcons(se_straight_red, rnil));
+      return qcons(row1, qnil);
     }
 
-    const row = rcons(nw_straight_green, rcons(se_straight_green, rnil));
-    return qcons(row, qnil);
+    const row1 = rcons(nw_straight_green, rcons(se_straight_green, rnil));
+    return qcons(row1, qnil);
   }
 
   // Recursive case begin - rows > 1 ; e.g.:
