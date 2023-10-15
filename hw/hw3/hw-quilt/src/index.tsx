@@ -54,13 +54,13 @@ const getRows = (params: URLSearchParams): number => {
 
 // Returns the quilt with the given pattern.
 // Throws an exception if the pattern is not A-E.
-const getQuilt = (pattern: string, color: Color | undefined): Quilt => {
+const getQuilt = (pattern: string, rows: number | undefined ,color: Color | undefined): Quilt => {
   switch (pattern) {
-    case "A": return PatternA(color);
-    case "B": return PatternB(color);
-    case "C": return PatternC(color);
-    case "D": return PatternD(color);
-    case "E": return PatternE(color);
+    case "A": return PatternA(rows, color);
+    case "B": return PatternB(rows, color);
+    case "C": return PatternC(rows, color);
+    case "D": return PatternD(rows, color);
+    case "E": return PatternE(rows, color);
     default:  throw new Error('impossible');
   }
 };
@@ -69,8 +69,8 @@ const getQuilt = (pattern: string, color: Color | undefined): Quilt => {
 // Parse the arguments to the page, which can indicate the color and number of
 // rows in the quilt.
 const params: URLSearchParams = new URLSearchParams(window.location.search);
-const color: Color | undefined = getColor(params);  // not used yet
-getRows(params);   // not used yet
+const color: Color | undefined = getColor(params);
+const rows: number | undefined = getRows(params);
 
 // Create a root in which to show the quilt.
 const main: HTMLElement|null = document.getElementById('main');
@@ -87,7 +87,7 @@ if (pattern === undefined) {
 } else {
   // Display the quilt in the page.
   try {
-    const result = getQuilt(pattern, color);
+    const result = getQuilt(pattern, rows, color);
     root.render(
       <React.StrictMode><QuiltElem quilt={result}/></React.StrictMode>);
   } catch (e: unknown) {
