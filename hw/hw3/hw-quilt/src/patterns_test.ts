@@ -5,11 +5,11 @@ import { PatternA } from './patterns';
 
 describe('patterns', function() {
 
-  const nw_round_green: Square = {shape: ROUND, color: GREEN, corner: NW};
+  const nw_round_green_test: Square = {shape: ROUND, color: GREEN, corner: NW};
 
   it('PatternA', function() {
-    const row_green: Row = rcons(nw_round_green, rcons(nw_round_green, rnil));
-    assert.deepStrictEqual(PatternA(),
+    const row_green: Row = rcons(nw_round_green_test, rcons(nw_round_green_test, rnil));
+    assert.deepStrictEqual(PatternA(GREEN),
          qcons(row_green, qcons(row_green, qcons(row_green, qcons(row_green, qnil)))));
 
     // TODO: uncomment this for part (g). This checks that the function throws
