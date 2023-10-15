@@ -9,16 +9,16 @@ const nw_round_green: Square = { shape: ROUND, color: GREEN, corner: NW };
 const ne_round_green: Square = { shape: ROUND, color: GREEN, corner: NE };
 const se_round_green: Square = { shape: ROUND, color: GREEN, corner: SE };
 const sw_round_green: Square = { shape: ROUND, color: GREEN, corner: SW };
-const nw_round_red: Square = { shape: ROUND, color: GREEN, corner: NW };
-const ne_round_red: Square = { shape: ROUND, color: GREEN, corner: NE };
-const se_round_red: Square = { shape: ROUND, color: GREEN, corner: SE };
-const sw_round_red: Square = { shape: ROUND, color: GREEN, corner: SW };
+const nw_round_red: Square = { shape: ROUND, color: RED, corner: NW };
+const ne_round_red: Square = { shape: ROUND, color: RED, corner: NE };
+const se_round_red: Square = { shape: ROUND, color: RED, corner: SE };
+const sw_round_red: Square = { shape: ROUND, color: RED, corner: SW };
 
 
 const nw_straight_green: Square = { shape: STRAIGHT, color: GREEN, corner: NW };
 const se_straight_green: Square = { shape: STRAIGHT, color: GREEN, corner: SE };
-const nw_straight_red: Square = { shape: STRAIGHT, color: GREEN, corner: NW };
-const se_straight_red: Square = { shape: STRAIGHT, color: GREEN, corner: SE };
+const nw_straight_red: Square = { shape: STRAIGHT, color: RED, corner: NW };
+const se_straight_red: Square = { shape: STRAIGHT, color: RED, corner: SE };
 
 // ************* helper  - begin ************
 const err_msg_rows: string = "Invalid row number.";
