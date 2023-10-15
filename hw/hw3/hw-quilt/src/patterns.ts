@@ -110,13 +110,13 @@ export const PatternD = (rows: number | undefined, color: Color | undefined): Qu
 
   // Recursive case
   if(color === RED) {
-    const row2 = rcons(se_round_red, rcons(sw_round_red, rnil));
     const row1 = rcons(ne_round_red, rcons(nw_round_red, rnil));
+    const row2 = rcons(se_round_red, rcons(sw_round_red, rnil));
     return qcons(row2, qcons(row1, PatternD(rows - 2, color)));
   }
 
-  const row2 = rcons(se_round_green, rcons(sw_round_green, rnil));
   const row1 = rcons(ne_round_green, rcons(nw_round_green, rnil));
+  const row2 = rcons(se_round_green, rcons(sw_round_green, rnil));
   return qcons(row2, qcons(row1, PatternD(rows - 2, color)));
 }
 
@@ -126,8 +126,6 @@ export const PatternE = (rows: number | undefined, color: Color | undefined): Qu
   if (rows === undefined || rows < 0) {
     throw new Error(err_msg_rows);
   }
-
-
 
   // Base case
   if (rows === 0) {
