@@ -1,5 +1,5 @@
 import React from 'react';
-import { RED, Square, Row, Quilt, rnil } from './quilt';
+import {RED, Square, Row, Quilt, rnil, qnil} from './quilt';
 import {JsxList, jnil, jcompact, jcons} from './jsx_list';
 
 
@@ -22,7 +22,7 @@ export const RowTableElems = (props: {row: Row, key: number}): JsxList => {
 
   // recursive
   return jcons(SquareTableElem({square: props.row.hd, key:props.key}),
-    RowTableElems({row: props.row.tl, key:props.key+1}));
+                RowTableElems({row: props.row.tl, key:props.key+1}));
 }
 
 
@@ -36,8 +36,10 @@ export const RowTableElem = (props: {row: Row, key: number}): JSX.Element => {
 
 /** Returns a list of TRs displaying each of the given rows. */
 export const QuiltTableElems = (props: {quilt: Quilt, key: number}): JsxList => {
-  console.log(props); // TODO: remove
-  return jnil;        // TODO: replace
+  if (props.quilt === qnil) {
+    return jnil;
+  }
+  return jcons(RowTableElem({row:props.quilt.hd, key: props.key}), QuiltTableElems({quilt: props.quilt.tl, key: props.key+1}));
 }
 
 
