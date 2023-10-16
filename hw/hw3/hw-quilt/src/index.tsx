@@ -3,6 +3,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { Color, RED, GREEN, Quilt } from './quilt';
 import { PatternA, PatternB, PatternC, PatternD, PatternE } from './patterns';
 import { QuiltElem } from './quilt_draw';
+import {symmetrize} from './quilt_ops';
 
 
 // Returns the pattern number, which must be A-E, or undefined if it was not
@@ -87,9 +88,19 @@ if (pattern === undefined) {
 } else {
   // Display the quilt in the page.
   try {
-    const result = getQuilt(pattern, rows, color);
-    root.render(
-      <React.StrictMode><QuiltElem quilt={result}/></React.StrictMode>);
+    // symmetrize
+    if (params.has("symmetrize")) {
+      const result = getQuilt(pattern, rows, color);
+      const resultSym = symmetrize(result);
+      root.render(
+        <React.StrictMode><QuiltElem quilt={resultSym}/></React.StrictMode>);
+    }
+    else {
+      const result = getQuilt(pattern, rows, color);
+      root.render(
+        <React.StrictMode><QuiltElem quilt={result}/></React.StrictMode>);
+    }
+
   } catch (e: unknown) {
     if (e instanceof Error) {
       root.render(<p><b>Error</b>: {e.message}</p>);

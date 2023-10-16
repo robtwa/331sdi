@@ -7,16 +7,16 @@ export const sflip_vert = (s: Square): Square => {
     return {corner: SW, color: s.color, shape: s.shape};
   }
 
+  if (s.corner === SW) {
+    return {corner: NW, color: s.color, shape: s.shape};
+  }
+
   if (s.corner === NE) {
     return {corner: SE, color: s.color, shape: s.shape};
   }
 
-  if (s.corner === SE) {
+  // s.corner === SE
     return {corner: NE, color: s.color, shape: s.shape};
-  }
-
-  // s.corner === SW
-  return {corner: NW, color: s.color, shape: s.shape};
 }
 
 /** Returns the same row but flipped vertically. */
@@ -30,6 +30,7 @@ export const rflip_vert = (r: Row): Row => {
   // recursive
   //console.log('recursive')
   return rcons(sflip_vert(r.hd), rflip_vert(r.tl));
+  //return rconcat(r_reverse(rflip_horz(r.tl)), rcons(sflip_horz(r.hd), rnil));
 }
 
 /** Returns the same quilt but flipped vertically. */
@@ -40,26 +41,26 @@ export const qflip_vert = (q: Quilt): Quilt => {
   }
 
   // recursive
-  return qcons(rflip_vert(q.hd), qflip_vert(q.tl));
+  //return qcons(rflip_vert(q.hd), qflip_vert(q.tl));
+  return qconcat((qflip_vert(q.tl)), q_reverse(qcons(rflip_vert(q.hd), qnil)));
 }
-
 
 /** Returns the same square but flipped horizontally. */
 export const sflip_horz = (s: Square): Square => {
   if (s.corner === NW) {
-    return {corner: SE, color: s.color, shape: s.shape};
-  }
-
-  if (s.corner === SW) {
     return {corner: NE, color: s.color, shape: s.shape};
   }
 
   if (s.corner === NE) {
+    return {corner: NW, color: s.color, shape: s.shape};
+  }
+
+  if (s.corner === SE) {
     return {corner: SW, color: s.color, shape: s.shape};
   }
 
-  // s.corner === SE
-  return {corner: NW, color: s.color, shape: s.shape};
+  // s.corner === SW
+  return {corner: SE, color: s.color, shape: s.shape};
 }
 
 /** Returns the same row but flipped horizontally. */
@@ -70,7 +71,8 @@ export const rflip_horz = (r: Row): Row => {
   }
 
   // Recursive case
-  return rcons(sflip_horz(r.hd), rflip_horz(r.tl));
+  // return rcons(sflip_horz(r.hd), rflip_horz(r.tl));
+  return rconcat(rflip_horz(r.tl), r_reverse(rcons(sflip_horz(r.hd), rnil)));
 }
 
 /** Returns the same quilt but flipped horizontally. */
@@ -83,7 +85,6 @@ export const qflip_horz = (q: Quilt): Quilt => {
   // recursive case
   return qcons(rflip_horz(q.hd), qflip_horz(q.tl));
 }
-
 
 /**
  * Returns the result of sewing together q1 and q2 horizontally, i.e.,
@@ -116,3 +117,23 @@ export const symmetrize = (q: Quilt): Quilt => {
   const r = sew(q, qflip_horz(q));
   return qconcat(r, qflip_vert(r));
 };
+
+export const r_reverse = (r: Row): Row => {
+  // base case
+  if (r === rnil) {
+    return rnil;
+  }
+
+  // recursive
+  return rconcat(r_reverse(r.tl), rcons(r.hd, rnil));
+}
+
+export const q_reverse = (q: Quilt): Quilt => {
+  // base case
+  if (q === qnil) {
+    return qnil;
+  }
+
+  // recursive
+  return qconcat(q_reverse(q.tl), qcons(q.hd, qnil));
+}
