@@ -1,6 +1,6 @@
 import React from 'react';
-import { RED, Square, Row, Quilt } from './quilt';
-import { JsxList, jnil, jcompact } from './jsx_list';
+import { RED, Square, Row, Quilt, rnil } from './quilt';
+import {JsxList, jnil, jcompact, jcons} from './jsx_list';
 
 
 /** Returns a TD that displays the square orientation as text. */
@@ -15,8 +15,14 @@ export const SquareTableElem = (props: {square: Square, key: number}): JSX.Eleme
 
 /** Returns a list of TDs displaying each of the given squares. */
 export const RowTableElems = (props: {row: Row, key: number}): JsxList => {
-  console.log(props); // TODO: remove
-  return jnil;        // TODO: replace
+  // base case
+  if (props.row === rnil) {
+    return jnil;
+  }
+
+  // recursive
+  return jcons(SquareTableElem({square: props.row.hd, key:props.key}),
+    RowTableElems({row: props.row.tl, key:props.key+1}));
 }
 
 
