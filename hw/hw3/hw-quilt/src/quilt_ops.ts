@@ -1,27 +1,35 @@
-import {Square, Row, rconcat, Quilt, qnil, qcons, qconcat, NW, SW, SE, NE} from './quilt';
+import {Square, Row, rconcat, Quilt, qnil, qcons, qconcat, NW, SW, SE, NE, rnil, rcons} from './quilt';
 
 
 /** Returns the same square but flipped vertically. */
 export const sflip_vert = (s: Square): Square => {
   if (s.corner === NW) {
-    return {shape: s.shape, color: s.color, corner: SW};
+    return {corner: SW, color: s.color, shape: s.shape};
   }
 
   if (s.corner === NE) {
-    return {shape: s.shape, color: s.color, corner: SE};
+    return {corner: SE, color: s.color, shape: s.shape};
   }
 
   if (s.corner === SE) {
-    return {shape: s.shape, color: s.color, corner: NE};
+    return {corner: NE, color: s.color, shape: s.shape};
   }
 
   // s.corner === SW
-  return {shape: s.shape, color: s.color, corner: NW};
+  return {corner: NW, color: s.color, shape: s.shape};
 }
 
 /** Returns the same row but flipped vertically. */
 export const rflip_vert = (r: Row): Row => {
-  return r;  // TODO: replace
+  // base case
+  if (r === rnil) {
+    //console.log('base case')
+    return rnil;
+  }
+
+  // recursive
+  //console.log('recursive')
+  return rcons(sflip_vert(r.hd), rflip_vert(r.tl));
 }
 
 /** Returns the same quilt but flipped vertically. */

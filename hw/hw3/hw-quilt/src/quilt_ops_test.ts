@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { NW, NE, SW, SE, GREEN, ROUND, Square, rnil, rcons, qnil, qcons } from './quilt';
-import { sew, symmetrize, sflip_vert } from './quilt_ops';
+import { sew, symmetrize, sflip_vert, rflip_vert } from './quilt_ops';
 
 
 describe('quilt_ops', function() {
@@ -17,7 +17,20 @@ describe('quilt_ops', function() {
   });
 
   it('rflip_vert', function() {
-    // TODO: implement
+    // 0-1-many heuristic, base case
+    assert.deepStrictEqual(rflip_vert(rnil), rnil);
+
+    // 0-1-many heuristic, 1 recursive call (only 1 possible)
+    assert.deepStrictEqual(rflip_vert(rcons(sw_sq, rnil)),
+      rcons(nw_sq, rnil));
+
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(rflip_vert(rcons(nw_sq, rcons(sw_sq, rnil))),
+      rcons(sw_sq, rcons(nw_sq, rnil)));
+
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(rflip_vert(rcons(nw_sq, rcons(sw_sq,rcons(nw_sq, rcons(sw_sq, rnil))))),
+      rcons(sw_sq, rcons(nw_sq,rcons(sw_sq, rcons(nw_sq, rnil)))));
   });
 
   it('qflip_vert', function() {
@@ -35,8 +48,6 @@ describe('quilt_ops', function() {
   it('qflip_horz', function() {
     // TODO: implement
   });
-
-
 
   it('sew', function() {
     const r1 = rcons(nw_sq, rcons(ne_sq, rnil));
