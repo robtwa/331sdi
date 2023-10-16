@@ -33,7 +33,6 @@ export const RowTableElem = (props: {row: Row, key: number}): JSX.Element => {
     </tr>);
 };
 
-
 /** Returns a list of TRs displaying each of the given rows. */
 export const QuiltTableElems = (props: {quilt: Quilt, key: number}): JsxList => {
   if (props.quilt === qnil) {
@@ -45,6 +44,8 @@ export const QuiltTableElems = (props: {quilt: Quilt, key: number}): JsxList => 
 
 /** Returns a TABLE displaying the given quilt. */
 export const QuiltTableElem = (props: {quilt: Quilt}): JSX.Element => {
-  console.log(props); // TODO: remove
-  return <p>TODO: replace with a table</p>;
+  if (props.quilt === qnil) {
+    return <table><tbody>{[]}</tbody></table>;
+  }
+  return <table><tbody>{jcompact((QuiltTableElems({quilt:props.quilt, key: 0})))}</tbody></table>;
 };
