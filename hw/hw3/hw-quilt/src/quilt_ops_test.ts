@@ -1,12 +1,19 @@
 import * as assert from 'assert';
 import { NW, NE, SW, SE, GREEN, ROUND, Square, rnil, rcons, qnil, qcons } from './quilt';
-import { sew, symmetrize } from './quilt_ops';
+import { sew, symmetrize, sflip_vert } from './quilt_ops';
 
 
 describe('quilt_ops', function() {
+  const nw_sq: Square = {corner: NW, color: GREEN, shape: ROUND};
+  const ne_sq: Square = {corner: NE, color: GREEN, shape: ROUND};
+  const se_sq: Square = {corner: SE, color: GREEN, shape: ROUND};
+  const sw_sq: Square = {corner: SW, color: GREEN, shape: ROUND};
 
   it('sflip_vert', function() {
-    // TODO: implement
+    assert.deepStrictEqual(sflip_vert(nw_sq), sw_sq);
+    assert.deepStrictEqual(sflip_vert(ne_sq), se_sq);
+    assert.deepStrictEqual(sflip_vert(se_sq), ne_sq);
+    assert.deepStrictEqual(sflip_vert(sw_sq), nw_sq);
   });
 
   it('rflip_vert', function() {
@@ -29,10 +36,7 @@ describe('quilt_ops', function() {
     // TODO: implement
   });
 
-  const nw_sq: Square = {corner: NW, color: GREEN, shape: ROUND};
-  const ne_sq: Square = {corner: NE, color: GREEN, shape: ROUND};
-  const se_sq: Square = {corner: SE, color: GREEN, shape: ROUND};
-  const sw_sq: Square = {corner: SW, color: GREEN, shape: ROUND};
+
 
   it('sew', function() {
     const r1 = rcons(nw_sq, rcons(ne_sq, rnil));

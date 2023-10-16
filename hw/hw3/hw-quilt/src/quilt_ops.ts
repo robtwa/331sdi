@@ -1,9 +1,22 @@
-import { Square, Row, rconcat, Quilt, qnil, qcons, qconcat } from './quilt';
+import {Square, Row, rconcat, Quilt, qnil, qcons, qconcat, NW, SW, SE, NE} from './quilt';
 
 
 /** Returns the same square but flipped vertically. */
 export const sflip_vert = (s: Square): Square => {
-  return s;  // TODO: replace
+  if (s.corner === NW) {
+    return {shape: s.shape, color: s.color, corner: SW};
+  }
+
+  if (s.corner === NE) {
+    return {shape: s.shape, color: s.color, corner: SE};
+  }
+
+  if (s.corner === SE) {
+    return {shape: s.shape, color: s.color, corner: NE};
+  }
+
+  // s.corner === SW
+  return {shape: s.shape, color: s.color, corner: NW};
 }
 
 /** Returns the same row but flipped vertically. */
