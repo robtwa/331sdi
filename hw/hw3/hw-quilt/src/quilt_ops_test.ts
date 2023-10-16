@@ -36,25 +36,30 @@ describe('quilt_ops', function() {
   });
 
   it('qflip_vert', function() {
+    // 0-1-many heuristic, base case
     assert.deepStrictEqual(qflip_vert(qnil), qnil);
 
     const row1 = rcons(nw_sq, rcons(ne_sq, rnil));
     const row1exp = rcons(sw_sq, rcons(se_sq, rnil));
     const quilt1 = qcons(row1, qnil);
     const quilt1exp = qcons(row1exp, qnil);
+
+    // 0-1-many heuristic, 1 recursive call (1st)
     assert.deepStrictEqual(qflip_vert(quilt1), quilt1exp);
 
     const row2 = rcons(sw_sq, rcons(se_sq, rnil));
     const row2exp = rcons(nw_sq, rcons(ne_sq, rnil));
     const quilt2 = qcons(row2,qnil);
     const quilt2exp = qcons(row2exp,qnil);
+
+    // 0-1-many heuristic, 1 recursive call (2nd)
     assert.deepStrictEqual(qflip_vert(quilt2), quilt2exp);
 
     const quilt1and2inp = qcons(row1,qcons(row2,qnil));
     const quilt1and2exp = qcons(row1exp,qcons(row2exp,qnil));
     const quilt1and2act = qflip_vert(quilt1and2inp);
-    // console.log("quilt1and2exp", quilt1and2exp);
-    // console.log("quilt1and2act", quilt1and2act);
+
+    // 0-1-many heuristic, more than 1 recursive call
     assert.deepStrictEqual(quilt1and2act, quilt1and2exp);
   });
 
