@@ -34,7 +34,13 @@ export const rflip_vert = (r: Row): Row => {
 
 /** Returns the same quilt but flipped vertically. */
 export const qflip_vert = (q: Quilt): Quilt => {
-  return q;  // TODO: replace
+  // base case
+  if (q === qnil) {
+    return qnil;
+  }
+
+  // recursive
+  return qcons(rflip_vert(q.hd), qflip_vert(q.tl));
 }
 
 
