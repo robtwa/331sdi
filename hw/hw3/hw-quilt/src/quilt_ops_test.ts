@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { NW, NE, SW, SE, GREEN, ROUND, Square, rnil, rcons, qnil, qcons } from './quilt';
-import {sew, symmetrize, sflip_vert, rflip_vert, qflip_vert, sflip_horz} from './quilt_ops';
+import {sew, symmetrize, sflip_vert, rflip_vert, qflip_vert, sflip_horz, rflip_horz, qflip_horz} from './quilt_ops';
 
 
 describe('quilt_ops', function() {
@@ -69,11 +69,61 @@ describe('quilt_ops', function() {
   });
 
   it('rflip_horz', function() {
-    // TODO: implement
+    // "0-1-many" heuristic, base case
+    assert.deepStrictEqual(rflip_horz(rnil), rnil);
+
+    // "0-1-many" heuristic, 1 recursive call (1st)
+    const row1Original = rcons(nw_sq, rcons(sw_sq, rnil));
+    const row1Expected = rcons(se_sq, rcons(ne_sq, rnil));
+    assert.deepStrictEqual(rflip_horz(row1Original), row1Expected);
+
+    // "0-1-many" heuristic, 1 recursive call (2nd)
+    const row2Original = rcons(ne_sq, rcons(se_sq, rnil));
+    const row2Expected = rcons(sw_sq, rcons(nw_sq, rnil));
+    assert.deepStrictEqual(rflip_horz(row2Original), row2Expected);
+
+    // "0-1-many" heuristic, more than 1 recursive call (1st)
+    const row3org = rcons(nw_sq, rcons(sw_sq, rcons(ne_sq, rcons(se_sq, rnil))));
+    const row3exp = rcons(se_sq, rcons(ne_sq, rcons(sw_sq, rcons(nw_sq, rnil))));
+    assert.deepStrictEqual(rflip_horz(row3org), row3exp);
+
+    // "0-1-many" heuristic, more than 1 recursive call (2nd)
+    const row4org = rcons(se_sq, rcons(ne_sq, rcons(sw_sq, rcons(nw_sq, rnil))));
+    const row4exp = rcons(nw_sq, rcons(sw_sq, rcons(ne_sq, rcons(se_sq, rnil))));
+    assert.deepStrictEqual(rflip_horz(row4org), row4exp);
+
   });
 
   it('qflip_horz', function() {
-    // TODO: implement
+    // "0-1-many" heuristic, base case
+    assert.deepStrictEqual(qflip_horz(qnil), qnil);
+
+    // "0-1-many" heuristic, 1 recursive call (1st)
+    const row1Original = rcons(nw_sq, rcons(sw_sq, rnil));
+    const row1Expected = rcons(se_sq, rcons(ne_sq, rnil));
+    const quilt1org = qcons(row1Original, qnil);
+    const quilt1exp = qcons(row1Expected, qnil);
+    assert.deepStrictEqual(qflip_horz(quilt1org), quilt1exp);
+
+    // "0-1-many" heuristic, 1 recursive call (2nd)
+    const row2Original = rcons(ne_sq, rcons(se_sq, rnil));
+    const row2Expected = rcons(sw_sq, rcons(nw_sq, rnil));
+    const quilt2org = qcons(row2Original, qnil);
+    const quilt2exp = qcons(row2Expected, qnil);
+    assert.deepStrictEqual(qflip_horz(quilt2org), quilt2exp);
+
+    // "0-1-many" heuristic, more than 1 recursive call (1st)
+    const quilt3org = qcons(row1Original, qcons(row2Original, qnil));
+    const quilt3exp = qcons(row1Expected, qcons(row2Expected, qnil));
+    assert.deepStrictEqual(qflip_horz(quilt3org), quilt3exp);
+
+    // "0-1-many" heuristic, more than 1 recursive call (2nd)
+    const quilt4org = qcons(row1Original, qcons(row2Original,
+      qcons(row1Original, qcons(row2Original, qnil))));
+    const quilt4exp = qcons(row1Expected, qcons(row2Expected,
+      qcons(row1Expected, qcons(row2Expected, qnil))));
+    assert.deepStrictEqual(qflip_horz(quilt4org), quilt4exp);
+
   });
 
   it('sew', function() {

@@ -64,12 +64,24 @@ export const sflip_horz = (s: Square): Square => {
 
 /** Returns the same row but flipped horizontally. */
 export const rflip_horz = (r: Row): Row => {
-  return r;  // TODO: replace
+  // Base case
+  if (r === rnil) {
+    return rnil;
+  }
+
+  // Recursive case
+  return rcons(sflip_horz(r.hd), rflip_horz(r.tl));
 }
 
 /** Returns the same quilt but flipped horizontally. */
 export const qflip_horz = (q: Quilt): Quilt => {
-  return q;  // TODO: replace
+  // base case
+  if (q === qnil) {
+    return qnil;
+  }
+
+  // recursive case
+  return qcons(rflip_horz(q.hd), qflip_horz(q.tl));
 }
 
 
