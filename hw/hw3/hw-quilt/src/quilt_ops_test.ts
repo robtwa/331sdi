@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { NW, NE, SW, SE, GREEN, ROUND, Square, rnil, rcons, qnil, qcons } from './quilt';
-import {sew, symmetrize, sflip_vert, rflip_vert, qflip_vert} from './quilt_ops';
+import {sew, symmetrize, sflip_vert, rflip_vert, qflip_vert, sflip_horz} from './quilt_ops';
 
 
 describe('quilt_ops', function() {
@@ -12,10 +12,8 @@ describe('quilt_ops', function() {
   it('sflip_vert', function() {
     assert.deepStrictEqual(sflip_vert(nw_sq), sw_sq);
     assert.deepStrictEqual(sflip_vert(sw_sq), nw_sq);
-
     assert.deepStrictEqual(sflip_vert(ne_sq), se_sq);
     assert.deepStrictEqual(sflip_vert(se_sq), ne_sq);
-
   });
 
   it('rflip_vert', function() {
@@ -64,7 +62,10 @@ describe('quilt_ops', function() {
   });
 
   it('sflip_horz', function() {
-    // TODO: implement
+    assert.deepStrictEqual(sflip_horz(nw_sq), se_sq);
+    assert.deepStrictEqual(sflip_horz(sw_sq), ne_sq);
+    assert.deepStrictEqual(sflip_horz(ne_sq), sw_sq);
+    assert.deepStrictEqual(sflip_horz(se_sq), nw_sq);
   });
 
   it('rflip_horz', function() {

@@ -46,7 +46,20 @@ export const qflip_vert = (q: Quilt): Quilt => {
 
 /** Returns the same square but flipped horizontally. */
 export const sflip_horz = (s: Square): Square => {
-  return s;  // TODO: replace
+  if (s.corner === NW) {
+    return {corner: SE, color: s.color, shape: s.shape};
+  }
+
+  if (s.corner === SW) {
+    return {corner: NE, color: s.color, shape: s.shape};
+  }
+
+  if (s.corner === NE) {
+    return {corner: SW, color: s.color, shape: s.shape};
+  }
+
+  // s.corner === SE
+  return {corner: NW, color: s.color, shape: s.shape};
 }
 
 /** Returns the same row but flipped horizontally. */
