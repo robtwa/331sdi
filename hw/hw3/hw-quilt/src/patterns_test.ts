@@ -78,6 +78,7 @@ describe('patterns', function() {
 
   });
 
+  // If the color parameter is not provided, default to green.
   it('PatternA - default to Green', function() {
     const row_green: Row = rcons(nw_round_green_test, rcons(nw_round_green_test, rnil));
 
@@ -419,6 +420,80 @@ describe('patterns', function() {
 
     // 0-1-many heuristic: more than 1 recursive call (3rd)
     assert.deepStrictEqual(PatternE(6, GREEN),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2,
+          qcons(row1, qcons(row2, qnil)))))));
+  });
+
+  it('PatternE - Red', function() {
+    const row1 = rcons(nw_straight_red_test, rcons(se_straight_red_test, rnil));
+    const row2 = rcons(se_straight_red_test, rcons(nw_straight_red_test, rnil));
+
+    // throw an error if rows === undefined
+    assert.throws(() => PatternE(undefined, RED), Error);
+
+    // throw an error if rows < 0
+    assert.throws(() => PatternE(-1, RED), Error);
+
+    // 0-1-many heuristic: base case 0
+    assert.deepStrictEqual(PatternE(0, RED), qnil);
+
+    // 0-1-many heuristic: base case 1
+    assert.deepStrictEqual(PatternE(1, RED),
+      qcons(row1, qnil));
+
+    // 0-1-many heuristic: 1 recursive call
+    assert.deepStrictEqual(PatternE(2, RED),
+      qcons(row1, qcons(row2, qnil)));
+
+    // 0-1-many heuristic: more than 1 recursive call (1st)
+    assert.deepStrictEqual(PatternE(3, RED),
+      qcons(row1, qcons(row2, qcons(row1, qnil))));
+
+    // 0-1-many heuristic: more than 1 recursive call (2nd)
+    assert.deepStrictEqual(PatternE(4, RED),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2, qnil)))));
+
+    // 0-1-many heuristic: more than 1 recursive call (3rd)
+    assert.deepStrictEqual(PatternE(6, RED),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2,
+          qcons(row1, qcons(row2, qnil)))))));
+  });
+
+  it('PatternE - Default to Green', function() {
+    const row1 = rcons(nw_straight_green_test, rcons(se_straight_green_test, rnil));
+    const row2 = rcons(se_straight_green_test, rcons(nw_straight_green_test, rnil));
+
+    // throw an error if rows === undefined
+    assert.throws(() => PatternE(undefined, undefined), Error);
+
+    // throw an error if rows < 0
+    assert.throws(() => PatternE(-1, undefined), Error);
+
+    // 0-1-many heuristic: base case 0
+    assert.deepStrictEqual(PatternE(0, undefined), qnil);
+
+    // 0-1-many heuristic: base case 1
+    assert.deepStrictEqual(PatternE(1, undefined),
+      qcons(row1, qnil));
+
+    // 0-1-many heuristic: 1 recursive call
+    assert.deepStrictEqual(PatternE(2, undefined),
+      qcons(row1, qcons(row2, qnil)));
+
+    // 0-1-many heuristic: more than 1 recursive call (1st)
+    assert.deepStrictEqual(PatternE(3, undefined),
+      qcons(row1, qcons(row2, qcons(row1, qnil))));
+
+    // 0-1-many heuristic: more than 1 recursive call (2nd)
+    assert.deepStrictEqual(PatternE(4, undefined),
+      qcons(row1, qcons(row2,
+        qcons(row1, qcons(row2, qnil)))));
+
+    // 0-1-many heuristic: more than 1 recursive call (3rd)
+    assert.deepStrictEqual(PatternE(6, undefined),
       qcons(row1, qcons(row2,
         qcons(row1, qcons(row2,
           qcons(row1, qcons(row2, qnil)))))));
