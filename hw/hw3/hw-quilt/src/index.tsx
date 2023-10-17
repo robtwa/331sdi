@@ -3,8 +3,9 @@ import { createRoot, Root } from 'react-dom/client';
 import { Color, RED, GREEN, Quilt } from './quilt';
 import { PatternA, PatternB, PatternC, PatternD, PatternE } from './patterns';
 import { QuiltElem } from './quilt_draw';
-import {symmetrize} from './quilt_ops';
+import { symmetrize } from './quilt_ops';
 import { QuiltTableElem } from './quilt_draw_table';
+import { QuiltForm } from './quilt_form'
 
 
 // Returns the pattern number, which must be A-E, or undefined if it was not
@@ -95,22 +96,34 @@ if (pattern === undefined) {
 
       if (params.has("table")) {
         root.render(
-          <React.StrictMode><QuiltTableElem quilt={result}/></React.StrictMode>);
+          <React.StrictMode>
+            <QuiltForm ></QuiltForm>
+            <QuiltTableElem quilt={result}/>
+          </React.StrictMode>);
       }
       else {
         root.render(
-          <React.StrictMode><QuiltElem quilt={result}/></React.StrictMode>);
+          <React.StrictMode>
+            <QuiltForm></QuiltForm>
+            <QuiltElem quilt={result}/>
+          </React.StrictMode>);
       }
     }
     else {
       const result = getQuilt(pattern, rows, color);
       if (params.has("table")) {
         root.render(
-          <React.StrictMode><QuiltTableElem quilt={result}/></React.StrictMode>);
+          <React.StrictMode>
+            <QuiltForm></QuiltForm>
+            <QuiltTableElem quilt={result}/>
+          </React.StrictMode>);
       }
       else {
         root.render(
-          <React.StrictMode><QuiltElem quilt={result}/></React.StrictMode>);
+          <React.StrictMode>
+            <QuiltForm></QuiltForm>
+            <QuiltElem quilt={result}/>
+          </React.StrictMode>);
       }
     }
 
