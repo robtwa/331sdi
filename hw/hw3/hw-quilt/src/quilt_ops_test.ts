@@ -19,6 +19,7 @@ describe('quilt_ops', function() {
   const sw_sq: Square = {corner: SW, color: GREEN, shape: ROUND};
 
   it('sflip_vert', function() {
+    // level -1, only 4 inputs.
     assert.deepStrictEqual(sflip_vert(nw_sq), sw_sq);
     assert.deepStrictEqual(sflip_vert(sw_sq), nw_sq);
     assert.deepStrictEqual(sflip_vert(ne_sq), se_sq);
@@ -68,6 +69,7 @@ describe('quilt_ops', function() {
   });
 
   it('sflip_horz', function() {
+    // level -1, only 4 inputs.
     assert.deepStrictEqual(sflip_horz(nw_sq), ne_sq);
     assert.deepStrictEqual(sflip_horz(sw_sq), se_sq);
     assert.deepStrictEqual(sflip_horz(ne_sq), nw_sq);
