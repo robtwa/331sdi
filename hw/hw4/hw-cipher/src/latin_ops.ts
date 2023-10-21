@@ -1,5 +1,9 @@
 import { List, nil, cons } from './list';
 
+/**
+ * returns a list of the same length but with each character replaced by the
+ * ‘next’ Latin character.
+ */
 export const cipher_encode = (L: List<number>): List<number> => {
     // Base case
     if (L === nil) {
@@ -10,6 +14,19 @@ export const cipher_encode = (L: List<number>): List<number> => {
     return cons(next_latin_char(L.hd), cipher_encode(L.tl));
 };
 
+/**
+ * returns a list of the same length but with each character replaced by the
+ * ‘previous’ Latin character
+ */
+export const cipher_decode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(prev_latin_char(L.hd), cipher_decode(L.tl));
+};
 
 
 

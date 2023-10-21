@@ -1,9 +1,10 @@
 import * as assert from 'assert';
 import { nil, cons } from './list';
 import { explode } from './char_list';
-import { next_latin_char, prev_latin_char, count_consonants,
-          cipher_encode
-        } from './latin_ops';
+import {
+  next_latin_char, prev_latin_char, count_consonants,
+  cipher_encode, cipher_decode
+} from './latin_ops';
 
 
 describe('latin_ops', function() {
@@ -84,6 +85,26 @@ describe('latin_ops', function() {
 
   it('cipher_decode', function() {
     // TODO: add tests
+    // 0-1-many heuristic, base case
+    assert.deepStrictEqual(cipher_decode(nil), nil);
+
+    // 0-1-many heuristic, 1 recursive call
+    assert.deepStrictEqual(cipher_decode(cons("e".charCodeAt(0), nil)),
+      cons("a".charCodeAt(0),nil));
+
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(
+      cipher_decode(cons("k".charCodeAt(0), cons("z".charCodeAt(0), nil))),
+      cons("c".charCodeAt(0),cons("s".charCodeAt(0),nil)));
+
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(
+      cipher_decode(cons("k".charCodeAt(0),
+        cons("z".charCodeAt(0),
+          cons("i".charCodeAt(0), nil)))),
+      cons("c".charCodeAt(0),
+        cons("s".charCodeAt(0),
+          cons("e".charCodeAt(0),nil))));
   });
 
   it('crazy_caps_encode', function() {
