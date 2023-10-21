@@ -1,4 +1,17 @@
-import { List, nil } from './list';
+import { List, nil, cons } from './list';
+
+export const cipher_encode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(next_latin_char(L.hd), cipher_encode(L.tl));
+};
+
+
+
 
 /** Determines whether the given character is a vowel. */
 const is_latin_vowel = (c: number): boolean => {

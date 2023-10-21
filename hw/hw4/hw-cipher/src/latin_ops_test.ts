@@ -1,7 +1,9 @@
 import * as assert from 'assert';
-import { nil } from './list';
+import { nil, cons } from './list';
 import { explode } from './char_list';
-import { next_latin_char, prev_latin_char, count_consonants } from './latin_ops';
+import { next_latin_char, prev_latin_char, count_consonants,
+          cipher_encode
+        } from './latin_ops';
 
 
 describe('latin_ops', function() {
@@ -58,6 +60,26 @@ describe('latin_ops', function() {
 
   it('cipher_encode', function() {
     // TODO: add tests
+    // "0-1-many" heuristic, base case
+    assert.deepStrictEqual(cipher_encode(nil), nil);
+
+    // "0-1-many" heuristic, 1 recursive call
+    assert.deepStrictEqual(cipher_encode(cons("a".charCodeAt(0), nil)),
+                            cons("e".charCodeAt(0), nil));
+
+    // "0-1-many" heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(
+      cipher_encode(cons("c".charCodeAt(0), cons("s".charCodeAt(0), nil))),
+      cons("k".charCodeAt(0), cons("z".charCodeAt(0), nil)));
+
+    // "0-1-many" heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(
+      cipher_encode(cons("c".charCodeAt(0),
+        cons("s".charCodeAt(0),
+          cons("e".charCodeAt(0), nil)))),
+      cons("k".charCodeAt(0),
+        cons("z".charCodeAt(0),
+          cons("i".charCodeAt(0), nil))));
   });
 
   it('cipher_decode', function() {
