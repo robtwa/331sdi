@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { nil, cons } from './list';
+import { nil } from './list';
 import { explode } from './char_list';
 import {
   next_latin_char, prev_latin_char, count_consonants,
@@ -65,22 +65,13 @@ describe('latin_ops', function() {
     assert.deepStrictEqual(cipher_encode(nil), nil);
 
     // "0-1-many" heuristic, 1 recursive call
-    assert.deepStrictEqual(cipher_encode(cons("a".charCodeAt(0), nil)),
-                            cons("e".charCodeAt(0), nil));
+    assert.deepStrictEqual(cipher_encode(explode("a")), explode("e"));
 
     // "0-1-many" heuristic, more than 1 recursive call (1st)
-    assert.deepStrictEqual(
-      cipher_encode(cons("c".charCodeAt(0), cons("s".charCodeAt(0), nil))),
-      cons("k".charCodeAt(0), cons("z".charCodeAt(0), nil)));
+    assert.deepStrictEqual(cipher_encode(explode("cs")),explode("kz"));
 
     // "0-1-many" heuristic, more than 1 recursive call (2nd)
-    assert.deepStrictEqual(
-      cipher_encode(cons("c".charCodeAt(0),
-        cons("s".charCodeAt(0),
-          cons("e".charCodeAt(0), nil)))),
-      cons("k".charCodeAt(0),
-        cons("z".charCodeAt(0),
-          cons("i".charCodeAt(0), nil))));
+    assert.deepStrictEqual(cipher_encode(explode("cse")),explode("kzi"));
   });
 
   it('cipher_decode', function() {
@@ -88,23 +79,14 @@ describe('latin_ops', function() {
     // 0-1-many heuristic, base case
     assert.deepStrictEqual(cipher_decode(nil), nil);
 
-    // 0-1-many heuristic, 1 recursive call
-    assert.deepStrictEqual(cipher_decode(cons("e".charCodeAt(0), nil)),
-      cons("a".charCodeAt(0),nil));
+    // "0-1-many" heuristic, 1 recursive call
+    assert.deepStrictEqual(cipher_decode(explode("e")), explode("a"));
 
-    // 0-1-many heuristic, more than 1 recursive call (1st)
-    assert.deepStrictEqual(
-      cipher_decode(cons("k".charCodeAt(0), cons("z".charCodeAt(0), nil))),
-      cons("c".charCodeAt(0),cons("s".charCodeAt(0),nil)));
+    // "0-1-many" heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(cipher_decode(explode("kz")),explode("cs"));
 
-    // 0-1-many heuristic, more than 1 recursive call (2nd)
-    assert.deepStrictEqual(
-      cipher_decode(cons("k".charCodeAt(0),
-        cons("z".charCodeAt(0),
-          cons("i".charCodeAt(0), nil)))),
-      cons("c".charCodeAt(0),
-        cons("s".charCodeAt(0),
-          cons("e".charCodeAt(0),nil))));
+    // "0-1-many" heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(cipher_decode(explode("kzi")),explode("cse"));
   });
 
   it('crazy_caps_encode', function() {
