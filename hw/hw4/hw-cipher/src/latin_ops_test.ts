@@ -2,8 +2,14 @@ import * as assert from 'assert';
 import { nil } from './list';
 import {explode} from './char_list';
 import {
-  next_latin_char, prev_latin_char, count_consonants,
-  cipher_encode, cipher_decode, crazy_caps_encode, crazy_caps_decode
+  next_latin_char,
+  prev_latin_char,
+  count_consonants,
+  cipher_encode,
+  cipher_decode,
+  crazy_caps_encode,
+  crazy_caps_decode,
+  encode_helper, decode_helper
 } from './latin_ops';
 
 
@@ -137,6 +143,54 @@ describe('latin_ops', function() {
     // more than 1 recursive call (5th)
     assert.deepStrictEqual(crazy_caps_decode(explode("CrAzY")),
                             explode("crazy"));
+  });
+
+  it('encode_helper', function() {
+    // base case: nil
+    assert.deepStrictEqual(encode_helper(nil, 0), nil);
+
+    // 1 recursive call
+    assert.deepStrictEqual(encode_helper(explode("c"), 0), explode("C"));
+
+    // more than 1 recursive call (1st)
+    assert.deepStrictEqual(encode_helper(explode("cr"), 0), explode("Cr"));
+
+    // more than 1 recursive call (2nd)
+    assert.deepStrictEqual(encode_helper(explode("cra"), 0), explode("CrA"));
+
+    // more than 1 recursive call (3rd)
+    assert.deepStrictEqual(encode_helper(explode("craz"), 0), explode("CrAz"));
+
+    // more than 1 recursive call (4th)
+    assert.deepStrictEqual(encode_helper(explode("crazy"), 0), explode("CrAzY"));
+  });
+
+  it('decode_helper', function() {
+    // base case: nil
+    assert.deepStrictEqual(decode_helper(nil, 0), nil);
+
+    // 1 recursive call
+    assert.deepStrictEqual(decode_helper(explode("C"), 0), explode("c"));
+
+    // more than 1 recursive call (1st)
+    assert.deepStrictEqual(decode_helper(explode("Cr"), 0),
+      explode("cr"));
+
+    // more than 1 recursive call (2nd)
+    assert.deepStrictEqual(decode_helper(explode("CrA"), 0),
+      explode("cra"));
+
+    // more than 1 recursive call (3rd)
+    assert.deepStrictEqual(decode_helper(explode("CrA"), 0),
+      explode("cra"));
+
+    // more than 1 recursive call (4th)
+    assert.deepStrictEqual(decode_helper(explode("CrAz"), 0),
+      explode("craz"));
+
+    // more than 1 recursive call (5th)
+    assert.deepStrictEqual(decode_helper(explode("CrAzY"), 0),
+      explode("crazy"));
   });
 
   it('count_consonants', function() {
