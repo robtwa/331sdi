@@ -7,7 +7,8 @@
     "build": "webpack --config src/webpack.config.js",
     "lint": "comfy-tslint --no-mutation src/*.{ts,tsx}",
     "start": "webpack-dev-server --config src/webpack.config.js",
-    "test": "ts-mocha -p tsconfig.json src/**/*_test.{ts,tsx}"
+    "test": "ts-mocha -p tsconfig.json src/**/*_test.{ts,tsx}",
+    "coverage": "nyc npm run test"
   },
   "author": "",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.1",
     "mocha": "^10.1.0",
+    "nyc": "^15.1.0",
     "progress-bar-webpack-plugin": "^2.1.0",
     "ts-loader": "^9.4.1",
     "ts-mocha": "^10.0.0",
