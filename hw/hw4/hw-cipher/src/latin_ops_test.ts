@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import { nil } from './list';
-import { explode } from './char_list';
+import {explode} from './char_list';
 import {
   next_latin_char, prev_latin_char, count_consonants,
-  cipher_encode, cipher_decode
+  cipher_encode, cipher_decode, crazy_caps_encode, crazy_caps_decode
 } from './latin_ops';
 
 
@@ -91,10 +91,52 @@ describe('latin_ops', function() {
 
   it('crazy_caps_encode', function() {
     // TODO: add tests
+    // base case: nil
+    assert.deepStrictEqual(crazy_caps_encode(nil), nil);
+
+    // 1 recursive call
+    assert.deepStrictEqual(crazy_caps_encode(explode("c")), explode("C"));
+
+    // more than 1 recursive call (1st)
+    assert.deepStrictEqual(crazy_caps_encode(explode("cr")), explode("Cr"));
+
+    // more than 1 recursive call (2nd)
+    assert.deepStrictEqual(crazy_caps_encode(explode("cra")), explode("CrA"));
+
+    // more than 1 recursive call (3rd)
+    assert.deepStrictEqual(crazy_caps_encode(explode("craz")), explode("CrAz"));
+
+    // more than 1 recursive call (4th)
+    assert.deepStrictEqual(crazy_caps_encode(explode("crazy")), explode("CrAzY"));
   });
 
   it('crazy_caps_decode', function() {
     // TODO: add tests
+    // base case: nil
+    assert.deepStrictEqual(crazy_caps_decode(nil), nil);
+
+    // 1 recursive call
+    assert.deepStrictEqual(crazy_caps_decode(explode("C")), explode("c"));
+
+    // more than 1 recursive call (1st)
+    assert.deepStrictEqual(crazy_caps_decode(explode("Cr")),
+                            explode("cr"));
+
+    // more than 1 recursive call (2nd)
+    assert.deepStrictEqual(crazy_caps_decode(explode("CrA")),
+                            explode("cra"));
+
+    // more than 1 recursive call (3rd)
+    assert.deepStrictEqual(crazy_caps_decode(explode("CrA")),
+                            explode("cra"));
+
+    // more than 1 recursive call (4th)
+    assert.deepStrictEqual(crazy_caps_decode(explode("CrAz")),
+                            explode("craz"));
+
+    // more than 1 recursive call (5th)
+    assert.deepStrictEqual(crazy_caps_decode(explode("CrAzY")),
+                            explode("crazy"));
   });
 
   it('count_consonants', function() {

@@ -28,6 +28,71 @@ export const cipher_decode = (L: List<number>): List<number> => {
     return cons(prev_latin_char(L.hd), cipher_decode(L.tl));
 };
 
+/**
+ * returns a list of the same length but with every other character,
+ * starting with the first, made upper case
+ */
+export const crazy_caps_encode = (L: List<number>): List<number> => {
+    if (L === nil) {  // L is an empty list.
+        return nil;
+    }
+    // Calling the helper function because a TA told me that
+    // adding a second parameter to the crazy_caps_encode()
+    // function is not allowed, but to a helper function is OK.
+    return encode_helper(L, 0);  // L is not an empty list.
+};
+
+/**
+ * Helper function for crazy_caps_encode()
+ */
+export const encode_helper = (L: List<number>,
+                                         curIdx: number): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    if (curIdx % 2 === 0) {
+        return cons(String.fromCharCode(L.hd).toUpperCase().charCodeAt(0),
+          encode_helper(L.tl, curIdx + 1));
+    }
+
+    return cons(L.hd, encode_helper(L.tl, curIdx + 1));
+};
+
+/**
+ * returns a list of the same length but with every other character,
+ * starting with the first, made lower case
+ */
+export const crazy_caps_decode = (L: List<number>): List<number> => {
+    if (L === nil) {    // L is an empty list
+        return nil;
+    }
+    // Calling the helper function because a TA told me that
+    // adding a second parameter to the crazy_caps_encode()
+    // function is not allowed, but to a helper function is OK.
+    return decode_helper(L, 0);  // L is not an empty list
+};
+
+/**
+ * Helper function for crazy_caps_decode()
+ */
+export const decode_helper = (L: List<number>,
+                                         curIdx: number): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    if (curIdx % 2 === 0) {
+        return cons(String.fromCharCode(L.hd).toLowerCase().charCodeAt(0),
+          decode_helper(L.tl, curIdx + 1));
+    }
+    return cons(L.hd, decode_helper(L.tl, curIdx + 1));
+
+};
 
 
 /** Determines whether the given character is a vowel. */
