@@ -8,8 +8,11 @@ import {
   cipher_encode,
   cipher_decode,
   crazy_caps_encode,
-  crazy_caps_decode, encode_skip, decode_skip,
-  pig_latin_encode
+  crazy_caps_decode,
+  encode_skip,
+  decode_skip,
+  pig_latin_encode,
+  pig_latin_decode
 } from './latin_ops';
 import {prefix, suffix} from "./list_ops";
 
@@ -95,65 +98,6 @@ describe('latin_ops', function() {
   // the heuristics we teach being a good starting point, but how it's
   // sometimess reasonable to add more that the minimum number they
   // require to give us more confidence in our code!
-
-  it('pig_latin_encode', function() {
-    // case 1:
-    // empty string, no characters
-    assert.strictEqual(compact(pig_latin_encode(explode(""))), "");
-    // neither consonants nor vowels
-    assert.strictEqual(compact(pig_latin_encode(explode("__"))), "__");
-    // all consonants
-    assert.strictEqual(compact(pig_latin_encode(explode("str"))), "str");
-
-    // case 2: starts with a vowel
-    assert.strictEqual(compact(pig_latin_encode(explode("a"))), "away");
-    assert.strictEqual(compact(pig_latin_encode(explode("is"))), "isway");
-    assert.strictEqual(compact(pig_latin_encode(explode("astro"))), "astroway");
-
-    // case 3: starting with consonant case
-    assert.strictEqual(compact(pig_latin_encode(explode("say"))), "aysay");
-    assert.strictEqual(compact(pig_latin_encode(explode("stay"))), "aystay");
-    assert.strictEqual(compact(pig_latin_encode(explode("nasty"))), "astynay");
-    assert.strictEqual(compact(pig_latin_encode(explode("qut"))), "utqay");
-    assert.strictEqual(compact(pig_latin_encode(explode("qit"))), "itqay");
-    assert.strictEqual(compact(pig_latin_encode(explode("buffalo"))), "uffalobay");
-    assert.strictEqual(compact(pig_latin_encode(explode("ruins"))), "uinsray");
-    assert.strictEqual(compact(pig_latin_encode(explode("suade"))), "uadesay");
-
-    // case 4: "qu" exception case
-    assert.strictEqual(compact(pig_latin_encode(explode("quay"))), "ayquay");
-    assert.strictEqual(compact(pig_latin_encode(explode("quail"))), "ailquay");
-    assert.strictEqual(compact(pig_latin_encode(explode("shquay"))), "ayshquay");
-  });
-
-  it('pig_latin_decode', function() {
-  //   // case 1: doesn't look like pig latin - no 'ay'
-  //   assert.strictEqual(compact(pig_latin_decode(explode(""))), "");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("y"))), "y");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("sat"))), "sat");
-
-  //   // case 2: doesn't look like pig latin - no consonants/vowel+consonants before 'ay'
-  //   assert.strictEqual(compact(pig_latin_decode(explode("ay"))), "ay");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("say"))), "say");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("shtay"))), "shtay");
-
-  //   // case 3: 'w' before ending 'ay'
-  //   assert.strictEqual(compact(pig_latin_decode(explode("away"))), "a");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("astroway"))), "astro");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("way"))), "way");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("sway"))), "sway");
-
-  //   // case 4: 'qu' before ending 'ay'
-  //   assert.strictEqual(compact(pig_latin_decode(explode("ayquay"))), "quay");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("ailquay"))), "lquai");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("aysquay"))), "squay");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("ayshquay"))), "shquay");
-
-  //   // case 5: consonants before 'ay' (if 3, 4 don't apply)
-  //   assert.strictEqual(compact(pig_latin_decode(explode("aysay"))), "say");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("aystray"))), "stray");
-  //   assert.strictEqual(compact(pig_latin_decode(explode("aysway"))), "sway");
-  });
 
   it('cipher_encode', function() {
     // TODO: add tests
@@ -354,6 +298,65 @@ describe('latin_ops', function() {
     assert.throws(()=>suffix(6, explode("12345")),
       Error,
       "undefined");
+  });
+
+  it('pig_latin_encode', function() {
+    // case 1:
+    // empty string, no characters
+    assert.strictEqual(compact(pig_latin_encode(explode(""))), "");
+    // neither consonants nor vowels
+    assert.strictEqual(compact(pig_latin_encode(explode("__"))), "__");
+    // all consonants
+    assert.strictEqual(compact(pig_latin_encode(explode("str"))), "str");
+
+    // case 2: starts with a vowel
+    assert.strictEqual(compact(pig_latin_encode(explode("a"))), "away");
+    assert.strictEqual(compact(pig_latin_encode(explode("is"))), "isway");
+    assert.strictEqual(compact(pig_latin_encode(explode("astro"))), "astroway");
+
+    // case 3: starting with consonant case
+    assert.strictEqual(compact(pig_latin_encode(explode("say"))), "aysay");
+    assert.strictEqual(compact(pig_latin_encode(explode("stay"))), "aystay");
+    assert.strictEqual(compact(pig_latin_encode(explode("nasty"))), "astynay");
+    assert.strictEqual(compact(pig_latin_encode(explode("qut"))), "utqay");
+    assert.strictEqual(compact(pig_latin_encode(explode("qit"))), "itqay");
+    assert.strictEqual(compact(pig_latin_encode(explode("buffalo"))), "uffalobay");
+    assert.strictEqual(compact(pig_latin_encode(explode("ruins"))), "uinsray");
+    assert.strictEqual(compact(pig_latin_encode(explode("suade"))), "uadesay");
+
+    // case 4: "qu" exception case
+    assert.strictEqual(compact(pig_latin_encode(explode("quay"))), "ayquay");
+    assert.strictEqual(compact(pig_latin_encode(explode("quail"))), "ailquay");
+    assert.strictEqual(compact(pig_latin_encode(explode("shquay"))), "ayshquay");
+  });
+
+  it('pig_latin_decode', function() {
+    // case 1: doesn't look like pig latin - no 'ay'
+    assert.strictEqual(compact(pig_latin_decode(explode(""))), "");
+    assert.strictEqual(compact(pig_latin_decode(explode("y"))), "y");
+    assert.strictEqual(compact(pig_latin_decode(explode("sat"))), "sat");
+
+    // case 2: doesn't look like pig latin - no consonants/vowel+consonants before 'ay'
+    assert.strictEqual(compact(pig_latin_decode(explode("ay"))), "ay");
+    assert.strictEqual(compact(pig_latin_decode(explode("say"))), "say");
+    assert.strictEqual(compact(pig_latin_decode(explode("shtay"))), "shtay");
+
+    // case 3: 'w' before ending 'ay'
+    assert.strictEqual(compact(pig_latin_decode(explode("away"))), "a");
+    assert.strictEqual(compact(pig_latin_decode(explode("astroway"))), "astro");
+    assert.strictEqual(compact(pig_latin_decode(explode("way"))), "way");
+    assert.strictEqual(compact(pig_latin_decode(explode("sway"))), "sway");
+
+    // case 4: 'qu' before ending 'ay'
+    assert.strictEqual(compact(pig_latin_decode(explode("ayquay"))), "quay");
+    assert.strictEqual(compact(pig_latin_decode(explode("ailquay"))), "lquai");
+    assert.strictEqual(compact(pig_latin_decode(explode("aysquay"))), "squay");
+    assert.strictEqual(compact(pig_latin_decode(explode("ayshquay"))), "shquay");
+
+    // case 5: consonants before 'ay' (if 3, 4 don't apply)
+    assert.strictEqual(compact(pig_latin_decode(explode("aysay"))), "say");
+    assert.strictEqual(compact(pig_latin_decode(explode("aystray"))), "stray");
+    assert.strictEqual(compact(pig_latin_decode(explode("aysway"))), "sway");
   });
 
 });
