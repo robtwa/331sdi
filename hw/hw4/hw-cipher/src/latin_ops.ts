@@ -33,32 +33,28 @@ export const cipher_decode = (L: List<number>): List<number> => {
  * starting with the first, made upper case
  */
 export const crazy_caps_encode = (L: List<number>): List<number> => {
-    if (L === nil) {  // L is an empty list.
+    // Base case
+    if (L === nil) {
         return nil;
     }
-    // Calling the helper function because a TA told me that
-    // adding a second parameter to the crazy_caps_encode()
-    // function is not allowed, but to a helper function is OK.
-    return encode_helper(L, 0);  // L is not an empty list.
+    // Recursive case
+    // Calling the helper function.
+    return cons(String.fromCharCode(L.hd).toUpperCase().charCodeAt(0),
+      encode_skip(L.tl));
 };
 
 /**
  * Helper function for crazy_caps_encode()
+ * Return a list to crazy_caps_encode() after skipping one character;
  */
-export const encode_helper = (L: List<number>,
-                                         curIdx: number): List<number> => {
+export const encode_skip = (L: List<number>): List<number> => {
     // Base case
     if (L === nil) {
         return nil;
     }
 
     // Recursive case
-    if (curIdx % 2 === 0) {
-        return cons(String.fromCharCode(L.hd).toUpperCase().charCodeAt(0),
-          encode_helper(L.tl, curIdx + 1));
-    }
-
-    return cons(L.hd, encode_helper(L.tl, curIdx + 1));
+    return cons(L.hd, crazy_caps_encode(L.tl));
 };
 
 /**
@@ -66,32 +62,28 @@ export const encode_helper = (L: List<number>,
  * starting with the first, made lower case
  */
 export const crazy_caps_decode = (L: List<number>): List<number> => {
-    if (L === nil) {    // L is an empty list
-        return nil;
-    }
-    // Calling the helper function because a TA told me that
-    // adding a second parameter to the crazy_caps_encode()
-    // function is not allowed, but to a helper function is OK.
-    return decode_helper(L, 0);  // L is not an empty list
-};
-
-/**
- * Helper function for crazy_caps_decode()
- */
-export const decode_helper = (L: List<number>,
-                                         curIdx: number): List<number> => {
     // Base case
     if (L === nil) {
         return nil;
     }
 
     // Recursive case
-    if (curIdx % 2 === 0) {
-        return cons(String.fromCharCode(L.hd).toLowerCase().charCodeAt(0),
-          decode_helper(L.tl, curIdx + 1));
-    }
-    return cons(L.hd, decode_helper(L.tl, curIdx + 1));
+    return cons(String.fromCharCode(L.hd).toLowerCase().charCodeAt(0),
+      decode_skip(L.tl));
+};
 
+/**
+ * Helper function for crazy_caps_decode()
+ * Return a list to crazy_caps_decode() after skipping one character;
+ */
+export const decode_skip = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(L.hd, crazy_caps_decode(L.tl));
 };
 
 

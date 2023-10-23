@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { nil } from './list';
-import {explode} from './char_list';
+import { explode } from './char_list';
 import {
   next_latin_char,
   prev_latin_char,
@@ -8,9 +8,9 @@ import {
   cipher_encode,
   cipher_decode,
   crazy_caps_encode,
-  crazy_caps_decode,
-  encode_helper, decode_helper
+  crazy_caps_decode, encode_skip, decode_skip,
 } from './latin_ops';
+import {prefix} from "./list_ops";
 
 
 describe('latin_ops', function() {
@@ -97,22 +97,22 @@ describe('latin_ops', function() {
 
   it('crazy_caps_encode', function() {
     // TODO: add tests
-    // base case: nil
+    // 0-1-many heuristic, base case: nil
     assert.deepStrictEqual(crazy_caps_encode(nil), nil);
 
-    // 1 recursive call
+    // 0-1-many heuristic, 1 recursive call
     assert.deepStrictEqual(crazy_caps_encode(explode("c")), explode("C"));
 
-    // more than 1 recursive call (1st)
+    // 0-1-many heuristic, more than 1 recursive call (1st)
     assert.deepStrictEqual(crazy_caps_encode(explode("cr")), explode("Cr"));
 
-    // more than 1 recursive call (2nd)
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
     assert.deepStrictEqual(crazy_caps_encode(explode("cra")), explode("CrA"));
 
-    // more than 1 recursive call (3rd)
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
     assert.deepStrictEqual(crazy_caps_encode(explode("craz")), explode("CrAz"));
 
-    // more than 1 recursive call (4th)
+    // 0-1-many heuristic, more than 1 recursive call (4th)
     assert.deepStrictEqual(crazy_caps_encode(explode("crazy")), explode("CrAzY"));
   });
 
@@ -121,76 +121,90 @@ describe('latin_ops', function() {
     // base case: nil
     assert.deepStrictEqual(crazy_caps_decode(nil), nil);
 
-    // 1 recursive call
+    // 0-1-many heuristic, 1 recursive call
     assert.deepStrictEqual(crazy_caps_decode(explode("C")), explode("c"));
 
-    // more than 1 recursive call (1st)
+    // 0-1-many heuristic, more than 1 recursive call (1st)
     assert.deepStrictEqual(crazy_caps_decode(explode("Cr")),
                             explode("cr"));
 
-    // more than 1 recursive call (2nd)
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
     assert.deepStrictEqual(crazy_caps_decode(explode("CrA")),
                             explode("cra"));
 
-    // more than 1 recursive call (3rd)
-    assert.deepStrictEqual(crazy_caps_decode(explode("CrA")),
-                            explode("cra"));
-
-    // more than 1 recursive call (4th)
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
     assert.deepStrictEqual(crazy_caps_decode(explode("CrAz")),
                             explode("craz"));
 
-    // more than 1 recursive call (5th)
+    // 0-1-many heuristic, more than 1 recursive call (4th)
     assert.deepStrictEqual(crazy_caps_decode(explode("CrAzY")),
                             explode("crazy"));
   });
 
-  it('encode_helper', function() {
+  it('encode_skip', function() {
     // base case: nil
-    assert.deepStrictEqual(encode_helper(nil, 0), nil);
+    assert.deepStrictEqual(encode_skip(nil), nil);
 
-    // 1 recursive call
-    assert.deepStrictEqual(encode_helper(explode("c"), 0), explode("C"));
+    // 0-1-many heuristic, 1 recursive call
+    assert.deepStrictEqual(encode_skip(explode("c")), explode("c"));
 
-    // more than 1 recursive call (1st)
-    assert.deepStrictEqual(encode_helper(explode("cr"), 0), explode("Cr"));
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(encode_skip(explode("cr")), explode("cR"));
 
-    // more than 1 recursive call (2nd)
-    assert.deepStrictEqual(encode_helper(explode("cra"), 0), explode("CrA"));
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(encode_skip(explode("cra")), explode("cRa"));
 
-    // more than 1 recursive call (3rd)
-    assert.deepStrictEqual(encode_helper(explode("craz"), 0), explode("CrAz"));
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
+    assert.deepStrictEqual(encode_skip(explode("craz")), explode("cRaZ"));
 
-    // more than 1 recursive call (4th)
-    assert.deepStrictEqual(encode_helper(explode("crazy"), 0), explode("CrAzY"));
+    // 0-1-many heuristic, more than 1 recursive call (4th)
+    assert.deepStrictEqual(encode_skip(explode("crazy")), explode("cRaZy"));
   });
 
-  it('decode_helper', function() {
+  it('decode_skip', function() {
     // base case: nil
-    assert.deepStrictEqual(decode_helper(nil, 0), nil);
+    assert.deepStrictEqual(decode_skip(nil), nil);
 
-    // 1 recursive call
-    assert.deepStrictEqual(decode_helper(explode("C"), 0), explode("c"));
+    // 0-1-many heuristic, 1 recursive call
+    assert.deepStrictEqual(decode_skip(explode("C")), explode("C"));
 
-    // more than 1 recursive call (1st)
-    assert.deepStrictEqual(decode_helper(explode("Cr"), 0),
-      explode("cr"));
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(decode_skip(explode("Cr")), explode("Cr"));
 
-    // more than 1 recursive call (2nd)
-    assert.deepStrictEqual(decode_helper(explode("CrA"), 0),
-      explode("cra"));
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(decode_skip(explode("CrA")), explode("CrA"));
 
-    // more than 1 recursive call (3rd)
-    assert.deepStrictEqual(decode_helper(explode("CrA"), 0),
-      explode("cra"));
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
+    assert.deepStrictEqual(decode_skip(explode("CrAz")), explode("CrAz"));
 
-    // more than 1 recursive call (4th)
-    assert.deepStrictEqual(decode_helper(explode("CrAz"), 0),
-      explode("craz"));
+    // 0-1-many heuristic, more than 1 recursive call (4th)
+    assert.deepStrictEqual(decode_skip(explode("CrAzY")), explode("CrAzY"));
+  });
 
-    // more than 1 recursive call (5th)
-    assert.deepStrictEqual(decode_helper(explode("CrAzY"), 0),
-      explode("crazy"));
+  it('prefix', function() {
+    // base case: prefix(n + 1, nil) := undefined
+    assert.throws(()=>prefix(1, nil), Error, "undefined");
+
+    // base case: prefix(0, L)   := nil    for any L: list
+    assert.deepStrictEqual(prefix(0, explode("123")), nil);
+
+    // base case: prefix(n, nil) := nil    for any n
+    assert.deepStrictEqual(prefix(0, nil), nil);
+
+    // 0-1-many heuristic, 1 recursive call
+    assert.deepStrictEqual(prefix(1, explode("12345")), explode("1"));
+
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(prefix(2, explode("12345")), explode("12"));
+
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(prefix(3, explode("12345")), explode("123"));
+
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
+    assert.deepStrictEqual(prefix(4, explode("12345")), explode("1234"));
+
+    // 0-1-many heuristic, more than 1 recursive call (4th)
+    assert.deepStrictEqual(prefix(5, explode("12345")), explode("12345"));
   });
 
   it('count_consonants', function() {
