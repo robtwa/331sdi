@@ -1,92 +1,5 @@
 import { List, nil, cons } from './list';
 
-/**
- * returns a list of the same length but with each character replaced by the
- * ‘next’ Latin character.
- */
-export const cipher_encode = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-
-    // Recursive case
-    return cons(next_latin_char(L.hd), cipher_encode(L.tl));
-};
-
-/**
- * returns a list of the same length but with each character replaced by the
- * ‘previous’ Latin character
- */
-export const cipher_decode = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-
-    // Recursive case
-    return cons(prev_latin_char(L.hd), cipher_decode(L.tl));
-};
-
-/**
- * returns a list of the same length but with every other character,
- * starting with the first, made upper case
- */
-export const crazy_caps_encode = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-    // Recursive case
-    // Calling the helper function.
-    return cons(String.fromCharCode(L.hd).toUpperCase().charCodeAt(0),
-      encode_skip(L.tl));
-};
-
-/**
- * Helper function for crazy_caps_encode()
- * Return a list to crazy_caps_encode() after skipping one character;
- */
-export const encode_skip = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-
-    // Recursive case
-    return cons(L.hd, crazy_caps_encode(L.tl));
-};
-
-/**
- * returns a list of the same length but with every other character,
- * starting with the first, made lower case
- */
-export const crazy_caps_decode = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-
-    // Recursive case
-    return cons(String.fromCharCode(L.hd).toLowerCase().charCodeAt(0),
-      decode_skip(L.tl));
-};
-
-/**
- * Helper function for crazy_caps_decode()
- * Return a list to crazy_caps_decode() after skipping one character;
- */
-export const decode_skip = (L: List<number>): List<number> => {
-    // Base case
-    if (L === nil) {
-        return nil;
-    }
-
-    // Recursive case
-    return cons(L.hd, crazy_caps_decode(L.tl));
-};
-
-
 /** Determines whether the given character is a vowel. */
 const is_latin_vowel = (c: number): boolean => {
     const ch = String.fromCharCode(c).toLowerCase();
@@ -208,3 +121,89 @@ export const count_consonants = (L: List<number>): number|undefined => {
 // TODO: add your function declarations in this file for: 
 // cipher_encode, cipher_decode crazy_caps_encode, crazy_caps_decode,
 // pig_latin_encode, pig_latin_decode
+
+/**
+ * returns a list of the same length but with each character replaced by the
+ * ‘next’ Latin character.
+ */
+export const cipher_encode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(next_latin_char(L.hd), cipher_encode(L.tl));
+};
+
+/**
+ * returns a list of the same length but with each character replaced by the
+ * ‘previous’ Latin character
+ */
+export const cipher_decode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(prev_latin_char(L.hd), cipher_decode(L.tl));
+};
+
+/**
+ * returns a list of the same length but with every other character,
+ * starting with the first, made upper case
+ */
+export const crazy_caps_encode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+    // Recursive case
+    // Calling the helper function.
+    return cons(String.fromCharCode(L.hd).toUpperCase().charCodeAt(0),
+      encode_skip(L.tl));
+};
+
+/**
+ * Helper function for crazy_caps_encode()
+ * Return a list to crazy_caps_encode() after skipping one character;
+ */
+export const encode_skip = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(L.hd, crazy_caps_encode(L.tl));
+};
+
+/**
+ * returns a list of the same length but with every other character,
+ * starting with the first, made lower case
+ */
+export const crazy_caps_decode = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(String.fromCharCode(L.hd).toLowerCase().charCodeAt(0),
+      decode_skip(L.tl));
+};
+
+/**
+ * Helper function for crazy_caps_decode()
+ * Return a list to crazy_caps_decode() after skipping one character;
+ */
+export const decode_skip = (L: List<number>): List<number> => {
+    // Base case
+    if (L === nil) {
+        return nil;
+    }
+
+    // Recursive case
+    return cons(L.hd, crazy_caps_decode(L.tl));
+};
