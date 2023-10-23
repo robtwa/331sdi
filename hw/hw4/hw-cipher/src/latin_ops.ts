@@ -240,7 +240,7 @@ export const pig_latin_encode = (L: List<number>): List<number> => {
  *  then move the “u” with the consonants as well,
  *  e.g., “quay” becomes “ayquay”, not “uayqay”.
  */
-const is_qu_case = (L: List<number>, N: number): boolean => {
+export const is_qu_case = (L: List<number>, N: number): boolean => {
     // is_q_the_last_conso
     const seg1 = prefix(N, L);
     if (!is_q_the_last_conso(seg1, N)) {
@@ -255,10 +255,9 @@ const is_qu_case = (L: List<number>, N: number): boolean => {
 
     // is_u_followed_a_vowel
     return is_u_followed_a_vowel(seg2);
-
 }
 
-const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
+export const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
     // check
     if (L === nil) {
         return false;
@@ -273,7 +272,7 @@ const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
     return is_q_the_last_conso(L.tl, N - 1);
 }
 
-const is_u_the_first_vowel = (L: List<number>): boolean => {
+export const is_u_the_first_vowel = (L: List<number>): boolean => {
     // check
     if (L === nil) {
         return false;
@@ -282,7 +281,7 @@ const is_u_the_first_vowel = (L: List<number>): boolean => {
     return L.hd === "u".charCodeAt(0);
 }
 
-const is_u_followed_a_vowel = (L: List<number>): boolean => {
+export const is_u_followed_a_vowel = (L: List<number>): boolean => {
     // check
     if (L === nil) {
         return false;
@@ -326,10 +325,6 @@ export const pig_latin_decode = (L: List<number>): List<number> => {
         const LRWay = suffix(N-3, L);
         // List is end at "way"
         if (compare(LRWay, explode("way"))) {
-            if (LLWay === nil) {
-                return L;
-            }
-
             if (is_latin_vowel(last(LLWay))) {
                 return LLWay;
             }
@@ -362,7 +357,7 @@ const extract_last_conso = (L: List<number>): List<number> => {
     return concat(extract_last_conso(L.tl), cons(L.hd, nil));
 }
 
-const compare = (L: List<number>, R: List<number>): boolean => {
+export const compare = (L: List<number>, R: List<number>): boolean => {
     // Base case
     if (L===nil && R===nil) {
         return true;
