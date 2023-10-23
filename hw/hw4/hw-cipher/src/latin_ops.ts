@@ -211,6 +211,9 @@ export const decode_skip = (L: List<number>): List<number> => {
     return cons(L.hd, crazy_caps_decode(L.tl));
 };
 
+/**
+ * Returns an encode list with pig-lation.
+ */
 export const pig_latin_encode = (L: List<number>): List<number> => {
     if (L === nil) {
         return nil;
@@ -256,7 +259,10 @@ export const is_qu_case = (L: List<number>, N: number): boolean => {
     // is_u_followed_a_vowel
     return is_u_followed_a_vowel(seg2);
 }
-
+/**
+ *  Returns true if 'q' is the last element in the list,
+ *  otherwise return false.
+ */
 export const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
     // check
     if (L === nil) {
@@ -271,7 +277,10 @@ export const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
     // recursive case
     return is_q_the_last_conso(L.tl, N - 1);
 }
-
+/**
+ *  Returns true if 'u' is the first element in the list,
+ *  otherwise return false.
+ */
 export const is_u_the_first_vowel = (L: List<number>): boolean => {
     // check
     if (L === nil) {
@@ -280,7 +289,10 @@ export const is_u_the_first_vowel = (L: List<number>): boolean => {
 
     return L.hd === "u".charCodeAt(0);
 }
-
+/**
+ *  Returns true if 'u' is followed by a vowel in the list,
+ *  otherwise return false.
+ */
 export const is_u_followed_a_vowel = (L: List<number>): boolean => {
     // check
     if (L === nil) {
@@ -293,7 +305,9 @@ export const is_u_followed_a_vowel = (L: List<number>): boolean => {
 
     return is_latin_vowel(L.tl.hd);
 }
-
+/**
+ * Returns a decoded list with pig-latin.
+ */
 export const pig_latin_decode = (L: List<number>): List<number> => {
     if (L === nil) {
         return nil;
@@ -347,6 +361,9 @@ export const pig_latin_decode = (L: List<number>): List<number> => {
     // case: 1, 2
     return L;
 };
+/**
+ *  Returns a list that combined by all consonants in the given list.
+ */
 const extract_last_conso = (L: List<number>): List<number> => {
     // Base case
     if (L === nil || !is_latin_consonant(L.hd)) {
@@ -356,7 +373,9 @@ const extract_last_conso = (L: List<number>): List<number> => {
     // Recursive case
     return concat(extract_last_conso(L.tl), cons(L.hd, nil));
 }
-
+/**
+ * Returns true if two lists are the same, otherwise returns false.
+ */
 export const compare = (L: List<number>, R: List<number>): boolean => {
     // Base case
     if (L===nil && R===nil) {
