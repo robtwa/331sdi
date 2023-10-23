@@ -86,7 +86,9 @@ export const ShowResult = (props: ShowResultProps): JSX.Element => {
   }
 
 };
-
+/**
+ *  Returns a string that contains the given arguments.
+ */
 export const ShowMssage = (word: string,
                            algo: string,
                            op:string,
