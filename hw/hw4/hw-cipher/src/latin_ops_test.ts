@@ -12,7 +12,11 @@ import {
   encode_skip,
   decode_skip,
   pig_latin_encode,
-  pig_latin_decode
+  pig_latin_decode,
+  compare,
+  is_u_followed_a_vowel,
+  is_u_the_first_vowel,
+  is_q_the_last_conso
 } from './latin_ops';
 import {prefix, suffix} from "./list_ops";
 
@@ -357,6 +361,53 @@ describe('latin_ops', function() {
     assert.strictEqual(compact(pig_latin_decode(explode("aysay"))), "say");
     assert.strictEqual(compact(pig_latin_decode(explode("aystray"))), "stray");
     assert.strictEqual(compact(pig_latin_decode(explode("aysway"))), "sway");
+  });
+
+  it('is_q_the_last_conso', function() {
+    // empty list
+    assert.strictEqual(is_q_the_last_conso (nil, 1), false);
+
+    // 'q' is the last consonants
+    assert.strictEqual(is_q_the_last_conso(explode("stq"), 3), true);
+
+    // 'q' is not the last consonants
+    assert.strictEqual(is_q_the_last_conso(explode("sqt"), 3), false);
+  });
+
+  it('is_u_the_first_vowel', function() {
+    // empty list
+    assert.strictEqual(is_u_the_first_vowel(nil), false);
+
+    // 'u' is the first vowel
+    assert.strictEqual(is_u_the_first_vowel(explode("ust")), true);
+
+    // 'u' is not the first vowel
+    assert.strictEqual(is_u_the_first_vowel(explode("aust")), false);
+  });
+
+  it('is_u_followed_a_vowel', function() {
+    // empty list
+    assert.strictEqual(is_u_followed_a_vowel(nil), false);
+
+    // list has one element
+    assert.strictEqual(is_u_followed_a_vowel(explode("s")), false);
+
+    // list has two elements: vowel + consonant
+    assert.strictEqual(is_u_followed_a_vowel(explode("sa")), true);
+  });
+
+  it('compare', function() {
+    // base case
+    assert.strictEqual(compare(nil, nil), true);
+
+    // 1 recursive call
+    assert.strictEqual(compare(explode("12"), explode("1")), false);
+
+    // more than 1 recursive call (1st)
+    assert.strictEqual(compare(explode("12"), explode("12")), true);
+
+    // more than 1 recursive call (2nd)
+    assert.strictEqual(compare(explode("123456"), explode("123456")), true);
   });
 
 });
