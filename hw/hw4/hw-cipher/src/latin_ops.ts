@@ -143,18 +143,15 @@ export const pig_latin_encode = (L: List<number>): List<number> => {
             return concat(concat(suffix(N, L), prefix(N, L)), explode("ay"));
         }
     }
-
-    return L;
 };
 
 /**
- *  if the last of the n ≥ 1 consonants is a “q”,
+ *  if the last of the n ≥ 1 consonant is a “q”,
  *      and the first vowel is a “u”,
  *      and the “u” is followed by another vowel,
  *
  *  then move the “u” with the consonants as well,
  *  e.g., “quay” becomes “ayquay”, not “uayqay”.
- * @param L
  */
 const is_qu_case = (L: List<number>, N: number): boolean => {
     // is_q_the_last_conso
@@ -170,10 +167,8 @@ const is_qu_case = (L: List<number>, N: number): boolean => {
     }
 
     // is_u_followed_a_vowel
-    if(!is_u_followed_a_vowel(seg2)){
-        return false;
-    }
-    return true;
+    return is_u_followed_a_vowel(seg2);
+
 }
 
 const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
@@ -184,12 +179,7 @@ const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
 
     // base case
     if (N === 1) {
-        if (L.hd === "q".charCodeAt(0)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return L.hd === "q".charCodeAt(0);
     }
 
     // recursive case
@@ -202,12 +192,7 @@ const is_u_the_first_vowel = (L: List<number>): boolean => {
         return false;
     }
 
-    if (L.hd === "u".charCodeAt(0)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return L.hd === "u".charCodeAt(0);
 }
 
 const is_u_followed_a_vowel = (L: List<number>): boolean => {
