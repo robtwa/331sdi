@@ -16,25 +16,40 @@ export const last = <A,>(L: List<A>): A => {
 /** Returns the prefix consting of the first n elements of L. */
 export const prefix = <A,>(n: number, L: List<A>): List<A> => {
   // base case:
-  // prefix(n + 1, nil) := undefined
-  if (L === nil && n > 0) {
-      throw new Error("undefined");
-  }
-  // base case:
   // prefix(0, L)   := nil    for any L: list
-  // prefix(n, nil) := nil    for any n
-  if (n === 0 || L === nil) {
+  if (n === 0) {
     return nil;
   }
+  else {  // n > 0 because n is a natural number
+    // error:
+    // prefix(n + 1, nil) := undefined
+    if (L === nil) {
+      throw new Error("undefined");
+    }
 
-  // recursive case:
-  // prefix(n + 1, cons(x, L)) := prefix(n, cons(x, L))
-  return cons(L.hd, prefix(n - 1, L.tl));
+    // recursive case:
+    // prefix(n + 1, cons(x, L)) := cons(x, prefix(n, L))   for any x: N
+    return cons(L.hd, prefix(n - 1, L.tl));
+  }
 };
 
 
 /** Returns the suffix consting of the elements of L after the first n. */
 export const suffix = <A,>(n: number, L: List<A>): List<A> => {
-  n;  // TODO: remove this (just making the compiler happy)
-  return L;  // TODO: replace
+  // base case:
+  // suffix(0, L)   := nil    for any L: list
+  if (n === 0) {
+    return L;
+  }
+  else {  // n > 0  because n is a natural number
+    // Error
+    // suffix(n + 1, nil) := undefined
+    if (L === nil) {
+      throw new Error("undefined");
+    }
+
+    // recursive case:
+    // suffix(n + 1, cons(x, L))		:= suffix(n, L)			for any x: N
+    return suffix(n - 1, L.tl);
+  }
 };

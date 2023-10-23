@@ -10,7 +10,7 @@ import {
   crazy_caps_encode,
   crazy_caps_decode, encode_skip, decode_skip,
 } from './latin_ops';
-import {prefix} from "./list_ops";
+import {prefix, suffix} from "./list_ops";
 
 
 describe('latin_ops', function() {
@@ -182,9 +182,6 @@ describe('latin_ops', function() {
   });
 
   it('prefix', function() {
-    // base case: prefix(n + 1, nil) := undefined
-    assert.throws(()=>prefix(1, nil), Error, "undefined");
-
     // base case: prefix(0, L)   := nil    for any L: list
     assert.deepStrictEqual(prefix(0, explode("123")), nil);
 
@@ -204,7 +201,69 @@ describe('latin_ops', function() {
     assert.deepStrictEqual(prefix(4, explode("12345")), explode("1234"));
 
     // 0-1-many heuristic, more than 1 recursive call (4th)
-    assert.deepStrictEqual(prefix(5, explode("12345")), explode("12345"));
+    assert.deepStrictEqual(prefix(9, explode("123456789")),
+                          explode("123456789"));
+
+    // error: prefix(n + 1, nil) := undefined
+    assert.throws(()=>prefix(1, nil), Error, "undefined");
+
+    // error: 1 recursive call
+    assert.throws(()=>prefix(2, explode("1")), Error,
+                "undefined");
+
+    // error: more than 1 recursive call (1st)
+    assert.throws(()=>prefix(3, explode("12")), Error,
+      "undefined");
+
+    // error: more than 1 recursive call (2nd)
+    assert.throws(()=>prefix(4, explode("123")), Error,
+      "undefined");
+
+    // error: more than 1 recursive call (3rd)
+    assert.throws(()=>prefix(10, explode("123456789")), Error,
+      "undefined");
+
+  });
+
+  it('suffix', function() {
+    // base case: suffix(n, nil) := nil    for any n
+    assert.deepStrictEqual(suffix(0, nil), nil);
+
+    // base case: suffix(0, L)   := nil    for any L: list
+    assert.deepStrictEqual(suffix(0, explode("123")), explode("123"));
+
+    // 0-1-many heuristic, 1 recursive call
+    assert.deepStrictEqual(suffix(1, explode("12345")), explode("2345"));
+
+    // 0-1-many heuristic, more than 1 recursive call (1st)
+    assert.deepStrictEqual(suffix(2, explode("12345")), explode("345"));
+
+    // 0-1-many heuristic, more than 1 recursive call (2nd)
+    assert.deepStrictEqual(suffix(3, explode("12345")), explode("45"));
+
+    // 0-1-many heuristic, more than 1 recursive call (3rd)
+    assert.deepStrictEqual(suffix(4, explode("12345")), explode("5"));
+
+    // 0-1-many heuristic, more than 1 recursive call (4th)
+    assert.deepStrictEqual(suffix(5, explode("12345")), nil);
+
+    // error: suffix(n + 1, nil) := undefined
+    assert.throws(()=>suffix(1, nil), Error, "undefined");
+
+    // error: 1 recursive call
+    assert.throws(()=>suffix(2, explode("1")),
+      Error,
+      "undefined");
+
+    // error: more than 1 recursive call (1st)
+    assert.throws(()=>suffix(3, explode("12")),
+      Error,
+      "undefined");
+
+    // error: more than 1 recursive call (2nd)
+    assert.throws(()=>suffix(6, explode("12345")),
+                          Error,
+                  "undefined");
   });
 
   it('count_consonants', function() {
