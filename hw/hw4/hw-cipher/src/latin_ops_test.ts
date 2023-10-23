@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { nil } from './list';
-import { explode } from './char_list';
+import { explode, compact } from './char_list';
 import {
   next_latin_char,
   prev_latin_char,
@@ -9,6 +9,7 @@ import {
   cipher_decode,
   crazy_caps_encode,
   crazy_caps_decode, encode_skip, decode_skip,
+  pig_latin_encode
 } from './latin_ops';
 import {prefix, suffix} from "./list_ops";
 
@@ -96,33 +97,33 @@ describe('latin_ops', function() {
   // require to give us more confidence in our code!
 
   it('pig_latin_encode', function() {
-  //   // case 1: 
-  //   // empty string, no characters
-  //   assert.strictEqual(compact(pig_latin_encode(explode(""))), "");
-  //   // neither consonants nor vowels
-  //   assert.strictEqual(compact(pig_latin_encode(explode("__"))), "__");
-  //   // all consonants
-  //   assert.strictEqual(compact(pig_latin_encode(explode("str"))), "str");
+    // case 1:
+    // empty string, no characters
+    assert.strictEqual(compact(pig_latin_encode(explode(""))), "");
+    // neither consonants nor vowels
+    assert.strictEqual(compact(pig_latin_encode(explode("__"))), "__");
+    // all consonants
+    assert.strictEqual(compact(pig_latin_encode(explode("str"))), "str");
 
-  //   // case 2: starts with a vowel
-  //   assert.strictEqual(compact(pig_latin_encode(explode("a"))), "away");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("is"))), "isway");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("astro"))), "astroway");
+    // case 2: starts with a vowel
+    assert.strictEqual(compact(pig_latin_encode(explode("a"))), "away");
+    assert.strictEqual(compact(pig_latin_encode(explode("is"))), "isway");
+    assert.strictEqual(compact(pig_latin_encode(explode("astro"))), "astroway");
 
-  //   // case 3: starting with consonant case
-  //   assert.strictEqual(compact(pig_latin_encode(explode("say"))), "aysay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("stay"))), "aystay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("nasty"))), "astynay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("qut"))), "utqay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("qit"))), "itqay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("buffalo"))), "uffalobay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("ruins"))), "uinsray");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("suade"))), "uadesay");
+    // case 3: starting with consonant case
+    assert.strictEqual(compact(pig_latin_encode(explode("say"))), "aysay");
+    assert.strictEqual(compact(pig_latin_encode(explode("stay"))), "aystay");
+    assert.strictEqual(compact(pig_latin_encode(explode("nasty"))), "astynay");
+    assert.strictEqual(compact(pig_latin_encode(explode("qut"))), "utqay");
+    assert.strictEqual(compact(pig_latin_encode(explode("qit"))), "itqay");
+    assert.strictEqual(compact(pig_latin_encode(explode("buffalo"))), "uffalobay");
+    assert.strictEqual(compact(pig_latin_encode(explode("ruins"))), "uinsray");
+    assert.strictEqual(compact(pig_latin_encode(explode("suade"))), "uadesay");
 
-  //   // case 4: "qu" exception case
-  //   assert.strictEqual(compact(pig_latin_encode(explode("quay"))), "ayquay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("quail"))), "ailquay");
-  //   assert.strictEqual(compact(pig_latin_encode(explode("shquay"))), "ayshquay");
+    // case 4: "qu" exception case
+    assert.strictEqual(compact(pig_latin_encode(explode("quay"))), "ayquay");
+    assert.strictEqual(compact(pig_latin_encode(explode("quail"))), "ailquay");
+    assert.strictEqual(compact(pig_latin_encode(explode("shquay"))), "ayshquay");
   });
 
   it('pig_latin_decode', function() {

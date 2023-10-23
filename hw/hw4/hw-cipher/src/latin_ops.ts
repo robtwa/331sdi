@@ -1,4 +1,6 @@
-import { List, nil, cons } from './list';
+import {List, nil, cons, concat} from './list';
+import {explode} from "./char_list";
+import {prefix, suffix} from "./list_ops";
 
 /** Determines whether the given character is a vowel. */
 const is_latin_vowel = (c: number): boolean => {
@@ -121,6 +123,105 @@ export const count_consonants = (L: List<number>): number|undefined => {
 // TODO: add your function declarations in this file for: 
 // cipher_encode, cipher_decode crazy_caps_encode, crazy_caps_decode,
 // pig_latin_encode, pig_latin_decode
+export const pig_latin_encode = (L: List<number>): List<number> => {
+    if (L === nil) {
+        return nil;
+    }
+
+    const N = count_consonants(L);
+    if(N === undefined) { // neither consonants nor vowels
+        return L;
+    }
+    if (N === 0) {  // starts with a vowel
+        return concat(L, explode("way"));
+    }
+    else {  // starting with consonant case
+        if(is_qu_case(L, N)) { // is the "qu" exception case
+            return concat(concat(suffix(N+1, L), prefix(N+1, L)), explode("ay"));
+        }
+        else { // is not the "qu" exception case
+            return concat(concat(suffix(N, L), prefix(N, L)), explode("ay"));
+        }
+    }
+
+    return L;
+};
+
+/**
+ *  if the last of the n ≥ 1 consonants is a “q”,
+ *      and the first vowel is a “u”,
+ *      and the “u” is followed by another vowel,
+ *
+ *  then move the “u” with the consonants as well,
+ *  e.g., “quay” becomes “ayquay”, not “uayqay”.
+ * @param L
+ */
+const is_qu_case = (L: List<number>, N: number): boolean => {
+    // is_q_the_last_conso
+    const seg1 = prefix(N, L);
+    if (!is_q_the_last_conso(seg1, N)) {
+        return false;
+    }
+
+    const seg2 = suffix(N, L);
+    // is_u_the_first_vowel
+    if(!is_u_the_first_vowel(seg2)){
+        return false;
+    }
+
+    // is_u_followed_a_vowel
+    if(!is_u_followed_a_vowel(seg2)){
+        return false;
+    }
+    return true;
+}
+
+const is_q_the_last_conso = (L: List<number>, N: number): boolean => {
+    // check
+    if (L === nil) {
+        return false;
+    }
+
+    // base case
+    if (N === 1) {
+        if (L.hd === "q".charCodeAt(0)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // recursive case
+    return is_q_the_last_conso(L.tl, N - 1);
+}
+
+const is_u_the_first_vowel = (L: List<number>): boolean => {
+    // check
+    if (L === nil) {
+        return false;
+    }
+
+    if (L.hd === "u".charCodeAt(0)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+const is_u_followed_a_vowel = (L: List<number>): boolean => {
+    // check
+    if (L === nil) {
+        return false;
+    }
+
+    if (L.tl === nil) {
+        return false;
+    }
+
+    return is_latin_vowel(L.tl.hd);
+}
 
 /**
  * returns a list of the same length but with each character replaced by the
