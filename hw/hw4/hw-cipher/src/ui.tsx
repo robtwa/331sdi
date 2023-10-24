@@ -62,37 +62,27 @@ export const ShowResult = (props: ShowResultProps): JSX.Element => {
 
   if (props.algo.toLowerCase() === "cipher") {
     if (props.op.toLowerCase() === "encode") {
-      return ShowMssage(props.word, props.algo, props.op,
-        compact(cipher_encode(explode(props.word))));
+      return ShowMssage(compact(cipher_encode(explode(props.word))));
     }
-    return ShowMssage(props.word, props.algo, props.op,
-      compact(cipher_decode(explode(props.word))));
+    return ShowMssage(compact(cipher_decode(explode(props.word))));
   }
   else if (props.algo.toLowerCase() === "crazy-caps") {
     if (props.op.toLowerCase() === "encode") {
-      return ShowMssage(props.word, props.algo, props.op,
-        compact(crazy_caps_encode(explode(props.word))));
+      return ShowMssage(compact(crazy_caps_encode(explode(props.word))));
     }
-    return ShowMssage(props.word, props.algo, props.op,
-      compact(crazy_caps_decode(explode(props.word))));
+    return ShowMssage(compact(crazy_caps_decode(explode(props.word))));
   }
   else {  // pig-latin
     if (props.op.toLowerCase() === "encode") {
-      return ShowMssage(props.word, props.algo, props.op,
-        compact(pig_latin_encode(explode(props.word))));
+      return ShowMssage(compact(pig_latin_encode(explode(props.word))));
     }
-    return ShowMssage(props.word, props.algo, props.op,
-      compact(pig_latin_decode(explode(props.word))));
+    return ShowMssage(compact(pig_latin_decode(explode(props.word))));
   }
 
 };
 /**
  *  Returns a string that contains the given arguments.
  */
-export const ShowMssage = (word: string,
-                           algo: string,
-                           op:string,
-                           result: string,
-                           ): JSX.Element => {
-  return <p><code>Hi there, {algo} {op}s "{word}" to "{result}".</code></p>;
+export const ShowMssage = (result: string,): JSX.Element => {
+  return <p><code>"{result}"</code></p>;
 };
