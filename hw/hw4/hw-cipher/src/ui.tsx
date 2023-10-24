@@ -84,5 +84,5 @@ export const ShowResult = (props: ShowResultProps): JSX.Element => {
  *  Returns a string that contains the given arguments.
  */
 export const ShowMssage = (result: string,): JSX.Element => {
-  return <p><code>"{result}"</code></p>;
+  return <p><code>{result}</code></p>;
 };
