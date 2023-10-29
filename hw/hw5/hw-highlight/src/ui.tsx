@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, cons, nil, compact_list } from './list';
-import { findMatchingNames, getColorCss } from './color_list';
+import { makeSimpleColorList } from './color_list';
 import { Highlight } from './parser';
 import './ui.css'
 
@@ -46,7 +46,7 @@ export const ShowForm = (_: {}): JSX.Element => {
  *     background color set to the actual color
  */
 export const ShowColors = (props: {text: string}): JSX.Element => {
-  const names = findMatchingNames(props.text.toLowerCase());
+  const names = makeSimpleColorList().findMatchingNames(props.text.toLowerCase());
   return <div>{compact_list(getColorCards(names))}</div>
 };
 
@@ -55,7 +55,7 @@ const getColorCards = (names: List<string>): List<JSX.Element> => {
   if (names === nil) {
     return nil;
   } else {
-    const [bg, fg] = getColorCss(names.hd.toLowerCase());
+    const [bg, fg] = makeSimpleColorList().getColorCss(names.hd.toLowerCase());
     return cons(
         <span className="color-border" key={names.hd}>
           <span className="color-card"
@@ -86,7 +86,7 @@ const getHighlights =
     return nil;
   } else {
     const h = highlights.hd;
-    const [bg, fg] = getColorCss(h.color.toLowerCase());
+    const [bg, fg] = makeSimpleColorList().getColorCss(h.color.toLowerCase());
     return cons(
         <span className="highlight" key={key}
               style={{backgroundColor: bg, color: fg}}>{h.text}</span>,
