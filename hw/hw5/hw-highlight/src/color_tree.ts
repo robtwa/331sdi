@@ -30,10 +30,15 @@ export const makeBst = (L: List<ColorInfo>): ColorNode => {
   }
 };
 
-// func lookup(y, empty)         := undefined                       for any y : Z
-//      lookup(y, node(x, S, T)) := node(x, S, T)    if x = y       for any x, y : Z and S, T : BST
-//      lookup(y, node(x, S, T)) := lookup(y, T)     if x < y       for any x, y : Z and S, T : BST
-//      lookup(y, node(x, S, T)) := lookup(y, S)     if y < x       for any x, y : Z and S, T : BST
+/**
+ * Returns the found ColorInfo if the specified color name is found in the BST,
+ * otherwise returns undefined.
+ *
+ * @param y Text used to find colors in the ColorNode BST.
+ * @param root ColorNode, the root of the given ColorNode BST.
+ * @returns ColorInfo of the found color text
+ *          undefined if the color text is not in the ColorNode BST
+ */
 export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
   // base case
   if (root === empty) {
@@ -41,10 +46,10 @@ export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
   }
 
   const [color, _css, _foreground] = root.info;
-  if (y === color) {  // base case
+  if (y.toLowerCase() === color.toLowerCase()) {  // base case
     return root.info;
   }
-  else if (y < color) { // recursive cases: y < color
+  else if (y.toLowerCase() < color.toLowerCase()) { // recursive cases: y < color
     return lookup(y, root.before);
   }
   else {  // recursive cases: color < y
