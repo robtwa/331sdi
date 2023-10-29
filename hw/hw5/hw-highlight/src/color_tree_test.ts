@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import { empty, node } from './color_node';
 import { makeBst, lookup} from "./color_tree";
 import { explode_array } from "./list";
+import { COLORS } from "./colors";
 
 describe('color_tree', function() {
 
@@ -75,14 +76,45 @@ describe('color_tree', function() {
     });
 
     it('lookup', function() {
-        // base case
-        // assert.deepEqual(lookup('yellow', empty), undefined);
+        // base case: root === empty
+        assert.deepEqual(lookup('blue', empty), undefined);
 
-        assert.deepEqual(lookup(
-                          'yellow',
-                            node(['yellow', '#FFFF00', false], empty, empty)
-                          ),
-                ['yellow', '#FFFF00', false]);
+        const tree = makeBst(explode_array([
+            ['black', '#000000', true],
+            ['blanchedalmond', '#FFEBCD', false],
+            ['blue', '#0000FF', true],
+            ['blueviolet', '#8A2BE2', true],
+            ['brown', '#A52A2A', true],
+            ['burlywood', '#DEB887', false],
+        ]));
+
+        // base case: y === color
+        assert.deepEqual(lookup('blueviolet', tree),
+          ['blueviolet', '#8A2BE2', true]);
+
+        // 0-1-many: 1 recursive call
+        assert.deepEqual(lookup('blanchedalmond', tree),
+          ['blanchedalmond', '#FFEBCD', false]);
+
+        // 0-1-many: more than 1 recursive call (1st)
+        assert.deepEqual(lookup('black', tree),
+          ['black', '#000000', true]);
+
+        // 0-1-many: more than 1 recursive call (2nd)
+        assert.deepEqual(lookup('blue', tree),
+          ['blue', '#0000FF', true]);
+
+        // 0-1-many: more than 1 recursive call (3rd)
+        assert.deepEqual(lookup('brown', tree),
+          ['brown', '#A52A2A', true]);
+
+        // 0-1-many: more than 1 recursive call (4th)
+        assert.deepEqual(lookup('burlywood', tree),
+          ['burlywood', '#DEB887', false]);
+
+        // 0-1-many: more than 1 recursive call (5th)
+        assert.deepEqual(lookup('tomato', makeBst(COLORS)),
+          ['tomato', '#FF6347', true]);
     });
 
     // TODO: copy some tests over here
