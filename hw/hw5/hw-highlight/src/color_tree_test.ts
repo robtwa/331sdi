@@ -115,6 +115,10 @@ describe('color_tree', function() {
         // 0-1-many: more than 1 recursive call (5th)
         assert.deepEqual(lookup('tomato', makeBst(COLORS)),
           ['tomato', '#FF6347', true]);
+
+        // 0-1-many: more than 1 recursive call (6th)
+        assert.deepEqual(lookup('nonexistent', makeBst(COLORS)),
+          undefined);
     });
 
     // TODO: copy some tests over here
