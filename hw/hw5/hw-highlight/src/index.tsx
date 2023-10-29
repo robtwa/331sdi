@@ -3,6 +3,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { List } from './list';
 import { Highlight, parseHighlightLines } from './parser';
 import { ShowForm, ShowColors, ShowHighlights } from './ui';
+import { makeSimpleColorList } from './color_list';
 
 
 // Parse the query parameters in the URL.
@@ -21,14 +22,17 @@ const root: Root = createRoot(main);
 try {
   // If the query included a word to search for, show the colors containing that
   if (word !== null) {
-    root.render(<React.StrictMode><ShowColors text={word}/></React.StrictMode>);
+    root.render(<React.StrictMode>
+      <ShowColors text={word} colorList={makeSimpleColorList()} />
+    </React.StrictMode>);
 
   // If the query included a list of lines, then show them highlighted.
   } else if (lines) {
     const highlights: List<Highlight> = parseHighlightLines(lines);
     root.render(
         <React.StrictMode>
-          <ShowHighlights highlights={highlights}/>
+          <ShowHighlights highlights={highlights}
+                          colorList={makeSimpleColorList()}/>
         </React.StrictMode>);
 
   // Otherwise, show the form asking them for input.
