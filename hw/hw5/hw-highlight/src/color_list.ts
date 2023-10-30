@@ -55,7 +55,7 @@ export const makeSimpleColorList = (): SimpleColorList => {
 // @param colors The full list of colors
 // @returns The sublist of colors containing those colors whose names contain
 //    the given text.
-const findMatchingNamesIn =
+export const findMatchingNamesIn =
     (text: string, colors: List<ColorInfo>): List<string> => {
   if (colors === nil) {
     return nil;
