@@ -1,8 +1,9 @@
 import * as assert from 'assert';
 import { empty, node } from './color_node';
 import { makeBst, lookup} from "./color_tree";
-import { explode_array } from "./list";
+import {cons, explode_array, nil} from "./list";
 import { COLORS } from "./colors";
+import {makeColorTree} from "./color_tree";
 
 describe('color_tree', function() {
 
@@ -122,4 +123,19 @@ describe('color_tree', function() {
     });
 
     // TODO: copy some tests over here
+    it('findMatchingNames', function() {
+        assert.deepEqual(makeColorTree().findMatchingNames("doesnotexist"), nil);
+        assert.deepEqual(makeColorTree().findMatchingNames("notacolor"), nil);
+        assert.deepEqual(makeColorTree().findMatchingNames("indigo"), cons("indigo", nil));
+        assert.deepEqual(makeColorTree().findMatchingNames("azure"), cons("azure", nil));
+        assert.deepEqual(makeColorTree().findMatchingNames("lavender"),
+          cons("lavender", cons("lavenderblush", nil)));
+        assert.deepEqual(makeColorTree().findMatchingNames("pink"),
+          cons("deeppink", cons("hotpink", cons("lightpink", cons("pink", nil)))));
+    });
+
+    it('getColorCss', function() {
+        assert.deepEqual(makeColorTree().getColorCss("lavender"), ['#E6E6FA', '#101010']);
+        assert.deepEqual(makeColorTree().getColorCss("indigo"), ['#4B0082', '#F0F0F0']);
+    });
 });
