@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { nil, cons, len, split, compact_list, explode_array } from './list';
-import { explode } from './char_list';
+import { nil, cons, len, split, compact_list, explode_array, split_at } from './list';
+import { explode} from './char_list';
 
 
 describe('list', function() {
@@ -38,6 +38,20 @@ describe('list', function() {
   
   it('split_at', function() {
     // TODO: add tests
+    // 0-1-many: base case
+    assert.deepEqual(split_at(explode(""), "3".charCodeAt(0)), [nil, nil]);
+    assert.deepEqual(split_at(explode(""), "4".charCodeAt(0)), [nil, nil]);
+
+    // 0-1-many: 1 recursive call
+    assert.deepEqual(split_at(explode("3"), "3".charCodeAt(0)), [nil, explode("3")]);
+    assert.deepEqual(split_at(explode("4"), "3".charCodeAt(0)), [explode("4"), nil]);
+
+    // 0-1-many: more than 1 recursive call
+    assert.deepEqual(split_at(explode("283"), "3".charCodeAt(0)), [explode("28"), explode("3")]);
+    assert.deepEqual(split_at(explode("2834"), "3".charCodeAt(0)), [explode("28"), explode("34")])
+    assert.deepEqual(split_at(explode("28343"), "3".charCodeAt(0)), [explode("28"), explode("343")]);
+    assert.deepEqual(split_at(explode("28343"), "4".charCodeAt(0)), [explode("283"), explode("43")]);
+    assert.deepEqual(split_at(explode("28343"), "8".charCodeAt(0)), [explode("2"), explode("8343")]);
   });
 
   it('compact_list', function() {
