@@ -4,7 +4,7 @@ import { ColorNode, empty, node } from './color_node';
 import { ColorList, findMatchingNamesIn } from './color_list';
 
 // TODO: Uncomment and complete
-
+// TODO: add interfaces, classes, functions here
 /**
  * Returns the ColorNode, which is a BST type for colors
  *
@@ -58,12 +58,11 @@ export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
   }
 };
 
-// TODO: add interfaces, classes, functions here
+// Implementation of the color tree.
+// Invariants are already part of the node definition and
+// do not need to be repeated in the class.
 class ColorTree implements ColorList {
   // AF: obj = this.bst
-  // RI: For node(x : Z, S : BST, T : BST),
-  //     every value in S must be less than or equal to x and
-  //     every value in T must be greater than x.
   readonly colors: List<ColorInfo>;
   readonly bst: ColorNode;
 
