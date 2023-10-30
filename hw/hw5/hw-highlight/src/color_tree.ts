@@ -3,8 +3,6 @@ import { ColorInfo, COLORS } from './colors';
 import { ColorNode, empty, node } from './color_node';
 import { ColorList, findMatchingNamesIn } from './color_list';
 
-// TODO: Uncomment and complete
-// TODO: add interfaces, classes, functions here
 /**
  * Returns the ColorNode, which is a BST type for colors
  *
