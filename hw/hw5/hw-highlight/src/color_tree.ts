@@ -61,9 +61,9 @@ export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
 // TODO: add interfaces, classes, functions here
 class ColorTree implements ColorList {
   // AF: obj = this.bst
-  // RI: For every node y in node(x : Z, S : BST, T : BST),
-  //     If y ≤ x, y cannot appear in any node of T;
-  //     If y > x, y cannot appear in any node of S.
+  // RI: For node(x : Z, S : BST, T : BST),
+  //     every value in S must be less than or equal to x and
+  //     every value in T must be greater than x.
   readonly colors: List<ColorInfo>;
   readonly bst: ColorNode;
 
