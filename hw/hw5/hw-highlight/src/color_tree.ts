@@ -1,6 +1,7 @@
 import { List, nil, split, len } from './list';
-import { ColorInfo } from './colors';
+import { ColorInfo, COLORS } from './colors';
 import { ColorNode, empty, node } from './color_node';
+import { ColorList, findMatchingNamesIn } from './color_list';
 
 // TODO: Uncomment and complete
 
@@ -58,3 +59,49 @@ export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
 };
 
 // TODO: add interfaces, classes, functions here
+class ColorTree implements ColorList {
+  // AF: obj = this.bst
+  // RI: For every node y in node(x : Z, S : BST, T : BST),
+  //     If y ≤ x, y cannot appear in any node of T;
+  //     If y > x, y cannot appear in any node of S.
+  readonly colors: List<ColorInfo>;
+  readonly bst: ColorNode;
+
+  // Creates an instance of BST with the given colors.
+  constructor(colors: List<ColorInfo>) {
+    this.bst = makeBst(colors);
+    this.colors = colors;
+  }
+
+  findMatchingNames = (text: string): List<string> => {
+    return findMatchingNamesIn(text, this.colors);
+  };
+
+  // Returns the colors from the (first) BST with this color name. Throws
+  // an Error none is found (i.e., we hit the end of the tree).
+  // @param name The name in question.
+  // @throws Error if no item in colors has the given name.
+  // @throws Error If the color name found is different from the given color name.
+  // @return The first item in colors whose name matches the given name.
+  getColorCss(name: string): readonly [string, string] {
+    const res:ColorInfo | undefined = lookup(name, this.bst);
+    if (res === undefined) {
+      throw new Error(`no color called "${name}"`);
+    }
+    const [color, css, foreground] = res;
+    if (color === name) {
+      return [css, foreground ? '#F0F0F0' : '#101010'];
+    } else {
+      throw new Error(`Incorrect color name "${name}"`);
+    }
+  }
+}
+
+// Creates an instance of ColorTree with the “singleton” pattern
+const instanceOfCT: ColorTree = new ColorTree(COLORS);
+/**
+ * Returns the same instance of ColorTree.
+ */
+export const makeColorTree = (): ColorTree => {
+  return instanceOfCT;
+}
