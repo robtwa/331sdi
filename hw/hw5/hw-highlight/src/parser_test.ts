@@ -54,8 +54,6 @@ describe('parser', function() {
         ["my ", {color: "red", text: "ball"}, explode(" is great")]);
     assert.deepStrictEqual(getNextHighlight(explode("grass is [green|itchy]")),
         ["grass is ", {color: "green", text: "itchy"}, explode("")]);
-
-    console.log(getNextHighlight(explode("[red|ball]")));
   });
 
   it('findHighlights', function() {
