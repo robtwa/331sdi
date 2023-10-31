@@ -46,6 +46,9 @@ export const ShowForm = (_: {}): JSX.Element => {
  *     background color set to the actual color
  */
 export const ShowColors = (props: {text: string, colorList: ColorList }): JSX.Element => {
+  if (props === undefined || props.text === undefined || props.colorList === undefined) {
+    return <div>{[]}</div>;
+  }
   const names = props.colorList.findMatchingNames(props.text.toLowerCase());
   return <div>{compact_list(getColorCards(names, props.colorList))}</div>
 };
@@ -77,6 +80,9 @@ const getColorCards = (names: List<string>, colorList: ColorList): List<JSX.Elem
 export const ShowHighlights =
     (props: {highlights: List<Highlight>,
       colorList: ColorList}): JSX.Element => {
+  if (props === undefined || props.highlights === undefined || props.colorList === undefined) {
+    return <div>{[]}</div>;
+  }
   return <div>{compact_list(getHighlights(props.highlights, 0, props.colorList))}</div>;
 };
 
