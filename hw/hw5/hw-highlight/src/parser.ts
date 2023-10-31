@@ -1,5 +1,5 @@
-import { List, nil, cons, explode_array, split_at } from './list';
-import { compact } from './char_list';
+import {List, nil, cons, explode_array, split_at, compact_list} from './list';
+import { compact, explode } from './char_list';
 
 
 /** Text and the name of the highlight (background) color to show it in. */
@@ -82,20 +82,56 @@ export const getNextHighlight = (chars: List<number>): NextHighlight|undefined =
 
 // TODO: Uncomment and complete:
 
-// /** Returns the highlights in the text as described in parseHighlightText. */
-// export const findHighlights = (chars: List<number>): List<Highlight> => {
-//   // TODO: implement this
-// };
+/** Returns the highlights in the text as described in parseHighlightText. */
+export const findHighlights = (chars: List<number>): List<Highlight> => {
+  // TODO: implement this
+  // base case
+  if (chars === nil) {
+    return nil;
+  }
 
-// /**
-//  * Parses text containing highlights of the form [color|text] into a list of
-//  * highlights, where all unhighlighted parts are white.
-//  * @param text Text to parse into highlights
-//  * @returns List of highlights described by the text, where all letters are
-//  *     contained in a single back highlight until a part of the form [c|t],
-//  *     which becomes the highlight with color c and text t, followed by the
-//  *     result of parsing the rest after that.
-//  */
-// export const parseHighlightText = (text: string): List<Highlight> => {
-//   return findHighlights(explode(text));
-// };
+  // base case
+  const res = getNextHighlight(chars);
+  if (res === undefined) {
+    return explode_array([{color: 'white', text: compact(chars)}]);
+  }
+  const [X, H, T] = res;
+
+  // recursive case - find the next highlight
+  const ls = findHighlights(T);
+  if (ls === nil) {   // if there is no more highlight in T, such that "X[..|..]T"
+    if (X !== "") {   // if X != "", such that "X[..|..]"
+      if(T !== nil) {  // if X != "" and T != nil, such that "X[..|..]T"
+        return explode_array([{color: 'white', text: X}, H, {color: 'white', text: compact(T)}]);
+      }
+      else { // if X != "" and T == nil, such that "X[..|..]T"
+        return explode_array([{color: 'white', text: X}, H]);
+      }
+    }
+    else {  // if X == "" and T == nil, such that "X[..|..]T"
+      return explode_array([H]);
+    }
+  }
+  else {  // if there is more highlight in T, such that "X[..|..]T"
+    const tl = compact_list(ls);
+    if (X !== "") {  // if X != "" in T, such that T has "X[..|..]"
+      return explode_array(compact_list(explode_array([{color: 'white', text: X}, H ])).concat(tl));
+    }
+    else {  // if X == "" in T, such that T has "X[..|..]"
+      return explode_array(compact_list(explode_array([H])).concat(tl));
+    }
+  }
+};
+
+/**
+ * Parses text containing highlights of the form [color|text] into a list of
+ * highlights, where all unhighlighted parts are white.
+ * @param text Text to parse into highlights
+ * @returns List of highlights described by the text, where all letters are
+ *     contained in a single back highlight until a part of the form [c|t],
+ *     which becomes the highlight with color c and text t, followed by the
+ *     result of parsing the rest after that.
+ */
+export const parseHighlightText = (text: string): List<Highlight> => {
+  return findHighlights(explode(text));
+};
