@@ -1,5 +1,5 @@
-import { ColorInfo, COLORS } from './colors';
-import { List, cons, nil } from './list';
+import {ColorInfo, COLORS} from './colors';
+import {List, cons, nil} from './list';
 
 // TODO: add interfaces and classes here
 /** Represents a color list */
@@ -36,7 +36,7 @@ class SimpleColorList implements ColorList {
   };
 
   getColorCss = (name: string): readonly [string, string] => {
-    return getColorCssIn(name,  this.colors);
+    return getColorCssIn(name, this.colors);
   };
 }
 
@@ -49,28 +49,30 @@ export const makeSimpleColorList = (): SimpleColorList => {
   return instanceOfSCList;
 }
 
-// Returns a new list containing just the names of those colors that include the
-// given text.
-// @param text The text in question
-// @param colors The full list of colors
-// @returns The sublist of colors containing those colors whose names contain
-//    the given text.
+/**
+ * Returns a new list containing just the names of those colors that include the
+ * given text.
+ * @param text The text in question
+ * @param colors The full list of colors
+ * @returns The sublist of colors containing those colors whose names contain
+ *          the given text.
+ */
 export const findMatchingNamesIn =
-    (text: string, colors: List<ColorInfo>): List<string> => {
-  if (colors === nil) {
-    return nil;
-  } else {
-    // Note: the _ prevents the typechecker froom complaining about
-    // our defining these variables and not using them which we must
-    // do to avoid tuple indexing
-    const [color, _css, _foreground] = colors.hd;
-    if (color.includes(text)) {
-      return cons(color, findMatchingNamesIn(text, colors.tl));
+  (text: string, colors: List<ColorInfo>): List<string> => {
+    if (colors === nil) {
+      return nil;
     } else {
-      return findMatchingNamesIn(text, colors.tl);
+      // Note: the _ prevents the typechecker froom complaining about
+      // our defining these variables and not using them which we must
+      // do to avoid tuple indexing
+      const [color, _css, _foreground] = colors.hd;
+      if (color.includes(text)) {
+        return cons(color, findMatchingNamesIn(text, colors.tl));
+      } else {
+        return findMatchingNamesIn(text, colors.tl);
+      }
     }
-  }
-};
+  };
 
 
 // Returns the colors from the (first) list entry with this color name. Throws
@@ -80,15 +82,15 @@ export const findMatchingNamesIn =
 // @throws Error if no item in colors has the given name.
 // @return The first item in colors whose name matches the given name.
 const getColorCssIn =
-    (name: string, colors: List<ColorInfo>): readonly [string, string] => {
-  if (colors === nil) {
-    throw new Error(`no color called "${name}"`);
-  } else {
-    const [color, css, foreground] = colors.hd;
-    if (color === name) {
-      return [css, foreground ? '#F0F0F0' : '#101010'];
+  (name: string, colors: List<ColorInfo>): readonly [string, string] => {
+    if (colors === nil) {
+      throw new Error(`no color called "${name}"`);
     } else {
-      return getColorCssIn(name, colors.tl);
+      const [color, css, foreground] = colors.hd;
+      if (color === name) {
+        return [css, foreground ? '#F0F0F0' : '#101010'];
+      } else {
+        return getColorCssIn(name, colors.tl);
+      }
     }
-  }
-};
+  };

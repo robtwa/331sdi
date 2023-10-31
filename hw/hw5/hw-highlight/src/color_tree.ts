@@ -1,7 +1,7 @@
-import { List, nil, split, len } from './list';
-import { ColorInfo, COLORS } from './colors';
-import { ColorNode, empty, node } from './color_node';
-import { ColorList, findMatchingNamesIn } from './color_list';
+import {List, nil, split, len} from './list';
+import {ColorInfo, COLORS} from './colors';
+import {ColorNode, empty, node} from './color_node';
+import {ColorList, findMatchingNamesIn} from './color_list';
 
 /**
  * Returns the ColorNode, which is a BST type for colors
@@ -13,9 +13,8 @@ import { ColorList, findMatchingNamesIn } from './color_list';
 export const makeBst = (L: List<ColorInfo>): ColorNode => {
   if (L === nil) {  // base case
     return empty;
-  }
-  else {  // recursive case
-    const M = Math.floor(len(L)/2);
+  } else {  // recursive case
+    const M = Math.floor(len(L) / 2);
     const [P, S] = split(M, L);
     if (S === nil) {
       throw new Error("split() returns an empty S.");
@@ -47,11 +46,9 @@ export const lookup = (y: string, root: ColorNode): ColorInfo | undefined => {
   const [color, _css, _foreground] = root.info;
   if (y.toLowerCase() === color.toLowerCase()) {  // base case
     return root.info;
-  }
-  else if (y.toLowerCase() < color.toLowerCase()) { // recursive cases: y < color
+  } else if (y.toLowerCase() < color.toLowerCase()) { // recursive cases: y < color
     return lookup(y, root.before);
-  }
-  else {  // recursive cases: color < y
+  } else {  // recursive cases: color < y
     return lookup(y, root.after);
   }
 };
@@ -74,14 +71,16 @@ class ColorTree implements ColorList {
     return findMatchingNamesIn(text, this.colors);
   };
 
-  // Returns the colors from the (first) BST with this color name. Throws
-  // an Error none is found (i.e., we hit the end of the tree).
-  // @param name The name in question.
-  // @throws Error if no item in colors has the given name.
-  // @throws Error If the color name found is different from the given color name.
-  // @return The first item in colors whose name matches the given name.
-  getColorCss(name: string): readonly [string, string] {
-    const res:ColorInfo | undefined = lookup(name, this.bst);
+  /**
+   * Returns the colors from the (first) BST with this color name. Throws
+   * an Error none is found (i.e., we hit the end of the tree).
+   * @param name The name in question.
+   * @throws Error if no item in colors has the given name.
+   *         Error If the color name found is different from the given color name.
+   * @return The first item in colors whose name matches the given name.
+   */
+  getColorCss = (name: string): readonly [string, string] => {
+    const res: ColorInfo | undefined = lookup(name, this.bst);
     if (res === undefined) {
       throw new Error(`no color called "${name}"`);
     }
