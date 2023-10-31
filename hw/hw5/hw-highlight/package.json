@@ -7,7 +7,8 @@
     "build": "webpack --config src/webpack.config.js",
     "lint": "comfy-tslint --no-mutation src/*.{ts,tsx}",
     "start": "webpack-dev-server --config src/webpack.config.js",
-    "test": "ts-mocha -p tsconfig.json src/**/*_test.{ts,tsx} --require ignore-styles"
+    "test": "ts-mocha -p tsconfig.json src/**/*_test.{ts,tsx} --require ignore-styles",
+    "coverage": "nyc npm run test"
   },
   "author": "",
   "license": "ISC",
@@ -30,6 +31,7 @@
     "ignore-styles": "^5.0.1",
     "mini-css-extract-plugin": "^2.6.1",
     "mocha": "^10.1.0",
+    "nyc": "^15.1.0",
     "progress-bar-webpack-plugin": "^2.1.0",
     "ts-loader": "^9.4.1",
     "ts-mocha": "^10.0.0",
