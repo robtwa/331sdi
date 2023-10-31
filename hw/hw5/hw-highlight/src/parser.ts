@@ -92,32 +92,31 @@ export const findHighlights = (chars: List<number>): List<Highlight> => {
 
   // base case
   const res = getNextHighlight(chars);
-  if (res === undefined) {
+
+  // case A
+  if (res === undefined) {  // if input does not contain any highlight
     return explode_array([{color: 'white', text: compact(chars)}]);
   }
   const [X, H, T] = res;
 
   // recursive case - find the next highlight
-  const ls = findHighlights(T);
-  if (ls === nil) {   // if there is no more highlight in T, such that "X[..|..]T"
-    if (X !== "") {   // if X != "", such that "X[..|..]"
-      if(T !== nil) {  // if X != "" and T != nil, such that "X[..|..]T"
-        return explode_array([{color: 'white', text: X}, H, {color: 'white', text: compact(T)}]);
-      }
-      else { // if X != "" and T == nil, such that "X[..|..]T"
-        return explode_array([{color: 'white', text: X}, H]);
-      }
+  const more = findHighlights(T);
+  if (more === nil) {   // if there is no more highlight in T
+    if (X !== "") {
+      // Case B1: nh(cons(a, L)) ≠ undefined and nh(T) = undefined and T = nil and X ≠ “”
+      return explode_array([{color: 'white', text: X}, H]);
     }
-    else {  // if X == "" and T == nil, such that "X[..|..]T"
+    else {
+      // Case B2: nh(cons(a, L)) ≠ undefined and nh(T) = undefined and T = nil and X = “”
       return explode_array([H]);
     }
   }
-  else {  // if there is more highlight in T, such that "X[..|..]T"
-    const tl = compact_list(ls);
-    if (X !== "") {  // if X != "" in T, such that T has "X[..|..]"
+  else {  // if there is more highlight in T, such that "X[..|..][..|..]"
+    const tl = compact_list(more);
+    if (X !== "") {  // Case C1: nh(cons(a, L)) ≠ undefined and nh(T) ≠ undefined and X ≠ “”.
       return explode_array(compact_list(explode_array([{color: 'white', text: X}, H ])).concat(tl));
     }
-    else {  // if X == "" in T, such that T has "X[..|..]"
+    else {  // Case C2: nh(cons(a, L)) ≠ undefined and nh(T) ≠ undefined and X = “”.
       return explode_array(compact_list(explode_array([H])).concat(tl));
     }
   }
