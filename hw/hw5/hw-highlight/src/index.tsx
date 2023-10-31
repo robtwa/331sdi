@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { List } from './list';
-import { Highlight, parseHighlightLines } from './parser';
+import {Highlight, parseHighlightText} from './parser';
 import { ShowForm, ShowColors, ShowHighlights } from './ui';
 import {makeColorTree} from "./color_tree";
 
@@ -28,7 +28,7 @@ try {
 
   // If the query included a list of lines, then show them highlighted.
   } else if (lines) {
-    const highlights: List<Highlight> = parseHighlightLines(lines);
+    const highlights: List<Highlight> = parseHighlightText(lines);
     root.render(
         <React.StrictMode>
           <ShowHighlights highlights={highlights}
