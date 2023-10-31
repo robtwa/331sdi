@@ -23,7 +23,7 @@ try {
   // If the query included a word to search for, show the colors containing that
   if (word !== null) {
     root.render(<React.StrictMode>
-      <ShowColors text={word} colorList={makeColorTree()} />
+      <ShowColors text={word} colors={makeColorTree()} />
     </React.StrictMode>);
 
   // If the query included a list of lines, then show them highlighted.
@@ -32,7 +32,7 @@ try {
     root.render(
         <React.StrictMode>
           <ShowHighlights highlights={highlights}
-                          colorList={makeColorTree()}/>
+                          colors={makeColorTree()}/>
         </React.StrictMode>);
 
   // Otherwise, show the form asking them for input.

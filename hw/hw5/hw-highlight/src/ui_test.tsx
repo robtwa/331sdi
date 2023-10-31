@@ -9,15 +9,15 @@ describe('ui', function() {
 
   it('ShowColors', function() {
     assert.deepEqual(
-        ShowColors({text: 'pretendo', colorList:colorListInst}), <div>{[]}</div>);
+        ShowColors({text: 'pretendo', colors:colorListInst}), <div>{[]}</div>);
     assert.deepEqual(
-        ShowColors({text: 'indigo', colorList:colorListInst}),
+        ShowColors({text: 'indigo', colors:colorListInst}),
         <div>{[
           <span className="color-border" key="indigo"><span className="color-card"
                 style={{backgroundColor: '#4B0082', color: '#F0F0F0'}}>indigo</span></span>
         ]}</div>);
     assert.deepEqual(
-        ShowColors({text: 'lavender', colorList:colorListInst}),
+        ShowColors({text: 'lavender', colors:colorListInst}),
         <div>{[
           <span className="color-border" key="lavender"><span className="color-card"
                 style={{backgroundColor: '#E6E6FA', color: '#101010'}}>lavender</span></span>,
@@ -29,12 +29,12 @@ describe('ui', function() {
 
   it('ShowHighlights', function() {
     assert.deepEqual(
-        ShowHighlights({highlights: explode_array([]), colorList:colorListInst}),
+        ShowHighlights({highlights: explode_array([]), colors:colorListInst}),
         <div>{[]}</div>);
     assert.deepEqual(
         ShowHighlights({highlights: explode_array([
             {color: 'red', text: 'a quick brown'}
-          ]), colorList:colorListInst}),
+          ]), colors:colorListInst}),
         <div>{[
           <span className="highlight" key={0}
                 style={{backgroundColor: '#FF0000', color: '#F0F0F0'}}>a quick brown</span>
@@ -44,7 +44,7 @@ describe('ui', function() {
             {color: 'red', text: 'a quick brown'},
             {color: 'green', text: 'fox jumped over'},
             {color: 'blue', text: 'the lazy dog'}
-          ]), colorList:colorListInst}),
+          ]), colors:colorListInst}),
         <div>{[
           <span className="highlight" key={0}
                 style={{backgroundColor: '#FF0000', color: '#F0F0F0'}}>a quick brown</span>,

@@ -45,12 +45,9 @@ export const ShowForm = (_: {}): JSX.Element => {
  *     includes the text, where each card says the color name and has its
  *     background color set to the actual color
  */
-export const ShowColors = (props: {text: string, colorList: ColorList }): JSX.Element => {
-  if (props === undefined || props.text === undefined || props.colorList === undefined) {
-    return <div>{[]}</div>;
-  }
-  const names = props.colorList.findMatchingNames(props.text.toLowerCase());
-  return <div>{compact_list(getColorCards(names, props.colorList))}</div>
+export const ShowColors = (props: {text: string, colors: ColorList }): JSX.Element => {
+  const names = props.colors.findMatchingNames(props.text.toLowerCase());
+  return <div>{compact_list(getColorCards(names, props.colors))}</div>
 };
 
 // Map a list of names into a list of HTML elements that display each color.
@@ -79,24 +76,21 @@ const getColorCards = (names: List<string>, colorList: ColorList): List<JSX.Elem
  */
 export const ShowHighlights =
     (props: {highlights: List<Highlight>,
-      colorList: ColorList}): JSX.Element => {
-  if (props === undefined || props.highlights === undefined || props.colorList === undefined) {
-    return <div>{[]}</div>;
-  }
-  return <div>{compact_list(getHighlights(props.highlights, 0, props.colorList))}</div>;
+      colors: ColorList}): JSX.Element => {
+  return <div>{compact_list(getHighlights(props.highlights, 0, props.colors))}</div>;
 };
 
 // Maps the list of highlights into a list of spans showing them.
 const getHighlights = 
-    (highlights: List<Highlight>, key: number, colorList:ColorList ): List<JSX.Element> => {
+    (highlights: List<Highlight>, key: number, colors:ColorList ): List<JSX.Element> => {
   if (highlights === nil) {
     return nil;
   } else {
     const h = highlights.hd;
-    const [bg, fg] = colorList.getColorCss(h.color.toLowerCase());
+    const [bg, fg] = colors.getColorCss(h.color.toLowerCase());
     return cons(
         <span className="highlight" key={key}
               style={{backgroundColor: bg, color: fg}}>{h.text}</span>,
-        getHighlights(highlights.tl, key+1, colorList));
+        getHighlights(highlights.tl, key+1, colors));
   }
 };
