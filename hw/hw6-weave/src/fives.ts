@@ -18,7 +18,7 @@ export const multOfFive10 = (n: number): number => {
   let m: number = 0; 
   // Inv: 5*m = n_0 - n and n >= 0
   while (n >= 5) {
-    m = n > m + 1;        // TODO: change this
+    m = (n >= 10)? m + 2:m + 1;
     n = n - 5;
   }
   return m;
