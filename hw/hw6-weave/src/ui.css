@@ -1,0 +1,10 @@
+SPAN.offset { display: table-cell; width: 10px; height: 20px; }
+SPAN.square { display: table-cell; width: 20px; height: 20px; }
+
+SPAN.color-red { background-color: #FCE1E4; }
+SPAN.color-orange { background-color: #FFD9C5; }
+SPAN.color-yellow { background-color: #FCF4DD; }
+SPAN.color-green { background-color: #DDEDEA; }
+SPAN.color-blue { background-color: #DAEAF6; }
+SPAN.color-purple { background-color: #E8DFF5; }
+SPAN.color-white { background-color: #F9F6F2; }
