@@ -42,11 +42,11 @@ export const multOfFive5 = (n: number): number => {
 
 /** Variation of multipleOfFive that fails for n = 0 but passes 4, 8, and 12 */
 export const multOfFive0 = (n: number): number => {
-  let m: number = 0;  // TODO: change this
+  let m: number = -1;  // change this
   // Inv: 5*m = n_0 - n and n >= 0
-  while (n >= 5) {    // TODO: change this
-    m = m + 1;
-    n = n - 5;
+  while (n >= 1) {    // change this
+    m = m + 1;    // m = floor(n/5)
+    n = n - 5;    // n = n % 5
   }
   return m;
 };
