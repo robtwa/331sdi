@@ -18,7 +18,7 @@ export const multOfFive10 = (n: number): number => {
   let m: number = 0; 
   // Inv: 5*m = n_0 - n and n >= 0
   while (n >= 5) {
-    m = (n >= 10)? m + 2:m + 1;
+    m = (n >= 10)? m + 2:m + 1; // change this
     n = n - 5;
   }
   return m;
@@ -26,12 +26,14 @@ export const multOfFive10 = (n: number): number => {
 
 /**
  * Variation of multipleOfFive that fails for n=5
- * but passes 0, 4, 8, and 12
+ * but passes 0, 4, 8, and 12.
+ *
+ * Do this by changing just the loop exit condition.
  * */
 export const multOfFive5 = (n: number): number => {
   let m: number = 0; 
   // Inv: 5*m = n_0 - n and n >= 0
-  while (n >= 5) {    // TODO: change this
+  while (n > 5) {    // change this
     m = m + 1;
     n = n - 5;
   }
