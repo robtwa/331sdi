@@ -1,40 +1,6 @@
 import {List, nil, equal, cons, rev, len} from './list';
 import { Color } from './color';
 
-
-////////////////////////////////////////////////////////////////
-// my helper functions - begin
-
-/**
- * My recursive version of weaveWarpFacedOdds
- * @param colors
- */
-export const weaveWarpFacedOdds1 = (colors: List<Color>): List<Color> => {
-  // base case
-  if (colors === nil) {
-    return nil;
-  }
-  // recursive case
-  return cons(colors.hd, weaveWarpFacedOdds(skip(colors.tl)));
-}
-
-// func skip(nil) 		    := nil
-//      skip(cons(a, L)) 	:= L 			for any a : Color and L : List
-export const skip = (L: List<Color>): List<Color> => {
-  // Base case
-  if (L === nil) {
-    return nil;
-  }
-
-  // Recursive case
-  return L.tl;
-};
-
-// my helper functions - end
-////////////////////////////////////////////////////////////////
-
-
-
 /**
  * Returns the list of colors shown in the each of the odd rows (first,
  * third, fifth, etc.) by a warp-faced weave with the given warp colors.
@@ -101,6 +67,36 @@ export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
   }
 };
 
+
+////////////////////////////////////////////////////////////////
+// my helper functions - begin
+
+// leave = weaveBalancedOdds
+// func leave(nil,c)	      := nil	                    for any c : Z
+//      leave(cons(a,L),c)	:= cons(a,replace(L,c))	    for any a,c : Z and L : List
+export const weaveBalancedOdds1 = (L:List<string>, c: string):List<string> =>{
+  if (L === nil) {  // base case
+    return nil;
+  }
+  else {  // recursive case
+    return cons(L.hd, weaveBalancedEvens1(L.tl, c));
+  }
+}
+
+// replace = weaveBalancedEvens
+// func replace(nil,c)	      := nil	                  for any c : Z
+//      replace(cons(a,L),c)	:= cons(c,leave(L,c))	    for any a,c : Z and L : List
+export const weaveBalancedEvens1 = (L:List<string>, c: string):List<string> =>{
+  if (L === nil) {  // base case
+    return nil;
+  }
+  else {  // recursive case
+    return cons(c, weaveBalancedOdds1(L.tl, c));
+  }
+}
+
+// my helper functions - end
+////////////////////////////////////////////////////////////////
 /**
  * Returns the list of colors shown in the each of the odd rows (first, third,
  * fifth, etc.) by a balanced weave with the given warp and weft colors.
@@ -108,8 +104,8 @@ export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
  * @param c (weft) color to replace with
  * @return leave(colors, c)
  */
-export const weaveBalancedOdds
-  = (colors: List<Color>, c: Color): List<Color> => {
+export const weaveBalancedOdds2 =
+  (colors: List<Color>, c: Color): List<Color> => {
   console.log(c)
   // TODO(6f): detect and handle odd length lists here
 
@@ -141,7 +137,7 @@ export const weaveBalancedOdds
  * @param c (weft) color to replace with
  * @return replace(colors, c)
  */
-export const weaveBalancedEvens =
+export const weaveBalancedEvens2 =
     (colors: List<Color>, c: Color): List<Color> => {
       console.log(c);
   // TODO(6f): detect and handle odd length lists here
@@ -207,6 +203,6 @@ export const weaveBalanced =
       console.log(rows)
   // TODO: implement this with a while loop as described in 7b
   // Be sure to document your loop invariant with an Inv comment above the loop
-  return cons(weaveBalancedEvens(colors, c),
-      cons(weaveBalancedOdds(colors, c), nil));
+  return cons(weaveBalancedEvens2(colors, c),
+      cons(weaveBalancedOdds2(colors, c), nil));
 };
