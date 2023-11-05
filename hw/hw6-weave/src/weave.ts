@@ -1,4 +1,4 @@
-import {List, nil, equal, cons, rev, len, compact_list} from './list';
+import {List, nil, equal, cons, rev, len} from './list';
 import { Color } from './color';
 
 
@@ -42,31 +42,19 @@ export const skip = (L: List<Color>): List<Color> => {
  * @return take(colors), i.e., every other color starting from the first
  */
 export const weaveWarpFacedOdds = (colors: List<Color>): List<Color> => {
-  // TODO(6c): detect and handle odd length lists here
+  if (colors !== nil && len(colors) % 2 !== 0) { // odds
+    return cons(colors.hd, weaveWarpFacedEvens(colors.tl));
+  }
 
   let R: List<Color> = rev(colors);   // reversed colors
   let S: List<Color> = nil;           // ghosted
   let T: List<Color> = nil;           // the returned color list
 
-  // If the "colors" list has less than two elements
-  if (len(R) < 2) {
-    T = R;
-    S = colors;
-    R = nil;
-  }
-
   // Inv: colors = concat(rev(R), S) and T = weaveWarpFacedOdds(S)
   while (R !== nil && R.tl !== nil) {
-    if (len(R) % 2 !== 0) {  // odd
-      T = cons(R.hd, T);  // take the current color
-      S = cons(R.hd, S);  // ghosted list
-      R = R.tl;           // the rest colors
-    }
-    else {  // even
       T = cons(R.tl.hd, T);               // take the next color
       S = cons(R.tl.hd, cons(R.hd, S));   // ghosted list
       R = R.tl.tl;                        // skip one
-    }
   }
 
   if (!equal(S, colors)) {  // defensive programming
@@ -87,30 +75,19 @@ export const weaveWarpFacedOdds = (colors: List<Color>): List<Color> => {
  * @return skip(colors), i.e., every other color starting from the second
  */
 export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
-  // TODO(6c): detect and handle odd length lists here
+  if (colors!==nil && len(colors) % 2 !== 0) { // odds
+    return weaveWarpFacedOdds(colors.tl);
+  }
 
   let R: List<Color> = rev(colors);
   let S: List<Color> = nil;
   let T: List<Color> = nil;
 
-  // If the "colors" list has less than two elements
-  if (len(R) < 2) {
-    T = nil;
-    S = colors;
-    R = nil;
-  }
-
   // Inv: colors = concat(rev(R), S) and T = weaveWarpFacedEvens(S)
   while (R !== nil && R.tl !== nil) {
-    if (len(R) % 2 === 0) {  // even
       T = cons(R.hd, T);  // take the current color
       S = cons(R.tl.hd, cons(R.hd, S));   // ghosted list
       R = R.tl.tl;                        // skip one
-    }
-    else {  // odd
-      S = cons(R.hd, S);    // ghosted list
-      R = R.tl;             // skip one
-    }
   }
 
   if (!equal(S, colors)) {  // defensive programming
