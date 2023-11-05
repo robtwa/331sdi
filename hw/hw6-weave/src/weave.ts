@@ -1,4 +1,4 @@
-import {List, nil, equal, cons, rev, len} from './list';
+import {List, nil, equal, cons, rev, len, compact_list} from './list';
 import { Color } from './color';
 
 /**
@@ -68,10 +68,34 @@ export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
 };
 
 
-////////////////////////////////////////////////////////////////
-// my helper functions - begin
+////////////////////////////////////////////////////////////////////////////////
+// Graders, do not read this part
+// This is just to show myself what the recursive versions look like
+//
+// recursive versions - begin
+// My recursive version of weaveWarpFacedOdds
+export const weaveWarpFacedOdds1 = (colors: List<Color>): List<Color> => {
+  // base case
+  if (colors === nil) {
+    return nil;
+  }
+  // recursive case
+  return cons(colors.hd, weaveWarpFacedOdds(skip(colors.tl)));
+}
 
-// leave = weaveBalancedOdds
+// func skip(nil) 		    := nil
+//      skip(cons(a, L)) 	:= L 			for any a : Color and L : List
+export const skip = (L: List<Color>): List<Color> => {
+  // Base case
+  if (L === nil) {
+    return nil;
+  }
+
+  // Recursive case
+  return L.tl;
+};
+
+// The recursive version for weaveBalancedOdds
 // func leave(nil,c)	      := nil	                    for any c : Z
 //      leave(cons(a,L),c)	:= cons(a,replace(L,c))	    for any a,c : Z and L : List
 export const weaveBalancedOdds1 = (L:List<string>, c: string):List<string> =>{
@@ -83,7 +107,7 @@ export const weaveBalancedOdds1 = (L:List<string>, c: string):List<string> =>{
   }
 }
 
-// replace = weaveBalancedEvens
+// The recursive version for weaveBalancedEvens
 // func replace(nil,c)	      := nil	                  for any c : Z
 //      replace(cons(a,L),c)	:= cons(c,leave(L,c))	    for any a,c : Z and L : List
 export const weaveBalancedEvens1 = (L:List<string>, c: string):List<string> =>{
@@ -94,9 +118,11 @@ export const weaveBalancedEvens1 = (L:List<string>, c: string):List<string> =>{
     return cons(c, weaveBalancedOdds1(L.tl, c));
   }
 }
-
-// my helper functions - end
+// recursive versions - end
 ////////////////////////////////////////////////////////////////
+
+
+
 /**
  * Returns the list of colors shown in the each of the odd rows (first, third,
  * fifth, etc.) by a balanced weave with the given warp and weft colors.
@@ -104,19 +130,21 @@ export const weaveBalancedEvens1 = (L:List<string>, c: string):List<string> =>{
  * @param c (weft) color to replace with
  * @return leave(colors, c)
  */
-export const weaveBalancedOdds2 =
+export const weaveBalancedOdds =
   (colors: List<Color>, c: Color): List<Color> => {
-  console.log(c)
-  // TODO(6f): detect and handle odd length lists here
+  if (colors !== nil && len(colors) % 2 !== 0) { // odd length
+    return cons(colors.hd, weaveBalancedEvens(colors.tl, c));
+  }
 
   let R: List<Color> = rev(colors);
-  let S: List<Color> = nil;
-  let T: List<Color> = nil;
+  let S: List<Color> = nil;   // ghosted
+  let T: List<Color> = nil;   // the returned list
 
-  // Inv: TODO(6d): add this
+  // Inv: colors = concat(rev(R), s) and T = weaveBalancedOdds(S)
   while (R !== nil && R.tl !== nil) {
-    // TODO(6e): implement this
-    break;  // TODO(6e): remove
+    T = cons(R.tl.hd, cons(c, T));      // Take the next color
+    S = cons(R.tl.hd, cons(R.hd, S));   // cons("red", cons("green", ...))
+    R = R.tl.tl;     // The rest of the color list for the next iteration
   }
 
   if (!equal(S, colors)) {  // defensive programming
@@ -137,22 +165,26 @@ export const weaveBalancedOdds2 =
  * @param c (weft) color to replace with
  * @return replace(colors, c)
  */
-export const weaveBalancedEvens2 =
+export const weaveBalancedEvens =
     (colors: List<Color>, c: Color): List<Color> => {
-      console.log(c);
-  // TODO(6f): detect and handle odd length lists here
+  if (colors !== nil && len(colors) % 2 !== 0) {
+    return cons(c, weaveBalancedOdds(colors.tl, c));
+  }
 
   let R: List<Color> = rev(colors);
   let S: List<Color> = nil;
   let T: List<Color> = nil;
 
-  // Inv: TODO(6d): add this
+  // Inv: colors = concat(rev(R), s) and T = weaveBalancedEvens(colors)
   while (R !== nil && R.tl !== nil) {
-    // TODO(6e): implement this
-    break;  // TODO(6e): remove
+    T = cons(c, cons(R.hd, T));
+    S = cons(R.tl.hd, cons(R.hd, S));
+    R = R.tl.tl;
   }
 
   if (!equal(S, colors)) {  // defensive programming
+    console.log("S = ", compact_list(S))
+    console.log("colors = ", compact_list(colors))
     throw new Error("uh oh! S != colors... we made a mistake somewhere!");
   }
 
@@ -203,6 +235,6 @@ export const weaveBalanced =
       console.log(rows)
   // TODO: implement this with a while loop as described in 7b
   // Be sure to document your loop invariant with an Inv comment above the loop
-  return cons(weaveBalancedEvens2(colors, c),
-      cons(weaveBalancedOdds2(colors, c), nil));
+  return cons(weaveBalancedEvens(colors, c),
+      cons(weaveBalancedOdds(colors, c), nil));
 };
