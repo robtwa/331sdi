@@ -1,5 +1,39 @@
-import { List, nil, equal ,cons, rev } from './list';
+import {List, nil, equal, cons, rev, len, compact_list} from './list';
 import { Color } from './color';
+
+
+////////////////////////////////////////////////////////////////
+// my helper functions - begin
+
+/**
+ * My recursive version of weaveWarpFacedOdds
+ * @param colors
+ */
+export const weaveWarpFacedOdds1 = (colors: List<Color>): List<Color> => {
+  // base case
+  if (colors === nil) {
+    return nil;
+  }
+  // recursive case
+  return cons(colors.hd, weaveWarpFacedOdds(skip(colors.tl)));
+}
+
+// func skip(nil) 		    := nil
+//      skip(cons(a, L)) 	:= L 			for any a : Color and L : List
+export const skip = (L: List<Color>): List<Color> => {
+  // Base case
+  if (L === nil) {
+    return nil;
+  }
+
+  // Recursive case
+  return L.tl;
+};
+
+// my helper functions - end
+////////////////////////////////////////////////////////////////
+
+
 
 /**
  * Returns the list of colors shown in the each of the odd rows (first,
@@ -10,14 +44,29 @@ import { Color } from './color';
 export const weaveWarpFacedOdds = (colors: List<Color>): List<Color> => {
   // TODO(6c): detect and handle odd length lists here
 
-  let R: List<Color> = rev(colors);
-  let S: List<Color> = nil;
-  let T: List<Color> = nil;
+  let R: List<Color> = rev(colors);   // reversed colors
+  let S: List<Color> = nil;           // ghosted
+  let T: List<Color> = nil;           // the returned color list
 
-  // Inv: TODO(6a): add this
+  // If the "colors" list has less than two elements
+  if (len(R) < 2) {
+    T = R;
+    S = colors;
+    R = nil;
+  }
+
+  // Inv: colors = concat(rev(R), S) and T = weaveWarpFacedOdds(S)
   while (R !== nil && R.tl !== nil) {
-    // TODO(6b): implement this
-    break;  // TODO(6b): remove
+    if (len(R) % 2 !== 0) {  // odd
+      T = cons(R.hd, T);  // take the current color
+      S = cons(R.hd, S);  // ghosted list
+      R = R.tl;           // the rest colors
+    }
+    else {  // even
+      T = cons(R.tl.hd, T);               // take the next color
+      S = cons(R.tl.hd, cons(R.hd, S));   // ghosted list
+      R = R.tl.tl;                        // skip one
+    }
   }
 
   if (!equal(S, colors)) {  // defensive programming
@@ -44,10 +93,24 @@ export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
   let S: List<Color> = nil;
   let T: List<Color> = nil;
 
-  // Inv: TODO(6a): add this
+  // If the "colors" list has less than two elements
+  if (len(R) < 2) {
+    T = nil;
+    S = colors;
+    R = nil;
+  }
+
+  // Inv: colors = concat(rev(R), S) and T = weaveWarpFacedEvens(S)
   while (R !== nil && R.tl !== nil) {
-    // TODO(6b): implement this
-    break;  // TODO(6b): remove
+    if (len(R) % 2 === 0) {  // even
+      T = cons(R.hd, T);  // take the current color
+      S = cons(R.tl.hd, cons(R.hd, S));   // ghosted list
+      R = R.tl.tl;                        // skip one
+    }
+    else {  // odd
+      S = cons(R.hd, S);    // ghosted list
+      R = R.tl;             // skip one
+    }
   }
 
   if (!equal(S, colors)) {  // defensive programming
@@ -68,8 +131,9 @@ export const weaveWarpFacedEvens = (colors: List<Color>): List<Color> => {
  * @param c (weft) color to replace with
  * @return leave(colors, c)
  */
-export const weaveBalancedOdds =
-    (colors: List<Color>, c: Color): List<Color> => {
+export const weaveBalancedOdds
+  = (colors: List<Color>, c: Color): List<Color> => {
+  console.log(c)
   // TODO(6f): detect and handle odd length lists here
 
   let R: List<Color> = rev(colors);
@@ -102,6 +166,7 @@ export const weaveBalancedOdds =
  */
 export const weaveBalancedEvens =
     (colors: List<Color>, c: Color): List<Color> => {
+      console.log(c);
   // TODO(6f): detect and handle odd length lists here
 
   let R: List<Color> = rev(colors);
@@ -141,6 +206,7 @@ export const weaveBalancedEvens =
  */
 export const weaveWarpFaced =
     (rows: number, colors: List<Color>): List<List<Color>> => {
+      console.log(rows)
   // TODO: implement this with a while loop as described in 7a
   // Be sure to document your loop invariant with an Inv comment above the loop
   return cons(weaveWarpFacedEvens(colors),
@@ -161,6 +227,7 @@ export const weaveWarpFaced =
  */
 export const weaveBalanced =
     (rows: number, colors: List<Color>, c: Color): List<List<Color>> => {
+      console.log(rows)
   // TODO: implement this with a while loop as described in 7b
   // Be sure to document your loop invariant with an Inv comment above the loop
   return cons(weaveBalancedEvens(colors, c),
