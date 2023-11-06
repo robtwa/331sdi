@@ -66,12 +66,23 @@ export const Weave = (props: WeaveProps): JSX.Element => {
  */
 export const DrawWeave =
     (weave: List<List<Color>>, index: number): List<JSX.Element> => {
-  // TODO: replace this with a proper recursive implementation
-  if (weave === nil || weave.tl === nil || weave.tl.tl !== nil)
-    throw new Error("only supports 2 rows so far ");
-
-  return cons(DrawWeaveRow(weave.hd, true, index),
-      cons(DrawWeaveRow(weave.tl.hd, false, index + 1), nil));
+  if (weave === nil){ // base case: 0 element
+    return nil;
+  }
+  else if (weave.tl === nil) {  // base case: 1 element
+    return cons(DrawWeaveRow(weave.hd, true, index),
+                  DrawWeave(weave.tl, index + 1));
+  }
+  else if (weave.tl.tl === nil) { // base case: 2 element
+    return cons(DrawWeaveRow(weave.hd, true, index),
+                cons(DrawWeaveRow(weave.tl.hd, false, index + 1),
+                  nil));
+  }
+  else { // recursive case
+    return cons(DrawWeaveRow(weave.hd, true, index),
+              cons(DrawWeaveRow(weave.tl.hd, false, index + 1),
+                DrawWeave(weave.tl.tl, index + 2)));
+  }
 };
 
 /**
