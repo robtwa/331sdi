@@ -1,5 +1,13 @@
-import {List, nil, equal, cons, rev, len, compact_list} from './list';
+import {
+  List,
+  nil,
+  equal,
+  cons,
+  rev,
+  len,
+} from './list';
 import { Color } from './color';
+// import * as assert from 'assert';
 
 /**
  * Returns the list of colors shown in the each of the odd rows (first,
@@ -96,8 +104,8 @@ export const skip = (L: List<Color>): List<Color> => {
 };
 
 // The recursive version for weaveBalancedOdds
-// func leave(nil,c)	      := nil	                    for any c : Z
-//      leave(cons(a,L),c)	:= cons(a,replace(L,c))	    for any a,c : Z and L : List
+// func leave(nil,c)	      := nil	                 for any c : Z
+//      leave(cons(a,L),c)	:= cons(a,replace(L,c)) for any a,c : Z and L : List
 export const weaveBalancedOdds1 = (L:List<string>, c: string):List<string> =>{
   if (L === nil) {  // base case
     return nil;
@@ -108,8 +116,8 @@ export const weaveBalancedOdds1 = (L:List<string>, c: string):List<string> =>{
 }
 
 // The recursive version for weaveBalancedEvens
-// func replace(nil,c)	      := nil	                  for any c : Z
-//      replace(cons(a,L),c)	:= cons(c,leave(L,c))	    for any a,c : Z and L : List
+// func replace(nil,c)	      := nil	              for any c : Z
+//      replace(cons(a,L),c)	:= cons(c,leave(L,c)) for any a,c : Z and L : List
 export const weaveBalancedEvens1 = (L:List<string>, c: string):List<string> =>{
   if (L === nil) {  // base case
     return nil;
@@ -183,8 +191,6 @@ export const weaveBalancedEvens =
   }
 
   if (!equal(S, colors)) {  // defensive programming
-    console.log("S = ", compact_list(S))
-    console.log("colors = ", compact_list(colors))
     throw new Error("uh oh! S != colors... we made a mistake somewhere!");
   }
 
@@ -194,6 +200,33 @@ export const weaveBalancedEvens =
     throw new Error("uh oh! the list length wasn't even");
   }
 };
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Recursive version for weaveWarpFaced
+//
+// func weave(0, colors) 	    := nil
+//      weave(1, colors) 	    := evens
+//      weave(n + 2, colors) 	:= cons(evens,
+//                                cons(odds,weave(n,colors))) for any n : N
+//          where evens := weaveWarpFacedEvens(colors)
+//            and odds := weaveWarpFacedOdds(colors)
+export const weaveWarpFaced2 =
+              (rows: number, colors: List<Color>): List<List<Color>> => {
+  if (rows === 0) {  // base case
+    return nil;
+  }
+  else if (rows === 1) {
+    return cons(weaveWarpFacedEvens(colors), nil);
+  }
+  else {  // recursive case
+    return cons(weaveWarpFacedEvens(colors),
+             cons(weaveWarpFacedOdds(colors),
+               weaveWarpFaced2(rows - 2,colors)));
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Returns the given number of rows of a weave with the given colors
@@ -211,12 +244,46 @@ export const weaveBalancedEvens =
  */
 export const weaveWarpFaced =
     (rows: number, colors: List<Color>): List<List<Color>> => {
-      console.log(rows)
-  // TODO: implement this with a while loop as described in 7a
-  // Be sure to document your loop invariant with an Inv comment above the loop
-  return cons(weaveWarpFacedEvens(colors),
-      cons(weaveWarpFacedOdds(colors), nil));
+  let I: number = (rows % 2 === 0)? 0 : 1;
+  let S: List<List<Color>> = (I === 0) ?
+                              nil : cons(weaveWarpFacedEvens(colors), nil);
+  // Inv: S = weaveWarpFaced(I, colors)
+  while (I != rows) {
+    // checks for invariant
+    // assert.deepEqual(S, weaveWarpFaced(I, colors));
+    S = cons(weaveWarpFacedEvens(colors),
+          cons(weaveWarpFacedOdds(colors), S));
+    I = I + 2;
+  }
+  return S;
 };
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Recursive version for weaveBalanced
+//
+// func weaveBal(0, colors, c) 		  := nil
+//      weaveBal(1, colors, c) 		  := evens
+//      weaveBal(n + 2, colors, c) 	:= cons(evens,
+//                                        cons(odds,weaveBal(n, colors)))
+//                                                                for any n : N
+//            where evens := weaveBalancedEvens(colors, c)
+//               and odds := weaveBalancedOdds(colors, c)
+export const weaveBalanced2 =
+          (rows: number, colors: List<Color>, c: Color): List<List<Color>> => {
+  if (rows === 0) {  // base case
+    return nil;
+  }
+  else if (rows === 1) {
+    return cons(weaveBalancedEvens(colors, c), nil);
+  }
+  else {  // recursive case
+    return cons(weaveBalancedEvens(colors, c),
+            cons(weaveBalancedOdds(colors, c),
+              weaveBalanced2(rows - 2, colors, c)));
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Returns the given number of rows of a balanced weave with the given colors
@@ -231,10 +298,17 @@ export const weaveWarpFaced =
  *             cons(weaveBalancedOdds(colors, c), weaveBalanced(n, colors, c)))
  */
 export const weaveBalanced =
-    (rows: number, colors: List<Color>, c: Color): List<List<Color>> => {
-      console.log(rows)
-  // TODO: implement this with a while loop as described in 7b
-  // Be sure to document your loop invariant with an Inv comment above the loop
-  return cons(weaveBalancedEvens(colors, c),
-      cons(weaveBalancedOdds(colors, c), nil));
+  (rows: number, colors: List<Color>, c: Color): List<List<Color>> => {
+  let I: number = (rows % 2 === 0)? 0 : 1;
+  let S: List<List<Color>> = (I === 0) ?
+                              nil : cons(weaveBalancedEvens(colors, c), nil);
+  // Inv: S = weaveWarpFaced(I, colors)
+  while (I != rows) {
+    // checks for invariant
+    // assert.deepEqual(S, weaveBalanced(I, colors, c));
+    S = cons(weaveBalancedEvens(colors, c),
+          cons(weaveBalancedOdds(colors, c), S));
+    I = I + 2;
+  }
+  return S;
 };
