@@ -145,9 +145,6 @@ export const weaveBalancedEvens =
   }
 };
 
-
-
-
 /**
  * Returns the given number of rows of a weave with the given colors
  * @param rows the (natural) number of rows in the weave
@@ -172,7 +169,7 @@ export const weaveWarpFaced =
     // checks for invariant
     // assert.deepEqual(S, weaveWarpFaced(I, colors));
     S = cons(weaveWarpFacedEvens(colors),
-      cons(weaveWarpFacedOdds(colors), S));
+          cons(weaveWarpFacedOdds(colors), S));
     I = I + 2;
   }
   return S;
@@ -200,7 +197,7 @@ export const weaveBalanced =
       // checks for invariant
       // assert.deepEqual(S, weaveBalanced(I, colors, c));
       S = cons(weaveBalancedEvens(colors, c),
-        cons(weaveBalancedOdds(colors, c), S));
+            cons(weaveBalancedOdds(colors, c), S));
       I = I + 2;
     }
     return S;
