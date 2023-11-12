@@ -3,9 +3,26 @@ const DEBUG: boolean = true;  // turn this to 'false' later if you want to preve
 // to false, but in a bigger program we might want to turn it off after debugging is
 // complete, to avoid running expensive invariant checks when the project is released.
 
-/** TODO: (part 1a) write the specification */
+// (part 1a) write the specification
+/**
+ * Replaces some words in the given array if the corresponding words have
+ * replacements in the given map.
+ * @param words an array of characters (all length-1 strings)
+ * @modifies words
+ * @effects words = substitute(words, reps)
+ */
 export const substitute = (words: string[], reps: Map<string, string>): void => {
-  // TODO: (part 1b) implement this
+  // (part 1b) implement this
+  let j: number = 0;  // index into to array "words"
+
+  // Inv: words = substitute(words_0[0 .. j - 1],reps) ⧺ words_0[j .. n - 1].
+  while (j !== words.length) {
+    if (reps.has(words[j])) {
+      words[j] = <string>reps.get(words[j]);
+    }
+
+    j = j + 1;  // increase the index j
+  }
 };
 
 /**
@@ -225,6 +242,7 @@ export const wordsContain =
  */
 export const joinWords = (words: ReadonlyArray<string>): string => {
   // TODO (part 4a): handle the case when the array is empty
+  console.log(words);
 
   // TODO (part 4b): write a loop for the case when the array is not empty
   return "wrong answer";

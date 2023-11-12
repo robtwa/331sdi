@@ -1,11 +1,82 @@
 import * as assert from 'assert';
-import { replaceWords, splitWords, wordsContain, joinWords } from './words';
+import { replaceWords, splitWords, wordsContain, joinWords, substitute } from './words';
 
 
 describe('words', function() {
 
   it('substitute', function() {
-    // TODO: (part 1c) add tests here
+    // (part 1c) add tests here
+    let words:string[] = [];
+    const reps = new Map([
+      ["a", "A"],
+      ["b", "B"],
+      ["c", "C"],
+      ["d", "D"],
+      ["e", "E"],
+      ["f", "F"],
+      ["g", "G"],
+      ["h", "H"],
+      ["i", "I"],
+      ["j", "J"],
+      ["k", "K"],
+      ["l", "L"],
+      ["m", "M"],
+      ["n", "N"],
+      ["o", "O"],
+      ["p", "P"],
+      ["q", "Q"],
+      ["r", "R"],
+      ["s", "S"],
+      ["t", "T"],
+      ["u", "U"],
+      ["v", "V"],
+      ["w", "W"],
+      ["x", "X"],
+      ["y", "Y"],
+      ["z", "Z"],
+    ]);
+
+    // 0-1-many: base case
+    substitute(words, reps);
+    assert.deepStrictEqual(words, []);
+
+    // 0-1-many: 1 iteration
+    words = ["a"];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["A"]);
+
+    // 0-1-many: more than 1 iteration (1st)
+    words = ["c", "s", "e", "3", "3", "1"];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["C", "S", "E", "3", "3", "1"]);
+
+    // 0-1-many: more than 1 iteration (2nd)
+    words = ["C", "S", "E", "3", "3", "1"];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["C", "S", "E", "3", "3", "1"]);
+
+    // 0-1-many: more than 1 iteration (3rd)
+    words = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+              "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]);
+
+    // 0-1-many: more than 1 iteration (4th)
+    words = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+      "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1"];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1"]);
+
+    // 0-1-many: more than 1 iteration (5th)
+    words = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+      "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+      "3", "3", "1", "a" ];
+    substitute(words, reps);
+    assert.deepStrictEqual(words, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+      "3", "3", "1", "A" ]);
   });
 
   it('replaceWords', function() {
