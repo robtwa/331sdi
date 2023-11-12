@@ -17,8 +17,9 @@ export const substitute = (words: string[], reps: Map<string, string>): void => 
 
   // Inv: words = substitute(words_0[0 .. j - 1],reps) ⧺ words_0[j .. n - 1].
   while (j !== words.length) {
-    if (reps.has(words[j])) {
-      words[j] = <string>reps.get(words[j]);
+    const val = reps.get(words[j]);
+    if (val !== undefined) {
+      words[j] = val;
     }
 
     j = j + 1;  // increase the index j
