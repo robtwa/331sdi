@@ -242,9 +242,26 @@ export const wordsContain =
  *         join-words(L @ [v]) + " " + w  if w is not punctuation
  */
 export const joinWords = (words: ReadonlyArray<string>): string => {
-  // TODO (part 4a): handle the case when the array is empty
-  console.log(words);
+  // (part 4a): handle the case when the array is empty
+  if (words.length === 0 ) {
+    return "";
+  }
 
-  // TODO (part 4b): write a loop for the case when the array is not empty
-  return "wrong answer";
+  // (part 4b): write a loop for the case when the array is not empty
+  let j:number = 0;         // an index into the array
+  let parts:string[] = [];  // an array of strings
+
+  //{{Inv: join(parts) = join-words(words[0 .. j − 1]) }}
+  while (j < words.length) {
+    // If w is the first element in the array or w is a punctuation mark
+    if ( j < 1 || (words[j].length === 1 && isPunct(words[j]))) {
+      parts[j] = words[j];
+    }
+    else {  // otherwise
+      parts[j] = " " + words[j];
+    }
+    j = j + 1;
+  }
+
+  return parts.join("");
 };
