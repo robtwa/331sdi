@@ -100,20 +100,53 @@ const isPunct = (ch: string): boolean => {
  *     4. each word is either a single punctuation character or 1+ letters
  */
 export const splitWords = (str: string): string[] => {
-  let splits: number[] = [];  // TODO (part a): fix this
-  let j: number = 9;          // TODO (part a): fix this
+  console.log("splitWords ************************")
+  console.log('str = "'+ str + '\"');
+  console.log("str.length = ", str.length);
+
+  let splits: number[] = [0];  // (part a): fix this
+  let j: number = 0;          // (part a): fix this
 
   CheckInv1(splits, str, j);
 
   // Inv: 1. 0 = splits[0] < splits[1] < ... < splits[n-1] = j
   //      2. for i = 0 .. n-1, if splits[i+1] - splits[i] > 1, then 
-  //         str[splits[i] ..  splits[i+1]-1] is all letters
+  //                      str[splits[i] ..  splits[i+1]-1] is all letters
   //      3. for i = 1 .. n-1, splits[i] is not between two letters
-  //  where n = splits.length
-  while (j !== 9) {  // TODO (part 5a): fix this
-    // TODO (part 5a): implement this
+  //                      where n = splits.length
+  while (j !== str.length) {  // (part 5a): fix this
+    // (part 5a): implement this
+    console.log("while loop -----------------------------------------")
+    console.log("j = ", j)
+    console.log(`str[`+j+`] = "` + str[j] +`"`);
+
+
+    if (j < 1 || (str[j] === " " || isPunct(str[j])) || (j > 0 && (str[j-1] === " " || isPunct(str[j-1])))) {
+      console.log("** push **")
+      splits.push(j + 1);
+    }
+    else {
+      console.log("** change **")
+      splits.push(<number> splits.pop() + 1 );
+    }
+    console.log("splits = ", splits)
+
+
+
+    j = j + 1;
+
     CheckInv1(splits, str, j);
+
+
+
+
+
+
   }
+
+
+
+
 
   let words: string[] = [];
   let i = 0;
