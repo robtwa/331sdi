@@ -100,12 +100,9 @@ const isPunct = (ch: string): boolean => {
  *     4. each word is either a single punctuation character or 1+ letters
  */
 export const splitWords = (str: string): string[] => {
-  console.log("splitWords ************************")
-  console.log('str = "'+ str + '\"');
-  console.log("str.length = ", str.length);
-
   let splits: number[] = [0];  // (part a): fix this
-  let j: number = 0;          // (part a): fix this
+  let j: number = 0;           // (part a): fix this
+  let last:number|undefined;   // the last element in the splits array
 
   CheckInv1(splits, str, j);
 
@@ -116,37 +113,21 @@ export const splitWords = (str: string): string[] => {
   //                      where n = splits.length
   while (j !== str.length) {  // (part 5a): fix this
     // (part 5a): implement this
-    console.log("while loop -----------------------------------------")
-    console.log("j = ", j)
-    console.log(`str[`+j+`] = "` + str[j] +`"`);
-
-
-    if (j < 1 || (str[j] === " " || isPunct(str[j])) || (j > 0 && (str[j-1] === " " || isPunct(str[j-1])))) {
-      console.log("** push **")
+    if (j < 1
+      || (str[j] === " " || isPunct(str[j]))
+      || (j > 0 && (str[j-1] === " " || isPunct(str[j-1])))) {
       splits.push(j + 1);
     }
     else {
-      console.log("** change **")
-      splits.push(<number> splits.pop() + 1 );
+      last = splits.pop();
+      if(last !== undefined) {
+        splits.push(<number>last + 1 );
+      }
     }
-    console.log("splits = ", splits)
-
-
 
     j = j + 1;
-
     CheckInv1(splits, str, j);
-
-
-
-
-
-
   }
-
-
-
-
 
   let words: string[] = [];
   let i = 0;
