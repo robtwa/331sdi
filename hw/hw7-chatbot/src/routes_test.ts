@@ -125,7 +125,7 @@ describe('routes', function () {
     load(req21load, res21load);
     assert.strictEqual(res21load._getStatusCode(), 200);
     assert.deepStrictEqual(res21load._getData(),
-      {name: 'A', value: 'some stuff'});
+      {value: 'some stuff'});
 
     // Second branch (2nd)
     // save data
@@ -147,7 +147,7 @@ describe('routes', function () {
     load(req22load, res22load);
     assert.strictEqual(res22load._getStatusCode(), 200);
     assert.deepStrictEqual(res22load._getData(),
-      {name: name, value: value});
+      {value: value});
 
     // Third branch, straight line code, error case (queried name does not exist)
     resetTranscriptsForTesting();

@@ -68,7 +68,6 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
 
   if (transcripts.has(name)) {
     res.send({
-      "name": name,
       "value": transcripts.get(name)
     });
   } else {
