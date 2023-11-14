@@ -156,9 +156,9 @@ describe('routes', function () {
     const res3 = httpMocks.createResponse();
     load(req3, res3);
 
-    assert.strictEqual(res3._getStatusCode(), 400);
+    assert.strictEqual(res3._getStatusCode(), 404);
     assert.deepStrictEqual(res3._getData(),
-      'The queried transcript does not exist');
+      'no transcript called "A" was found');
   });
 
 });

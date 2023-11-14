@@ -68,11 +68,11 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
 
   if (transcripts.has(name)) {
     res.send({
-      name: name,
-      value: transcripts.get(name)
+      "name": name,
+      "value": transcripts.get(name)
     });
   } else {
-    res.status(400).send('The queried transcript does not exist');
+    res.status(404).send('no transcript called "'+name+'" was found');
   }
 
 }
