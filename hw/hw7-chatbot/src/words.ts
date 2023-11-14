@@ -118,11 +118,7 @@ export const splitWords = (str: string): string[] => {
       || (j > 0 && (str[j - 1] === " " || isPunct(str[j - 1])))) {
       splits.push(j + 1);
     } else {
-      // the last element in the "splits" array
-      let last: number | undefined = splits.pop();
-      if (last !== undefined) {
-        splits.push(last + 1);
-      }
+      splits[splits.length - 1] = splits[splits.length - 1] + 1;
     }
 
     j = j + 1;
