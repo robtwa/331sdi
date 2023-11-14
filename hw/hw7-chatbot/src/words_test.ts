@@ -1,12 +1,18 @@
 import * as assert from 'assert';
-import { replaceWords, splitWords, wordsContain, joinWords, substitute } from './words';
+import {
+  replaceWords,
+  splitWords,
+  wordsContain,
+  joinWords,
+  substitute
+} from './words';
 
 
-describe('words', function() {
+describe('words', function () {
 
-  it('substitute', function() {
+  it('substitute', function () {
     // (part 1c) add tests here
-    let words:string[] = [];
+    let words: string[] = [];
     const reps = new Map([
       ["a", "A"],
       ["b", "B"],
@@ -57,7 +63,7 @@ describe('words', function() {
 
     // 0-1-many: more than 1 iteration (3rd)
     words = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-              "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+      "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
     substitute(words, reps);
     assert.deepStrictEqual(words, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
       "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]);
@@ -72,25 +78,27 @@ describe('words', function() {
     // 0-1-many: more than 1 iteration (5th)
     words = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
       "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-      "3", "3", "1", "a" ];
+      "3", "3", "1", "a"];
     substitute(words, reps);
     assert.deepStrictEqual(words, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
       "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-      "3", "3", "1", "A" ]);
+      "3", "3", "1", "A"]);
   });
 
-  it('replaceWords', function() {
+  it('replaceWords', function () {
     const repl = new Map([["a", ["a", "b", "c"]], ["d", ["e", "f"]]]);
     assert.deepStrictEqual(replaceWords([], repl), []);
     assert.deepStrictEqual(replaceWords(["the"], repl), ["the"]);
     assert.deepStrictEqual(replaceWords(["a"], repl), ["a", "b", "c"]);
     assert.deepStrictEqual(replaceWords(["the", "a", "dog"], repl),
-        ["the", "a", "b", "c", "dog"]);
+      ["the", "a", "b", "c", "dog"]);
     assert.deepStrictEqual(replaceWords(["the", "a", "dog", "d"], repl),
-        ["the", "a", "b", "c", "dog", "e", "f"]);
+      ["the", "a", "b", "c", "dog", "e", "f"]);
   });
 
-  it('splitWords', function() {
+  it('splitWords', function () {
+    // assert.deepStrictEqual(splitWords("if this, then that"), ["if", "this", ",", "then", "that"]);
+
     assert.deepStrictEqual(splitWords(""), []);
     assert.deepStrictEqual(splitWords(" "), []);
     assert.deepStrictEqual(splitWords("."), ["."]);
@@ -106,7 +114,7 @@ describe('words', function() {
     assert.deepStrictEqual(splitWords("abc def  gh"), ["abc", "def", "gh"]);
   });
 
-  it('wordsContain', function() {
+  it('wordsContain', function () {
     assert.strictEqual(wordsContain([], ["a"]), -1);
     assert.strictEqual(wordsContain(["a", "b"], ["a"]), 0);
     assert.strictEqual(wordsContain(["c", "a", "b"], ["a"]), 1);
@@ -131,7 +139,7 @@ describe('words', function() {
     assert.strictEqual(wordsContain(["A", "B", "C", "D", "E"], ["c", "d", "c"]), -1);
   });
 
-  it('joinWords', function() {
+  it('joinWords', function () {
     assert.strictEqual(joinWords([]), "");
     assert.strictEqual(joinWords(["a"]), "a");
     assert.strictEqual(joinWords([","]), ",");
