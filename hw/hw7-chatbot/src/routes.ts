@@ -16,8 +16,8 @@ const lastUsed: Map<string, number> = new Map<string, number>();
 // Keep track of possible responses for when we run out of things to say.
 const memory: string[][] = [];
 
-// TODO(6a): declare a Map to record transcripts
-
+// (6a): declare a Map to record transcripts
+const transcripts: Map<string, unknown> = new Map<string, unknown>();
 
 /**
  * Handles request for /chat, with a message included as a query parameter,
@@ -49,21 +49,39 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     return;
   }
 
-  // TODO(6a): implement this part
+  // (6a): implement this part
   //  - store the passed in value in the map under the given name
   //  - return a record indicating whether that replaced an existing transcript
-  res.send({replaced: false});  // TODO(6a): replace
+  const replaced:boolean = transcripts.has(name);
+  transcripts.set(name, value);
+  res.send({replaced: replaced});  // (6a): replace
 }
 
 /** Handles request for /load by returning the transcript requested. */
 export const load = (req: SafeRequest, res: SafeResponse): void => {
-  // TODO(6b): implement this function
+  // (6b): implement this function
+  const name = first(req.query.name);
+  if (name === undefined || typeof name !== 'string') {
+    res.status(400).send('required argument "name" was missing');
+    return;
+  }
+
+  if (transcripts.has(name)) {
+    res.send({
+      name: name,
+      value: transcripts.get(name)});
+  }
+  else {
+    res.status(400).send('The queried transcript does not exist');
+  }
+
 }
 
 
 /** Used in tests to set the transcripts map back to empty. */
 export const resetTranscriptsForTesting = (): void => {
-  // TODO(6a): remove all saved transcripts from the map
+  // (6a): remove all saved transcripts from the map
+  transcripts.clear();
 };
 
 
