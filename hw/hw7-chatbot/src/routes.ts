@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { ParamsDictionary } from "express-serve-static-core";
-import { splitWords, joinWords } from './words';
-import { PATTERNS } from "./patterns";
-import { chatResponse } from "./chatbot";
+import {Request, Response} from "express";
+import {ParamsDictionary} from "express-serve-static-core";
+import {splitWords, joinWords} from './words';
+import {PATTERNS} from "./patterns";
+import {chatResponse} from "./chatbot";
 
 
 // Require type checking of request body.
@@ -52,7 +52,7 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
   // (6a): implement this part
   //  - store the passed in value in the map under the given name
   //  - return a record indicating whether that replaced an existing transcript
-  const replaced:boolean = transcripts.has(name);
+  const replaced: boolean = transcripts.has(name);
   transcripts.set(name, value);
   res.send({replaced: replaced});  // (6a): replace
 }
@@ -69,9 +69,9 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
   if (transcripts.has(name)) {
     res.send({
       name: name,
-      value: transcripts.get(name)});
-  }
-  else {
+      value: transcripts.get(name)
+    });
+  } else {
     res.status(400).send('The queried transcript does not exist');
   }
 
@@ -88,7 +88,7 @@ export const resetTranscriptsForTesting = (): void => {
 // Helper to return the (first) value of the parameter if any was given.
 // (This is mildly annoying because the client can also give mutiple values,
 // in which case, express puts them into an array.)
-const first = (param: unknown): string|undefined => {
+const first = (param: unknown): string | undefined => {
   if (Array.isArray(param) && param.length > 0) {
     return first(param[0]);
   } else if (typeof param === 'string') {
