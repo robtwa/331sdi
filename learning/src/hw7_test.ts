@@ -18,4 +18,14 @@ describe('hw7', function() {
   });
 
 
+  it('void', function() {
+
+    const str = "if this, then that";
+
+    for (let i = 0; i < str.length; i++) {
+      console.log("str["+i+"] = " + str[i] )
+    }
+  });
+
+
 });
