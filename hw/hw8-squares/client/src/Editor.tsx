@@ -63,9 +63,9 @@ export class Editor extends Component<EditorProps, EditorState> {
 
   tools = (): JSX.Element => {
     return <div className="buttonArea">
-      <button id="btn_save" className="button" onClick={this.doSplitClick}>Split</button>
-      <button id="btn_close" className="button" >Merge</button>
-      <select onChange={this.doColorChange} value={this.state.color} className="select">
+      <button id="btn_split" className="button" onClick={this.doSplitClick} >Split</button>
+      <button id="btn_merge" className="button" onClick={this.doMergeClick} >Merge</button>
+      <select onChange={this.doColorChange} value={this.state.color || ""} className="select">
         {Colors.map((color, index)=>(
           <option key={"color_"+index} value={color}>{color}</option>
         ))}
@@ -115,17 +115,54 @@ export class Editor extends Component<EditorProps, EditorState> {
 
   doMergeClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
     // TODO: implement
+    console.log("/".repeat(60))
+    console.log("11. doMergeClick() ")
+    const path: Path | undefined = this.state.selected;
+    const tree = toJson(this.state.root);
+    console.log("path = ", path)
+    console.log("tree = ", tree)
+    const data = this.mergeSq(path, tree);
+    console.log("11.2 data = ", data)
+    this.setState({root: fromJson(data)})
   };
+
+  mergeSq = (path: Path | undefined, root:unknown ):unknown =>{
+    console.log("12. root = ", root)
+
+    if (path === nil) {
+      console.log("12.1")
+      return root;
+    }
+    else {
+      if(Array.isArray(root) && path?.hd !== undefined) {
+        if (path?.tl === nil) {
+          console.log("12.2 root[dirToIdx[path.hd]] = ", root[dirToIdx[path.hd]])
+          return root[dirToIdx[path.hd]];
+        }
+        else {
+          console.log("12.3")
+          let data = [root[0], root[1], root[2], root[3]];
+          data[dirToIdx[path.hd]] = this.mergeSq(path.tl, root[dirToIdx[path.hd]]);
+          return data;
+        }
+      }
+      else {
+        throw new Error(`type ${typeof root} is not a valid square`);
+      }
+    }
+  }
 
   doColorChange = (_evt: ChangeEvent<HTMLSelectElement>): void => {
     console.log("/".repeat(60))
-    console.log("7. doColorChange() ")
+    console.log("7.1 doColorChange() ")
+    console.log("_evt.target.value = " + _evt.target.value)
     // TODO: implement
-    const color:Color = toColor(_evt.target.value);
+    const color: Color = toColor(_evt.target.value);
     const path: Path | undefined = this.state.selected;
     const tree = toJson(this.state.root);
     const data = this.changeColor(color, path, tree);
     this.setState({root: fromJson(data), color: color})
+
   };
 
   changeColor = (color: Color, path: Path | undefined, root:unknown ):unknown =>{
@@ -145,6 +182,5 @@ export class Editor extends Component<EditorProps, EditorState> {
         throw new Error(`type ${typeof root} is not a valid square`);
       }
     }
-
   }
 }
