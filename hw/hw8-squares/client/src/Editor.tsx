@@ -63,7 +63,8 @@ export class Editor extends Component<EditorProps, EditorState> {
     return <div className="buttonArea">
       <button id="btn_split" className="button" onClick={this.doSplitClick} >Split</button>
       <button id="btn_merge" className="button" onClick={this.doMergeClick} >Merge</button>
-      <select onChange={this.doColorChange} value={this.state.color || ""} className="select">
+      <select onChange={this.doColorChange} value="NA" className="select">
+        <option key={"color_NA"} value="NA">Pick a color</option>
         {Colors.map((color, index)=>(
           <option key={"color_"+index} value={color}>{color}</option>
         ))}
@@ -103,8 +104,7 @@ export class Editor extends Component<EditorProps, EditorState> {
    */
   splitSq = (path: Path | undefined, root: unknown): unknown => {
     if (path === nil) {
-      return [this.state.color, this.state.color,
-              this.state.color, this.state.color];
+      return [root, root, root, root];
     }
     else {
       if(Array.isArray(root) && root.length === 4 && path?.hd !== undefined) {
