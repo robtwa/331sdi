@@ -3,6 +3,8 @@ import { List } from './list';
 
 export type Color = "white" | "red" | "orange" | "yellow" | "green" | "blue" | "purple";
 
+export const Colors = ["white" , "red" , "orange" , "yellow" , "green" , "blue" , "purple"];
+
 /** Converts a string to a color (or throws an exception if not a color). */
 export const toColor = (s: string): Color => {
   switch (s) {
@@ -37,6 +39,12 @@ export type Dir = "NW" | "NE" | "SE" | "SW";
 /** Describes how to get to a square from the root of the tree. */
 export type Path = List<Dir>;
 
+export const dirToIdx = {
+  NW: 0,
+  NE: 1,
+  SW: 2,
+  SE: 3
+}
 
 /** Returns JSON describing the given Square. */
 export const toJson = (sq: Square): unknown => {
