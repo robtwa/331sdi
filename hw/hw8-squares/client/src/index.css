@@ -1,0 +1,40 @@
+body{
+    font-family: Arial;
+    background-color: #effff7;
+}
+h1{
+    font-size: 22px;
+}
+label{
+    font-size: 18px;
+    padding: 1px;
+    margin: 0;
+}
+li {
+    display: list-item;
+    padding: 4px 1px;
+    font-size: 16px;
+}
+.buttonArea {
+    margin-bottom: 1em;
+}
+.button {
+    padding: 1px 1em;
+    margin-right: 5px;
+    min-width: 80px;
+}
+.select {
+    padding: 5px 1em;
+    margin-right: 5px;
+    min-width: 80px;
+}
+.input {
+    margin-right: 5px;
+}
+a.delete {
+    margin-left: 3em;
+}
+.message {
+    padding: 1em 5px;
+    color: #000000;
+}
