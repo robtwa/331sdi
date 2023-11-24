@@ -29,24 +29,28 @@ export type SquareProps = {
  * @return TD element with the given width and pattern described in square
  */
 export const SquareElem = (props: SquareProps): JSX.Element => {
+  // console.log("3. SquareElem", props)
+
   return (
     <table cellPadding={0} cellSpacing={0}>
       <tbody>
         <tr>
-          <SquareNodeElem square={props.square} onClick={props.onClick}
-              width={props.width} height={props.height} path={nil}
-              selected={props.selected ? rev(props.selected) : undefined}/>
+          <SquareNodeElem
+            square={props.square}
+            onClick={props.onClick}
+            width={props.width}
+            height={props.height}
+            path={nil}
+            selected={props.selected ? rev(props.selected) : undefined}/>
         </tr>
       </tbody>
     </table>);
 };
 
-
 type SquareNodeProps = SquareProps & {
   path: Path;  // path to the current node (reversed)
   revSelected?: Path;  // selected path in reversed order
 };
-
 
 /**
  * Return HTML for one node in the tree and everything below it.
@@ -54,17 +58,23 @@ type SquareNodeProps = SquareProps & {
  * @return TD element with the given width and pattern described in square
  */
 export const SquareNodeElem = (props: SquareNodeProps): JSX.Element => {
+  // console.log("4. SquareNodeElem", props)
+
   const clickHandler = (!props.onClick) ? ignoreClick :
       (evt: MouseEvent) => handleClick(evt, props);
 
   if (props.square.kind === "solid") {
+    // console.log("4.1 SquareNodeElem: solid", props)
+
     const cls = (props.selected && equal(props.path, props.selected))
         ? props.square.color + '-selected' : props.square.color;
     const w = props.width + 'px';
     const h = props.height + 'px';
     return <td className={'square-solid ' + cls} style={{width: w, height: h}}
                onClick={clickHandler}> </td>;
-  } else {
+  } else {  // props.square.kind === "split"
+    // console.log("4.2 SquareNodeElem: split", props)
+
     const cls = "square-split";
     const left = Math.floor(props.width / 2);
     const right = Math.ceil(props.width / 2);
@@ -102,7 +112,9 @@ export const SquareNodeElem = (props: SquareNodeProps): JSX.Element => {
  */
 export const handleClick = (evt: MouseEvent, props: SquareNodeProps): void => {
   evt.stopPropagation();
+  // console.log("5. handleClick", props)
   if (props.onClick !== undefined) {
+    // console.log("5.1 props.onClick !== undefined")
     props.onClick(rev(props.path));
   }
 };
