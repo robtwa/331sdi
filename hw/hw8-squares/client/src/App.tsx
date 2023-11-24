@@ -122,14 +122,14 @@ export class App extends Component<{}, AppState> {
    *
    * @param name The string file name
    */
-  doLoadRequest = (name:string): void => {
-    fetch("/api/load?name="+name)
+  doLoadRequest = (filename:string): void => {
+    fetch("/api/load?filename="+filename)
       .then((res: Response): void => {
         if (res.status === 200) {
           res.json().then((data:unknown) =>{
             try {
               this.setState({
-                filename: name,
+                filename: filename,
                 file_open: true,
                 sq:fromJson(data)})
             }
@@ -156,16 +156,18 @@ export class App extends Component<{}, AppState> {
   };
 
   /**
+   * Extra credit.
+   *
    * Request the server to delete the specified file and return a new list of
    * remaining files.
    * If the request is successful, update the data to the editor.
    * If any errors occur, display the short error to the UI, and print the long
    * error to the console.
    *
-   * @param name The string filename
+   * @param filename The string filename
    */
-  doDeleteRequest = (name:string): void => {
-    fetch("/api/delete?name="+name)
+  doDeleteRequest = (filename:string): void => {
+    fetch("/api/delete?filename="+filename)
       .then((res: Response): void => {
         if (res.status === 200) {
           res.json().then((data:unknown) =>{
@@ -232,7 +234,7 @@ export class App extends Component<{}, AppState> {
    */
   onSave = (tree: Square): void => {
     const payload = {
-      name: this.state.filename,
+      filename: this.state.filename,
       data: toJson(tree)
     }
 
@@ -242,7 +244,6 @@ export class App extends Component<{}, AppState> {
            headers: {"Content-Type": "application/json"}})
       .then((res: Response): void => {
         if (res.status === 200) {
-          console.log(`File saved`)
           this.setState({message: `File saved`})
         } else {
           console.error(`bad status code: ${res.status}`);
@@ -253,7 +254,4 @@ export class App extends Component<{}, AppState> {
         console.error(error);
       });
   };
-
-
-
 }
