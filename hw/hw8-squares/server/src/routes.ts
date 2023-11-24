@@ -23,7 +23,7 @@ const files: Map<string, object> = new Map();
  */
 export const save = (req: SafeRequest, res: SafeResponse): void => {
   const filename = first(req.body.filename);
-  const data = req.body?.data;
+  const data = req.body.data;
 
   // validation
   if (filename === undefined) {
@@ -80,16 +80,16 @@ export const list = (_: SafeRequest, res: SafeResponse): void => {
  * @param res The HTTP response object
  */
 export const load = (req: SafeRequest, res: SafeResponse): void => {
-  const name = first(req.query.name);
-  if (name === undefined) {
-    res.status(400).send('missing "name" parameter');
+  const filename = first(req.query.filename);
+  if (filename === undefined) {
+    res.status(400).send('missing "filename" parameter');
     return;
   }
-  else if (!files.has(name)) {
-    res.status(400).send('There is no file with this name');
+  else if (!files.has(filename)) {
+    res.status(400).send('There is no file with the given name.');
     return;
   }
-  const data = files.get(name);
+  const data = files.get(filename);
   res.send(JSON.stringify(data));
 };
 
@@ -105,17 +105,17 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
  * @param res The HTTP response object
  */
 export const remove = (req: SafeRequest, res: SafeResponse): void => {
-  const name = first(req.query.name);
-  if (name === undefined) {
-    res.status(400).send('missing "name" parameter');
+  const filename = first(req.query.filename);
+  if (filename === undefined) {
+    res.status(400).send('missing "filename" parameter');
     return;
   }
-  else if (!files.has(name)) {
-    res.status(400).send('There is no file with this name');
+  else if (!files.has(filename)) {
+    res.status(400).send('There is no file with the given name');
     return;
   }
 
-  files.delete(name);  // delete file
+  files.delete(filename);  // delete file
   const data = Array.from(files.keys());  // generate a new file list
   res.send(JSON.stringify(data));  // send
 };
