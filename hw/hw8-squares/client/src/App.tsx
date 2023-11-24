@@ -6,55 +6,56 @@ import {Editor} from "./Editor";
 const initSq = solid("green");
 
 interface AppState {
-  // will probably need something here
-  _filename: string|undefined;
-  filename: string|undefined;
-  file_open: boolean;
-  file_list: string[];
-  sq:Square
+  _filename: string|undefined;    // temp var for entering a filename
+  filename: string|undefined;     // The name of the file currently being edited
+  file_open: boolean;             // Status of whether the file is open or not
+  file_list: string[];            // List of all files
+  sq:Square                       // The square currently being edited
+  message: string|undefined;      // String message
 }
 
 export class App extends Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
+
+    // The initial state
     this.state = {
       _filename:undefined,
       filename:undefined,
       file_open:false,
       file_list:[],
-      sq:initSq
+      sq:initSq,
+      message: undefined
     };
   }
 
   componentDidMount() {
+    // When the component is mounted on the screen, call this function to
+    // get a list of all saved files from the backend server
     this.doListRequest();
   }
 
   render = (): JSX.Element => {
-    console.log("0. ", this.state)
-
-    if (this.state.filename !== undefined && this.state.file_open ) {
-      // If they wanted this square, then we're done!
-
-      // TODO: replace this code with the commented out code below to use Editor
-      // return <SquareElem width={600} height={600} square={sq}
-      //           onClick={this.doSquareClick}/>;
+    // Determines whether to display the file creation UI or the editor UI
+    // based on the current state.
+    if (this.state.filename !== undefined && this.state.file_open) {
+      // Show the Editor UI
       return <>
-        <label key="label_filename">File name: {this.state.filename}</label>
         <Editor key="editor" initialState={this.state.sq} color={"green"}
                 saveFileFunc={this.onSave}
-                closeFileFunc={this.onClose}/>
+                closeFileFunc={this.onClose}
+                message={this.state.message}/>
+        <label key="label_filename"><b>File name</b>: {this.state.filename}</label>
       </>
     }
     else {
-      // ask the user to create a new file
-      return this.formNewFile(this.state.file_list);
+      // Show the UI for creating a new square.
+      return this.newFileUI(this.state.file_list);
     }
   };
 
-  // Task: add some functions to access routes and handle state changes probably
-
-  formNewFile = (files:string[]): JSX.Element => {
+  // Return to the UI for creating a file
+  newFileUI = (files:string[]): JSX.Element => {
     return <>
       <h1>Files</h1>
       <ul>
@@ -74,77 +75,125 @@ export class App extends Component<{}, AppState> {
     </>;
   }
 
+  /**
+   * Requests the name of all currently saved files from the server
+   * If the request is successful, the status code is 200 and the the returned
+   * data is an array, then update the received filenames to this component’s
+   * state object.
+   */
   doListRequest = (): void => {
     fetch("/api/list")
       .then((res: Response): void => {
-        console.log(res.status)
         if (res.status === 200) {
           res.json().then((data:unknown) =>{
             if (Array.isArray(data)) {
-              console.log("data is array ")
               this.setState({file_list: data})
             }
-            console.log("data = ", data)
+            else {
+              console.error("Bad data. The returned list of " +
+                "filenames is not an array");
+              this.setState({message: "Bad data. The returned list of " +
+                  "filenames is not an array"})
+            }
+          }).catch(error => {
+            // The error can be long, so do not update it to the state object.
+            // Print it to the console.
+            console.error(error);
           })
-        } else if (res.status === 400) {
-          console.log(res.json())
         } else {
-          console.log(`bad status code: ${res.status}`);
+          console.error(`bad status code: ${res.status}`);
+          this.setState({message: `bad status code: ${res.status}`})
         }
       })
       .catch((error) => {
+        // The error can be long, so do not update it to the state object.
+        // Print it to the console.
         console.error(error);
       });
   };
 
+  /**
+   * Request the specified file data from the server and load it into the
+   * editor.
+   * If the requested file exists, the status code is 200 and the data returned
+   * is valid, then updated the data to the state object.
+   * If any errors occur, display a short error to the UI, and print the long
+   * error to the console.
+   *
+   * @param name The string file name
+   */
   doLoadRequest = (name:string): void => {
-    console.log("doLoadRequest /////////////////////////")
     fetch("/api/load?name="+name)
       .then((res: Response): void => {
-        console.log(res.status)
         if (res.status === 200) {
           res.json().then((data:unknown) =>{
-            console.log("data = ", data)
-            this.setState({filename: name, file_open: true, sq:fromJson(data)})
+            try {
+              this.setState({
+                filename: name,
+                file_open: true,
+                sq:fromJson(data)})
+            }
+            catch (error){
+              // The error can be long, so do not update it to the state object.
+              // Print it to the console.
+              console.error(error);
+            }
+          }).catch(error =>{
+            // The error can be long, so do not update it to the state object.
+            // Print it to the console.
+            console.error(error);
           })
-        } else if (res.status === 400) {
-          console.log(res.json())
         } else {
-          console.log(`bad status code: ${res.status}`);
+          console.error(`bad status code: ${res.status}`);
+          this.setState({message: `bad status code: ${res.status}`})
         }
       })
       .catch((error) => {
+        // The error can be long, so do not update it to the state object.
+        // Print it to the console.
         console.error(error);
       });
   };
 
+  /**
+   * Request the server to delete the specified file and return a new list of
+   * remaining files.
+   * If the request is successful, update the data to the editor.
+   * If any errors occur, display the short error to the UI, and print the long
+   * error to the console.
+   *
+   * @param name The string filename
+   */
   doDeleteRequest = (name:string): void => {
-    console.log("doDeleteRequest /////////////////////////")
     fetch("/api/delete?name="+name)
       .then((res: Response): void => {
-        console.log(res.status)
         if (res.status === 200) {
           res.json().then((data:unknown) =>{
-            console.log("data = ", data)
             if (Array.isArray(data)) {
-              console.log("data is array ")
               this.setState({file_list: data})
             }
+            else {
+              console.error("Bad data. The returned list of " +
+                "filenames is not an array");
+              this.setState({message: "Bad data. The returned list of " +
+                  "filenames is not an array"})
+            }
           })
-        } else if (res.status === 400) {
-          console.log(res.json())
         } else {
-          console.log(`bad status code: ${res.status}`);
+          console.error(`bad status code: ${res.status}`);
+          this.setState({message: `bad status code: ${res.status}`})
         }
       })
       .catch((error) => {
+        // The error can be long, so do not update it to the state object.
+        // Print it to the console.
         console.error(error);
       });
   };
 
+  // Event handler for creating a new file.
   doCreate = (_evt: FormEvent): void => {
     _evt.preventDefault();
-    console.log(_evt);
     if (this.state._filename !== "") {
       this.setState({
         filename: this.state._filename,
@@ -155,13 +204,15 @@ export class App extends Component<{}, AppState> {
     }
   };
 
+  // Event handler for entering a file name.
+  // Update the filename to the state object.
   doChange = (_evt: ChangeEvent<HTMLInputElement>): void => {
-    console.log(_evt);
     this.setState({_filename:_evt.target.value})
   };
 
+  // Event handler for closing a file.
+  // Update the state object and call the function that updates the file list.
   onClose = (): void => {
-    console.log("doCloseClick")
     this.setState({
       filename: undefined,
       _filename: undefined,
@@ -171,10 +222,15 @@ export class App extends Component<{}, AppState> {
     this.doListRequest();
   };
 
+  /**
+   * Saves the contents of the currently edited file to the server.
+   * If the request is successful, update the message to the state object.
+   * If any errors occur, display the short error to the UI, and print the long
+   * error to the console.
+   *
+   * @param tree the square tree
+   */
   onSave = (tree: Square): void => {
-    console.log("doSaveClick")
-    console.log("tree = ", toJson(tree))
-
     const payload = {
       name: this.state.filename,
       data: toJson(tree)
@@ -184,21 +240,20 @@ export class App extends Component<{}, AppState> {
       {method: "POST",
            body: JSON.stringify(payload),
            headers: {"Content-Type": "application/json"}})
-      .then(this.doSaveResp)
+      .then((res: Response): void => {
+        if (res.status === 200) {
+          console.log(`File saved`)
+          this.setState({message: `File saved`})
+        } else {
+          console.error(`bad status code: ${res.status}`);
+          this.setState({message: `bad status code: ${res.status}`})
+        }
+      })
       .catch((error) => {
         console.error(error);
       });
   };
 
-  doSaveResp = (res: Response): void => {
-    if (res.status === 200) {
-      console.log(res.json())
-    } else if (res.status === 400) {
-      console.log(res.json())
-    } else {
-      console.log(`bad status code: ${res.status}`);
-    }
-  };
 
 
 }
