@@ -16,6 +16,8 @@ type EditorProps = {
   /** Initial state of the file. */
   initialState: Square;
   color: Color;
+  saveFileFunc: (tree: Square) => void;
+  closeFileFunc:  () => void;
 };
 
 
@@ -43,7 +45,7 @@ export class Editor extends Component<EditorProps, EditorState> {
   }
 
   render = (): JSX.Element => {
-    // TODO: add some editing tools here
+    // Task: add some editing tools here
     console.log("2. Editor: this.props = ", this.props)
     return <table ><tbody><tr>
         <td>
@@ -55,8 +57,10 @@ export class Editor extends Component<EditorProps, EditorState> {
         <td style={{paddingLeft: "20px"}}>
           <p style={{fontWeight:"bold"}}>Tools:</p>
           {this.state.selected && this.tools()}
-          <button id="btn_save" className="button" >Save</button>
-          <button id="btn_close" className="button" >Close</button>
+          <button id="btn_save" className="button"
+                  onClick={this.doSaveClick} >Save</button>
+          <button id="btn_close" className="button"
+                  onClick={this.props.closeFileFunc}>Close</button>
         </td>
       </tr></tbody></table>;
   };
@@ -73,8 +77,12 @@ export class Editor extends Component<EditorProps, EditorState> {
     </div>;
   }
 
+  doSaveClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
+    this.props.saveFileFunc(this.state.root)
+  };
+
   doSquareClick = (path: Path): void => {
-    // TODO: remove this code, do something with the path to the selected square
+    // Task: remove this code, do something with the path to the selected square
     console.log("6. doSquareClick()")
     console.log("path = ", path);
     console.log("this.state = ", this.state)
@@ -85,17 +93,15 @@ export class Editor extends Component<EditorProps, EditorState> {
     console.log("/".repeat(70))
     console.log("9. doSplitClick")
 
-    // TODO: implement
+    // Task: implement
     const path: Path | undefined = this.state.selected;
     const tree = this.splitSq(path, toJson(this.state.root), 0);
     console.log("9.1 tree = ", tree)
-
     this.setState({root: fromJson(tree)})
   };
 
   splitSq = (path: Path | undefined, root: unknown, times: number): unknown => {
     console.log("\t".repeat(times) + "10. root = ", root)
-
     if (path === nil) {
       return [this.state.color, this.state.color,
               this.state.color, this.state.color];
@@ -162,7 +168,6 @@ export class Editor extends Component<EditorProps, EditorState> {
     const tree = toJson(this.state.root);
     const data = this.changeColor(color, path, tree);
     this.setState({root: fromJson(data), color: color})
-
   };
 
   changeColor = (color: Color, path: Path | undefined, root:unknown ):unknown =>{
