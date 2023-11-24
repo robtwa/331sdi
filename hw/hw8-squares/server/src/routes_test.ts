@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as httpMocks from 'node-mocks-http';
-import { dummy } from './routes';
+import { list, save } from './routes';
 
 
 describe('routes', function() {
@@ -17,7 +17,7 @@ describe('routes', function() {
     const res1 = httpMocks.createResponse();
 
     // call our function to execute the request and fill in the response
-    dummy(req1, res1);
+    list(req1, res1);
 
     // check that the request was successful
     assert.strictEqual(res1._getStatusCode(), 200);
@@ -27,4 +27,19 @@ describe('routes', function() {
 
 
   // TODO: add tests for your routes
+  it('save', function() {
+    // httpMocks lets us create mock Request and Response params to pass into our route functions
+    const req1 = httpMocks.createRequest(
+      // query: is how we add query params. body: {} can be used to test a POST request
+      {method: 'POST', url: '/api/save', query: {filename: 'test1', data: "just a test"}});
+    const res1 = httpMocks.createResponse();
+
+    // call our function to execute the request and fill in the response
+    save(req1, res1);
+
+    // check that the request was successful
+    assert.strictEqual(res1._getStatusCode(), 200);
+    // and the response data is as expected
+    assert.deepEqual(res1._getData(), {res: 'test1'});
+  });
 });
