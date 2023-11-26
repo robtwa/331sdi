@@ -2,10 +2,11 @@ import React, {ChangeEvent, Component, FormEvent} from "react";
 import {fromJson, solid, Square, toJson} from './square';
 // import { SquareElem } from './square_draw';
 import {Editor} from "./Editor";
+import './index.css';
 
 const initSq = solid("green");
 
-interface AppState {
+type AppState = {
   _filename: string|undefined;    // temp var for entering a filename
   filename: string|undefined;     // The name of the file currently being edited
   file_open: boolean;             // Status of whether the file is open or not
@@ -30,8 +31,8 @@ export class App extends Component<{}, AppState> {
   }
 
   componentDidMount() {
-    // When the component is mounted on the screen, call this function to
-    // get a list of all saved files from the backend server
+    // When the component is mounted on the screen, call the doListRequest
+    // function to get a list of all saved files from the backend server
     this.doListRequest();
   }
 
