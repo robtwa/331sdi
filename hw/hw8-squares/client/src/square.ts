@@ -39,6 +39,9 @@ export type Dir = "NW" | "NE" | "SE" | "SW";
 /** Describes how to get to a square from the root of the tree. */
 export type Path = List<Dir>;
 
+/**
+ * Convert dir to index
+ */
 export const dirToIdx = {
   NW: 0,
   NE: 1,
