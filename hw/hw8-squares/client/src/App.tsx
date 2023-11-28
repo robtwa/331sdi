@@ -2,6 +2,7 @@ import React, {ChangeEvent, Component, FormEvent} from "react";
 import {fromJson, solid, Square, toJson} from './square';
 // import { SquareElem } from './square_draw';
 import {Editor} from "./Editor";
+import {isRecord} from "./record";
 import './index.css';
 
 type AppState = {
@@ -29,39 +30,35 @@ export class App extends Component<{}, AppState> {
   }
 
   /**
-   * When the component is mounted on the screen, call the doListRequest
-   * function to get a list of all saved files from the backend server
+   * When the component is mounted on the screen, call the doListRequestClick
+   * function to get a list of all saved files from the server.
    */
   componentDidMount = ():void => {
-    this.doListRequest();
+    this.doListRequestClick();
   }
 
+  // Render UI
   render = (): JSX.Element => {
-    // Determines whether to display the file creation UI or the editor UI
-    // based on the current state.
+    // Determines whether to render the UI of editor or creation
     if (this.state.filename !== undefined && this.state.file_open) {
-      // Show the Editor UI
+      // Render the UI the square Editor
       return <>
         <Editor key="editor" initialState={this.state.sq} color={"green"}
-                saveFileFunc={this.onSave}
-                closeFileFunc={this.onClose}
+                saveFileFunc={this.doSaveClick}
+                closeFileFunc={this.doCloseClick}
                 message={this.state.message}/>
         <label key="label_filename"><b>File name</b>: {this.state.filename}</label>
       </>
     }
     else {
-      // Show the UI for creating a new square.
+      // Render the UI for creating a new square.
       return <>
         <h1>Files</h1>
         <ul>
-          {}
-          {this.state.file_list.map((name)=>(
-            <li key={"file_list_"+name}><a href="#" onClick={()=>this.doLoadRequest(name)} >{name}</a>
-            <a href="#" className="delete"
-               onClick={()=>this.doDeleteRequest(name)}>Delete</a></li>))}
+          {this.renderFileList()}
         </ul>
         <div>
-          <form onSubmit={this.doCreate} >
+          <form onSubmit={this.doCreateClick} >
             <label htmlFor="filename" >Name: </label>
             <input id="filename" required={true} onChange={this.doChange}
                    className="input"/>
@@ -72,127 +69,23 @@ export class App extends Component<{}, AppState> {
     }
   };
 
+  // Render the saved file list
+  renderFileList = (): JSX.Element[] => {
+    const links: JSX.Element[] = [];
+    // Invariant: links is the list of the links in this.state.file_list[0:i]
+    for (const name of this.state.file_list) {
+      links.push(<li key={"file_list_"+name}>
+            <a href="#" onClick={()=>this.doLoadClick(name)} >{name}</a>
+            <a href="#" className="delete"
+                onClick={()=>this.doDeleteClick(name)}>Delete</a></li>)
+    }
 
-  /**
-   * Requests the name of all currently saved files from the server
-   * If the request is successful, the status code is 200 and the the returned
-   * data is an array, then update the received filenames to this component’s
-   * state object.
-   */
-  doListRequest = (): void => {
-    fetch("/api/list")
-      .then((res: Response): void => {
-        if (res.status === 200) {
-          res.json().then((data:unknown) =>{
-            if (Array.isArray(data)) {
-              this.setState({file_list: data})
-            }
-            else {
-              console.error("Bad data. The returned list of " +
-                "filenames is not an array");
-              this.setState({message: "Bad data. The returned list of " +
-                  "filenames is not an array"})
-            }
-          }).catch(error => {
-            // The error can be long, so do not update it to the state object.
-            // Print it to the console.
-            console.error(error);
-          })
-        } else {
-          console.error(`bad status code: ${res.status}`);
-          this.setState({message: `bad status code: ${res.status}`})
-        }
-      })
-      .catch((error) => {
-        // The error can be long, so do not update it to the state object.
-        // Print it to the console.
-        console.error(error);
-      });
-  };
+    return links;
+  }
 
-  /**
-   * Request the specified file data from the server and load it into the
-   * editor.
-   * If the requested file exists, the status code is 200 and the data returned
-   * is valid, then updated the data to the state object.
-   * If any errors occur, display a short error to the UI, and print the long
-   * error to the console.
-   *
-   * @param name The string file name
-   */
-  doLoadRequest = (filename:string): void => {
-    fetch("/api/load?filename="+filename)
-      .then((res: Response): void => {
-        if (res.status === 200) {
-          res.json().then((data:unknown) =>{
-            try {
-              this.setState({
-                filename: filename,
-                file_open: true,
-                sq:fromJson(data)})
-            }
-            catch (error){
-              // The error can be long, so do not update it to the state object.
-              // Print it to the console.
-              console.error(error);
-            }
-          }).catch(error =>{
-            // The error can be long, so do not update it to the state object.
-            // Print it to the console.
-            console.error(error);
-          })
-        } else {
-          console.error(`bad status code: ${res.status}`);
-          this.setState({message: `bad status code: ${res.status}`})
-        }
-      })
-      .catch((error) => {
-        // The error can be long, so do not update it to the state object.
-        // Print it to the console.
-        console.error(error);
-      });
-  };
-
-  /**
-   * Extra credit.
-   *
-   * Request the server to delete the specified file and return a new list of
-   * remaining files.
-   * If the request is successful, update the data to the editor.
-   * If any errors occur, display the short error to the UI, and print the long
-   * error to the console.
-   *
-   * @param filename The string filename
-   */
-  doDeleteRequest = (filename:string): void => {
-    fetch("/api/delete?filename="+filename)
-      .then((res: Response): void => {
-        if (res.status === 200) {
-          res.json().then((data:unknown) =>{
-            if (Array.isArray(data)) {
-              this.setState({file_list: data})
-            }
-            else {
-              console.error("Bad data. The returned list of " +
-                "filenames is not an array");
-              this.setState({message: "Bad data. The returned list of " +
-                  "filenames is not an array"})
-            }
-          })
-        } else {
-          console.error(`bad status code: ${res.status}`);
-          this.setState({message: `bad status code: ${res.status}`})
-        }
-      })
-      .catch((error) => {
-        // The error can be long, so do not update it to the state object.
-        // Print it to the console.
-        console.error(error);
-      });
-  };
 
   // Event handler for creating a new file.
-  doCreate = (_evt: FormEvent): void => {
+  doCreateClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
     if (this.state._filename !== "") {
       this.setState({
@@ -205,32 +98,33 @@ export class App extends Component<{}, AppState> {
   };
 
   // Event handler for entering a file name.
-  // Update the filename to the state object.
   doChange = (_evt: ChangeEvent<HTMLInputElement>): void => {
+    // Update the filename to the state object.
     this.setState({_filename:_evt.target.value})
   };
 
   // Event handler for closing a file.
-  // Update the state object and call the function that updates the file list.
-  onClose = (): void => {
+  doCloseClick = (): void => {
+    // Update the state object
     this.setState({
       filename: undefined,
       _filename: undefined,
       file_open: false,
       sq: solid("green")
     })
-    this.doListRequest();
+
+    // Requests a new list of all saved files.
+    this.doListRequestClick();
   };
 
   /**
-   * Saves the contents of the currently edited file to the server.
-   * If the request is successful, update the message to the state object.
-   * If any errors occur, display the short error to the UI, and print the long
-   * error to the console.
+   * Saves the content of the currently edited file to the server.
+   * If the request is successful, update the saved message to the state object.
+   * If any errors occur, print a short error info to the console.
    *
    * @param tree the square tree
    */
-  onSave = (tree: Square): void => {
+  doSaveClick = (tree: Square): void => {
     const payload = {
       filename: this.state.filename,
       data: toJson(tree)
@@ -238,18 +132,155 @@ export class App extends Component<{}, AppState> {
 
     fetch("/api/save",
       {method: "POST",
-           body: JSON.stringify(payload),
-           headers: {"Content-Type": "application/json"}})
-      .then((res: Response): void => {
-        if (res.status === 200) {
-          this.setState({message: `File saved`})
-        } else {
-          console.error(`bad status code: ${res.status}`);
-          this.setState({message: `bad status code: ${res.status}`})
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        body: JSON.stringify(payload),
+        headers: {"Content-Type": "application/json"}})
+      .then(this.doSaveResp)
+      .catch(()=>this.doSaveError("failed to connect to server"));
   };
+
+  // Called when the server responds to the save file request.
+  doSaveResp = (res:Response):void => {
+    if (res.status === 200) {
+      res.json().then(this.doSaveJson)
+        .catch(() => this.doSaveError("200 response is not valid JSON"));
+    } else {
+      this.doSaveError(`bad status code: ${res.status}`);
+    }
+  }
+
+  // Called when the save file response JSON has been parsed.
+  doSaveJson = (data: unknown): void => {
+    if (isRecord(data)) {
+      this.setState({message: "File saved"});
+    }
+    else {
+      this.doSaveError("Bad data. The returned data is not a json.");
+    }
+  };
+
+  // Called if an error occurs trying to save file
+  doSaveError = (msg: string): void => {
+    console.error(`Error fetching /api/save: ${msg}`);
+  };
+
+  /**
+   * Requests a list of all saved files from the server.
+   * If the request is successful and the status code is 200 and the returned
+   * data is valid, update the list to the component’s state object.
+   */
+  doListRequestClick = (): void => {
+    fetch("/api/list")
+      .then(this.doListRequestResp)
+      .catch(()=>this.doListRequestError("failed to connect to server"));
+  };
+
+  // Called when the server responds with a file list.
+  doListRequestResp = (res:Response):void => {
+    if (res.status === 200) {
+      res.json().then(this.doListRequestJson)
+        .catch(()=>this.doListRequestError("200 response is not valid JSON"))
+    } else {
+      this.doListRequestError(`bad status code: ${res.status}`);
+    }
+  }
+
+  // Called when the response JSON has been parsed.
+  doListRequestJson = (data: unknown): void => {
+    if (Array.isArray(data)) {
+      this.setState({file_list: data})
+    }
+    else {
+      this.doListRequestError("Bad data. The returned data is invalid.");
+    }
+  };
+
+  // Called if an error occurs trying to get the file list
+  doListRequestError = (msg: string): void => {
+    console.error(`Error fetching /api/list: ${msg}`);
+  };
+
+  /**
+   * Request a specified file data from the server.
+   * If the requested file exists and the status code is 200 and the data
+   *  returned is a valid square, then updated the data to the state object.
+   * If any errors occur, print a short error info to the console.
+   *
+   * @param name The string file name
+   */
+  doLoadClick = (filename:string): void => {
+    fetch("/api/load?filename="+filename)
+      .then((res: Response) => this.doLoadResp(res, filename))
+      .catch(()=>this.doLoadError("failed to connect to server", filename));
+  };
+
+  // Called when the server responds with a square data.
+  doLoadResp = (res:Response, filename: string):void => {
+    if (res.status === 200) {
+      res.json().then((data:unknown)=>this.doLoadJson(data, filename))
+        .catch(()=>this.doLoadError("200 response is not valid JSON", filename))
+    } else {
+      this.doLoadError(`bad status code: ${res.status}`, filename);
+    }
+  }
+
+  // Called when the response JSON has been parsed.
+  doLoadJson = (data: unknown, filename: string): void => {
+    if (Array.isArray(data)) {
+      this.setState({
+        filename: filename,
+        file_open: true,
+        sq:fromJson(data)})
+    }
+    else {
+      this.doLoadError("Bad data. The returned data is invalid.", filename);
+    }
+  };
+
+  // Called if an error occurs trying to get the file data
+  doLoadError = (msg: string, filename: string): void => {
+    console.error(`Error fetching /api/load?filename=${filename}: ${msg}`);
+  };
+
+  // Extra credit. ////////////////////////////////////////////////////////////
+  // New feature: delete a file
+
+  /**
+   * Request the server to delete a specified file and return a new list of
+   * remaining files.
+   * If the request is successful, delete the file from the file list.
+   * If any errors occur, print a short error info to the console.
+   *
+   * @param filename The string filename
+   */
+  doDeleteClick = (filename:string): void => {
+    fetch("/api/delete?filename="+filename)
+      .then((res: Response) => this.doDeleteResp(res, filename))
+      .catch(()=>this.doDeleteError("failed to connect to server", filename));
+  };
+
+  // Called when the server response to the request of deleting a file.
+  doDeleteResp = (res:Response, filename: string):void => {
+    if (res.status === 200) {
+      res.json().then((data:unknown)=>this.doDeleteJson(data, filename))
+        .catch(()=>this.doDeleteError("200 response is not valid JSON", filename))
+    } else {
+      this.doDeleteError(`bad status code: ${res.status}`, filename);
+    }
+  }
+
+  // Called when the response JSON has been parsed.
+  doDeleteJson = (data: unknown, filename: string): void => {
+    if (Array.isArray(data)) {
+      this.setState({file_list: data})
+    }
+    else {
+      this.doDeleteError("Bad data. The returned data is invalid", filename);
+    }
+  };
+
+  // Called if an error occurs trying to delete a file.
+  doDeleteError = (msg: string, filename: string): void => {
+    console.error(`Error fetching /api/delete?filename=${filename}: ${msg}`);
+  };
+
 }
