@@ -2,16 +2,28 @@ import React, { Component, ChangeEvent, MouseEvent } from "react";
 import {
   Square,
   Path,
-  Colors,
   toColor,
   Color,
   toJson,
-  fromJson,
-  dirToIdx
+  fromJson
 } from './square';
 import { SquareElem } from "./square_draw";
 import {nil} from "./list";
 import './index.css';
+
+
+/**
+ * Convert dir to index
+ */
+const dirToIdx = {
+  NW: 0,
+  NE: 1,
+  SW: 2,
+  SE: 3
+}
+
+const Colors = ["white" , "red" , "orange" , "yellow" , "green" , "blue" , "purple"];
+
 
 type EditorProps = {
   /** Initial state of the file. */

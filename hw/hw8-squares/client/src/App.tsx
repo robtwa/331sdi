@@ -4,8 +4,6 @@ import {fromJson, solid, Square, toJson} from './square';
 import {Editor} from "./Editor";
 import './index.css';
 
-const initSq = solid("green");
-
 type AppState = {
   _filename: string|undefined;    // temp var for entering a filename
   filename: string|undefined;     // The name of the file currently being edited
@@ -25,14 +23,16 @@ export class App extends Component<{}, AppState> {
       filename:undefined,
       file_open:false,
       file_list:[],
-      sq:initSq,
+      sq:solid("green"),
       message: undefined
     };
   }
 
-  componentDidMount() {
-    // When the component is mounted on the screen, call the doListRequest
-    // function to get a list of all saved files from the backend server
+  /**
+   * When the component is mounted on the screen, call the doListRequest
+   * function to get a list of all saved files from the backend server
+   */
+  componentDidMount = ():void => {
     this.doListRequest();
   }
 
@@ -51,30 +51,27 @@ export class App extends Component<{}, AppState> {
     }
     else {
       // Show the UI for creating a new square.
-      return this.newFileUI(this.state.file_list);
+      return <>
+        <h1>Files</h1>
+        <ul>
+          {}
+          {this.state.file_list.map((name)=>(
+            <li key={"file_list_"+name}><a href="#" onClick={()=>this.doLoadRequest(name)} >{name}</a>
+            <a href="#" className="delete"
+               onClick={()=>this.doDeleteRequest(name)}>Delete</a></li>))}
+        </ul>
+        <div>
+          <form onSubmit={this.doCreate} >
+            <label htmlFor="filename" >Name: </label>
+            <input id="filename" required={true} onChange={this.doChange}
+                   className="input"/>
+            <button type="submit" id="btn_create" className="button" >Create</button>
+          </form>
+        </div>
+      </>;
     }
   };
 
-  // Return to the UI for creating a file
-  newFileUI = (files:string[]): JSX.Element => {
-    return <>
-      <h1>Files</h1>
-      <ul>
-        {files.map((name)=>(<li key={"file_list_"+name}><a href="#"
-           onClick={()=>this.doLoadRequest(name)} >{name}</a>
-           <a href="#" className="delete"
-              onClick={()=>this.doDeleteRequest(name)}>Delete</a></li>))}
-      </ul>
-      <div>
-        <form onSubmit={this.doCreate} >
-        <label htmlFor="filename" >Name: </label>
-        <input id="filename" required={true} onChange={this.doChange}
-               className="input"/>
-        <button type="submit" id="btn_create" className="button" >Create</button>
-        </form>
-      </div>
-    </>;
-  }
 
   /**
    * Requests the name of all currently saved files from the server
@@ -202,7 +199,7 @@ export class App extends Component<{}, AppState> {
         filename: this.state._filename,
         _filename: undefined,
         file_open: true,
-        sq: initSq
+        sq: solid("green")
       })
     }
   };
@@ -220,7 +217,7 @@ export class App extends Component<{}, AppState> {
       filename: undefined,
       _filename: undefined,
       file_open: false,
-      sq: initSq
+      sq: solid("green")
     })
     this.doListRequest();
   };
