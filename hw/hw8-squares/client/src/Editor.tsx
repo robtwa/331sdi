@@ -5,25 +5,13 @@ import {
   toColor,
   Color,
   toJson,
-  fromJson
+  fromJson,
 } from './square';
 import { SquareElem } from "./square_draw";
 import {nil} from "./list";
 import './index.css';
 
-
-/**
- * Convert dir to index
- */
-const dirToIdx = {
-  NW: 0,
-  NE: 1,
-  SW: 2,
-  SE: 3
-}
-
-const Colors = ["white" , "red" , "orange" , "yellow" , "green" , "blue" , "purple"];
-
+type direction = {NW: number, NE: number, SW: number, SE: number};
 
 type EditorProps = {
   /** Initial state of the file. */
@@ -32,6 +20,8 @@ type EditorProps = {
   saveFileFunc: (tree: Square) => void;
   closeFileFunc:  () => void;
   message: string | undefined;
+  colorList: string[];
+  dirToIdx: direction;
 };
 
 type EditorState = {
@@ -62,7 +52,7 @@ export class Editor extends Component<EditorProps, EditorState> {
         </td>
         <td style={{paddingLeft: "20px"}}>
           <p style={{fontWeight:"bold"}}>Tools:</p>
-          {this.state.selected && this.tools()}
+          {this.state.selected && this.renderTools()}
           <button id="btn_save" className="button"
                   onClick={this.doSaveClick} >Save</button>
           <button id="btn_close" className="button"
@@ -72,19 +62,28 @@ export class Editor extends Component<EditorProps, EditorState> {
   };
 
   // Returns the UI of the tool buttons
-  tools = (): JSX.Element => {
+  renderTools = (): JSX.Element => {
     return <div className="buttonArea">
       <button id="btn_split" className="button"
               onClick={this.doSplitClick} >Split</button>
       <button id="btn_merge" className="button"
-              onClick={this.doMergeClick} >Merge</button>
-      <select onChange={this.doColorChange} value="NA" className="select">
+              onClick={this.doMergeSquaresClick} >Merge</button>
+      <select onChange={this.doChangeColorClick} value="NA" className="select">
         <option key={"color_NA"} value="NA">Pick a color</option>
-        {Colors.map((color, index)=>(
-          <option key={"color_"+index} value={color}>{color}</option>
-        ))}
+        {this.renderOptions()}
+
       </select>
     </div>;
+  }
+
+  renderOptions = ():JSX.Element[] =>{
+    const options:JSX.Element[] = [];
+    // Inv: options is the list of options in this.state.colorList[0:i]
+    for (let i = 0; i < this.props.colorList.length; i++) {
+      options.push(<option key={"color_"+i} value={this.props.colorList[i]}>{this.props.colorList[i]}</option>)
+    }
+
+    return options;
   }
 
   // Event handler for the save button
@@ -106,7 +105,7 @@ export class Editor extends Component<EditorProps, EditorState> {
   doSplitClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
     // Task: implement
     const path: Path | undefined = this.state.selected;
-    const tree = this.splitSq(path, toJson(this.state.root));
+    const tree = this.doSplitSquareClick(path, toJson(this.state.root));
     this.setState({root: fromJson(tree)})
   };
 
@@ -118,11 +117,12 @@ export class Editor extends Component<EditorProps, EditorState> {
    * If the path is not a nil and the root is a valid square array,
    *    insert 4 additional squares on the selected square and return it,
    *    otherwise print an error message to the console
+   * @modifies data
    * @param path the path of the target square, it is undefined if no path
    *        selected yet
    * @param root the root of the square tree
    */
-  splitSq = (path: Path | undefined, root: unknown): unknown => {
+  doSplitSquareClick = (path: Path | undefined, root: unknown): unknown => {
     if (path === undefined) { // No path selected yet
       return root;
     }
@@ -134,12 +134,18 @@ export class Editor extends Component<EditorProps, EditorState> {
       // Check if root is a valid square array
       if(Array.isArray(root) && root.length === 4) {
         // if root is a valid square array
-        const data:unknown[] = root;
-        // Split the square at the specified index by converting dir to the
-        // index of the square array
-        data[dirToIdx[path.hd]] = this.splitSq(path.tl,
-                                                  root[dirToIdx[path.hd]]);
-        return data;
+        if (path.hd === "NW") {
+          return [this.doSplitSquareClick(path.tl, root[0]), root[1], root[2], root[3]];
+        }
+        else if (path.hd === "NE") {
+          return [root[0], this.doSplitSquareClick(path.tl, root[1]), root[2], root[3]];
+        }
+        else if (path.hd === "SW") {
+          return [root[0], root[1], this.doSplitSquareClick(path.tl, root[2]), root[3]];
+        }
+        else {  // SE
+          return [root[0], root[1], root[2], this.doSplitSquareClick(path.tl, root[3])];
+        }
       }
       else {
         // root is not a valid square array
@@ -150,10 +156,10 @@ export class Editor extends Component<EditorProps, EditorState> {
   };
 
   // Event handler for merging squares.
-  doMergeClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
+  doMergeSquaresClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
     const path: Path | undefined = this.state.selected;
     const tree = toJson(this.state.root);
-    const data = this.mergeSq(path, tree);
+    const data = this.doMergeClick(path, tree);
     this.setState({root: fromJson(data)})
   };
 
@@ -168,9 +174,8 @@ export class Editor extends Component<EditorProps, EditorState> {
    * @param path the path of the target square, undefined for not select a path
    * @param root the root of the square tree
    */
-  mergeSq = (path: Path | undefined, root:unknown):unknown =>{
-    if (path === undefined) {
-      // if no path selected yet
+  doMergeClick = (path: Path | undefined, root:unknown):unknown =>{
+    if (path === undefined) {  // If no square is selected
       return root;
     }
 
@@ -179,19 +184,28 @@ export class Editor extends Component<EditorProps, EditorState> {
       return root;
     }
 
-    // Check to see if root is a valid array for square
+    // Determine whether root is a valid square array.
     if((Array.isArray(root) && root.length === 4)) {
       if (path.tl === nil) {  // base case - If the next square is nil
-        return root[dirToIdx[path.hd]];
+        // Merging other squares with the selected square
+        return root[this.props.dirToIdx[path.hd]];
       }
       else {  // recursive cases
         // Continue to find the root of the selected square according to the
         // path
-        const data:unknown[] = root;
-        data[dirToIdx[path.hd]] = this.mergeSq(path.tl,
-                                                root[dirToIdx[path.hd]]);
-        return data;
-      }
+        if (path.hd === "NW") {
+          return [this.doMergeClick(path.tl, root[0]), root[1], root[2], root[3]];
+        }
+        else if (path.hd === "NE") {
+          return [root[0], this.doMergeClick(path.tl, root[1]), root[2], root[3]];
+        }
+        else if (path.hd === "SW") {
+          return [root[0], root[1], this.doMergeClick(path.tl, root[2]), root[3]];
+        }
+        else {  // SE
+          return [root[0], root[1], root[2], this.doMergeClick(path.tl, root[3])];
+        }
+      }  // end if
     }
     else {
       console.error(`type ${typeof root} is not a valid square`);
@@ -203,12 +217,12 @@ export class Editor extends Component<EditorProps, EditorState> {
    * Event handler for changing color.
    * @param _evt
    */
-  doColorChange = (_evt: ChangeEvent<HTMLSelectElement>): void => {
+  doChangeColorClick = (_evt: ChangeEvent<HTMLSelectElement>): void => {
     // Task: implement
     const color: Color = toColor(_evt.target.value);  // get the selected color
     const path: Path | undefined = this.state.selected;  //
     const tree = toJson(this.state.root);
-    const data = this.changeColor(color, path, tree);
+    const data = this.doColorChange(color, path, tree);
     this.setState({root: fromJson(data), color: color})
   };
 
@@ -223,7 +237,7 @@ export class Editor extends Component<EditorProps, EditorState> {
    * @param path the path of the target square
    * @param root the root of the square tree
    */
-  changeColor = (color: Color,
+  doColorChange = (color: Color,
                  path: Path | undefined,
                  root:unknown ):unknown =>{
     if (path === nil) {  // base case
@@ -234,17 +248,23 @@ export class Editor extends Component<EditorProps, EditorState> {
       if(Array.isArray(root) && root.length === 4) { // root is a valid array
         // Check if a path has been selected
         if (path === undefined) {  // No path selected yet
-          console.error(`No path selected yet`);
+          console.error("No path selected yet");
           return root;
         }
         else {  // A path has been selected
-          // Assign the current root to the data array
-          const data:unknown[] = root;
-          // Change the color on the specified square by converting from dir to
-          // array index
-          data[dirToIdx[path.hd]] = this.changeColor(color, path.tl,
-            root[dirToIdx[path.hd]]);
-          return data;
+          // Change the color of the specified square
+          if (path.hd === "NW") {
+            return [this.doColorChange(color, path.tl, root[0]), root[1], root[2], root[3]];
+          }
+          else if (path.hd === "NE") {
+            return [root[0], this.doColorChange(color, path.tl, root[1]), root[2], root[3]];
+          }
+          else if (path.hd === "SW") {
+            return [root[0], root[1], this.doColorChange(color, path.tl, root[2]), root[3]];
+          }
+          else {  // SE
+            return [root[0], root[1], root[2], this.doColorChange(color, path.tl, root[3])];
+          }
         }
       }
       else {  // root is not a valid array
