@@ -12,7 +12,7 @@ describe('routes', function() {
     const res1 = httpMocks.createResponse();
     save(req1, res1);
     assert.strictEqual(res1._getStatusCode(), 400);
-    assert.deepEqual(res1._getData(), `missing "filename" parameter`);
+    assert.deepEqual(res1._getData(), 'missing "filename" parameter');
 
     // branch 2 ///////////////////////////////////////////////////////////
     const req2 = httpMocks.createRequest(
@@ -20,7 +20,7 @@ describe('routes', function() {
     const res2 = httpMocks.createResponse();
     save(req2, res2);
     assert.strictEqual(res2._getStatusCode(), 400);
-    assert.deepEqual(res2._getData(), `The "filename" parameter must be at least one character`);
+    assert.deepEqual(res2._getData(), 'The "filename" parameter must be at least one character');
 
     // branch 3 ///////////////////////////////////////////////////////////
     const req3 = httpMocks.createRequest(
@@ -28,7 +28,7 @@ describe('routes', function() {
     const res3 = httpMocks.createResponse();
     save(req3, res3);
     assert.strictEqual(res3._getStatusCode(), 400);
-    assert.deepEqual(res3._getData(), `missing "data" parameter`);
+    assert.deepEqual(res3._getData(), 'missing "data" parameter');
 
     // branch 4 ///////////////////////////////////////////////////////////
     const req4 = httpMocks.createRequest(
@@ -36,7 +36,7 @@ describe('routes', function() {
     const res4 = httpMocks.createResponse();
     save(req4, res4);
     assert.strictEqual(res4._getStatusCode(), 400);
-    assert.deepEqual(res4._getData(), `"data" cannot be null`);
+    assert.deepEqual(res4._getData(), '"data" cannot be null');
 
     // branch 5: 1st
     const req5 = httpMocks.createRequest(
