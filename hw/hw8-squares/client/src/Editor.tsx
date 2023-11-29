@@ -80,6 +80,8 @@ export class Editor extends Component<EditorProps, EditorState> {
     const options:JSX.Element[] = [];
     // Inv: options is the list of options in this.state.colorList[0:i]
     for (let i = 0; i < this.props.colorList.length; i++) {
+      // Note: Doing a line break on the following line will result in a lint
+      // error
       options.push(<option key={"color_"+i} value={this.props.colorList[i]}>{this.props.colorList[i]}</option>)
     }
 
@@ -111,15 +113,15 @@ export class Editor extends Component<EditorProps, EditorState> {
 
   /**
    * Returns the split square tree after splitting the selected square.
-   * If no path is selected, return the root.
-   * If the path is a nil, return 4 squares with the color of the selected
-   *    square.
-   * If the path is not a nil and the root is a valid square array,
-   *    insert 4 additional squares on the selected square and return it,
-   *    otherwise print an error message to the console
    * @param path the path of the target square, it is undefined if no path
    *        selected yet
    * @param root the root of the square tree
+   * @returns {(root|[unknown, unknown, unknown, unknown])} If no path is
+   * selected, return the root; If the path is a nil, return 4 squares with the
+   * color of the selected square. If the path is not a nil and the root is a
+   * valid square array, split the selected square into 4 squares and return
+   * them, otherwise print a short error message to the console and return the
+   * given square.
    */
   doSplitSquareClick = (path: Path | undefined, root: unknown): unknown => {
     if (path === undefined) { // No path selected yet
@@ -165,13 +167,13 @@ export class Editor extends Component<EditorProps, EditorState> {
   /**
    * Returns the merged square tree after merging the selected square with its
    * siblings.
-   * If the path is undefined, return the root.
-   * If there is only one square, return the root.
-   * If the root is a valid square array, merge other three squares with the
-   *    selected square and return it, otherwise print an error message to the
-   *    console
    * @param path the path of the target square, undefined for not select a path
    * @param root the root of the square tree
+   * @returns {(root|[unknown, unknown, unknown, unknown])} If the path is
+   * undefined, return the root. If there is only one square, return the root.
+   * If the root is a valid square array, merge other three squares with the
+   * selected square and return it, otherwise print an error message to the
+   * console and return the root.
    */
   doMergeClick = (path: Path | undefined, root:unknown):unknown =>{
     if (path === undefined) {
@@ -227,43 +229,44 @@ export class Editor extends Component<EditorProps, EditorState> {
 
   /**
    * Return the square tree after changing color on the selected square.
-   * If the path is a nil, return the color.
-   * If the path is not a nil and the root is a valid square array,
-   *    change the color on the selected square and return it.
-   * If the root is not a valid square array, print out the error message
-   *    to the console.
    * @param color user selected color
    * @param path the path of the target square
    * @param root the root of the square tree
+   * @returns {(root|color|[unknown, unknown, unknown, unknown])} If the path is
+   * undefined, return the root. If the path is a nil, return the color.
+   * If the path is not a nil and the root is a valid square array, change the
+   * color on the selected square and return it. If the root is not a valid
+   * square array, print out the error message to the console and return the
+   * root.
    */
   doColorChange = (color: Color,
                  path: Path | undefined,
                  root:unknown ):unknown =>{
+    // Check if a path has been selected
+    if (path === undefined) {
+      // No path is selected
+      console.error("No path selected yet");
+      return root;
+    }
+
     if (path === nil) {  // base case
       return color;  // Change the color of the specified square
     }
     else { // recursive cases
       // Check if root is a valid array
       if(Array.isArray(root) && root.length === 4) { // root is a valid array
-        // Check if a path has been selected
-        if (path === undefined) {  // No path selected yet
-          console.error("No path selected yet");
-          return root;
+        // Continue to find the selected square
+        if (path.hd === "NW") {
+          return [this.doColorChange(color, path.tl, root[0]), root[1], root[2], root[3]];
         }
-        else {  // A path has been selected
-          // Continue to find the selected square
-          if (path.hd === "NW") {
-            return [this.doColorChange(color, path.tl, root[0]), root[1], root[2], root[3]];
-          }
-          else if (path.hd === "NE") {
-            return [root[0], this.doColorChange(color, path.tl, root[1]), root[2], root[3]];
-          }
-          else if (path.hd === "SW") {
-            return [root[0], root[1], this.doColorChange(color, path.tl, root[2]), root[3]];
-          }
-          else {  // SE
-            return [root[0], root[1], root[2], this.doColorChange(color, path.tl, root[3])];
-          }
+        else if (path.hd === "NE") {
+          return [root[0], this.doColorChange(color, path.tl, root[1]), root[2], root[3]];
+        }
+        else if (path.hd === "SW") {
+          return [root[0], root[1], this.doColorChange(color, path.tl, root[2]), root[3]];
+        }
+        else {  // SE
+          return [root[0], root[1], root[2], this.doColorChange(color, path.tl, root[3])];
         }
       }
       else {  // root is not a valid array
