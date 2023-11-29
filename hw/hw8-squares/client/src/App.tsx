@@ -148,6 +148,9 @@ export class App extends Component<{}, AppState> {
     if (res.status === 200) {
       res.json().then(this.doSaveJson)
         .catch(() => this.doSaveError("200 response is not valid JSON"));
+    } else if (res.status === 400) {
+      res.text().then((res:string)=>this.doSaveError(res))
+        .catch(() => this.doSaveError("400 response is not text"));
     } else {
       this.doSaveError(`bad status code: ${res.status}`);
     }
@@ -184,6 +187,9 @@ export class App extends Component<{}, AppState> {
     if (res.status === 200) {
       res.json().then(this.doListRequestJson)
         .catch(()=>this.doListRequestError("200 response is not valid JSON"))
+    } else if (res.status === 400) {
+      res.text().then((res:string)=>this.doListRequestError(res))
+        .catch(() => this.doListRequestError("400 response is not text"));
     } else {
       this.doListRequestError(`bad status code: ${res.status}`);
     }
@@ -210,7 +216,7 @@ export class App extends Component<{}, AppState> {
    *  returned is a valid square, then updated the data to the state object.
    * If any errors occur, print a short error info to the console.
    *
-   * @param name The string file name
+   * @param filename The string file name
    */
   doLoadClick = (filename:string): void => {
     fetch("/api/load?filename="+filename)
@@ -223,6 +229,9 @@ export class App extends Component<{}, AppState> {
     if (res.status === 200) {
       res.json().then((data:unknown)=>this.doLoadJson(data, filename))
         .catch(()=>this.doLoadError("200 response is not valid JSON", filename))
+    } else if (res.status === 400) {
+      res.text().then((res:string)=>this.doLoadError(res, filename))
+        .catch(() => this.doLoadError("400 response is not text", filename));
     } else {
       this.doLoadError(`bad status code: ${res.status}`, filename);
     }
@@ -282,6 +291,9 @@ export class App extends Component<{}, AppState> {
     if (res.status === 200) {
       res.json().then((data:unknown)=>this.doDeleteJson(data, filename))
         .catch(()=>this.doDeleteError("200 response is not valid JSON", filename))
+    } else if (res.status === 400) {
+      res.text().then((res:string)=>this.doDeleteError(res, filename))
+        .catch(() => this.doDeleteError("400 response is not text", filename));
     } else {
       this.doDeleteError(`bad status code: ${res.status}`, filename);
     }
