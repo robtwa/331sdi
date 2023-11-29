@@ -127,12 +127,12 @@ export class Editor extends Component<EditorProps, EditorState> {
     }
 
     if (path === nil) {  // base case
-      return [root, root, root, root];
+      return [root, root, root, root];  // Split the specified square
     }
     else {  // recursive case
       // Check if root is a valid square array
-      if(Array.isArray(root) && root.length === 4) {
-        // if root is a valid square array
+      if(Array.isArray(root) && root.length === 4) { // root is a valid square array
+        // Continue to find the selected square
         if (path.hd === "NW") {
           return [this.doSplitSquareClick(path.tl, root[0]), root[1], root[2], root[3]];
         }
@@ -174,7 +174,8 @@ export class Editor extends Component<EditorProps, EditorState> {
    * @param root the root of the square tree
    */
   doMergeClick = (path: Path | undefined, root:unknown):unknown =>{
-    if (path === undefined) {  // If no square is selected
+    if (path === undefined) {
+      // If no square is selected
       return root;
     }
 
@@ -190,8 +191,7 @@ export class Editor extends Component<EditorProps, EditorState> {
         return root[this.props.dirToIdx[path.hd]];
       }
       else {  // recursive cases
-        // Continue to find the root of the selected square according to the
-        // path
+        // Continue to find the selected square
         if (path.hd === "NW") {
           return [this.doMergeClick(path.tl, root[0]), root[1], root[2], root[3]];
         }
@@ -240,7 +240,7 @@ export class Editor extends Component<EditorProps, EditorState> {
                  path: Path | undefined,
                  root:unknown ):unknown =>{
     if (path === nil) {  // base case
-      return color;
+      return color;  // Change the color of the specified square
     }
     else { // recursive cases
       // Check if root is a valid array
@@ -251,7 +251,7 @@ export class Editor extends Component<EditorProps, EditorState> {
           return root;
         }
         else {  // A path has been selected
-          // Change the color of the specified square
+          // Continue to find the selected square
           if (path.hd === "NW") {
             return [this.doColorChange(color, path.tl, root[0]), root[1], root[2], root[3]];
           }
