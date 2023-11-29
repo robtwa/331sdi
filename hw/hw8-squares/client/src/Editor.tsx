@@ -117,7 +117,6 @@ export class Editor extends Component<EditorProps, EditorState> {
    * If the path is not a nil and the root is a valid square array,
    *    insert 4 additional squares on the selected square and return it,
    *    otherwise print an error message to the console
-   * @modifies data
    * @param path the path of the target square, it is undefined if no path
    *        selected yet
    * @param root the root of the square tree
