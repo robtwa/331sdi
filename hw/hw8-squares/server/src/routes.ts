@@ -10,14 +10,15 @@ type SafeResponse = Response;  // only writing, so no need to check
 const files: Map<string, unknown> = new Map();
 
 /**
- * Returns the saved square file name.
- * If the request does not specify a file name, a 400 error is returned and
- * contains error information.
- * If the file name specified in the request does not exist, a 400 error is
- * returned and contains error information.
- * If no square data is provided or the data is empty, a 400 error and related
- * error information will be returned.
- *
+ * Save the received square data and send the HTTP response.
+ * If the request does not specify a filename, send a 400 error with a short
+ * error information.
+ * If the provided filename is empty, send a 400 error with a short error
+ * information.
+ * If the request does not specify a data or the data is null, send a 400 error
+ * with a short error information.
+ * If both the filename and the data are valid, save the square data and send
+ * an HTTP response containing the filename.
  * @param req The HTTP request object
  * @param res The HTTP response object
  */
@@ -57,10 +58,9 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
 
 
 /**
- * Returns a JSON String that is an array containing the names of all saved
- * files. If there are no saved files, an empty array is returned in JSON string
+ * Sends a http response containing the names of all saved files in JSON string
+ * format. If there are no saved files, send an empty array in JSON string
  * format.
- *
  * @param _ The HTTP request object
  * @param res The HTTP response object
  */
@@ -70,12 +70,12 @@ export const list = (_: SafeRequest, res: SafeResponse): void => {
 };
 
 /**
- * Returns a JSON string containing the square data for the requested file.
- * If the request does not specify a file name, a 400 error is returned and
- * contains error information.
- * If the file name specified in the request does not exist, a 400 error is
- * returned and contains error information.
- *
+ * Sends a http response with the data of the requested square file a JSON
+ * string containing.
+ * If the request does not specify a filename, send a 400 error with a short
+ * error information.
+ * If the request file does not exist, send a 400 error with a short error
+ * information.
  * @param req The HTTP request object
  * @param res The HTTP response object
  */
@@ -94,12 +94,12 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
 };
 
 /**
- * Delete a specified square file and return a file list that does not contain
- * the deleted file.
- * If the request does not specify a file name, a 400 error is returned and
- * contains error information.
- * If the file name specified in the request does not exist, a 400 error is
- * returned and contains error information.
+ * Delete a specified square file and send a http response with a file list
+ * that does not contain the deleted files.
+ * If the request does not specify a file name, send a 400 error with a short
+ * error information.
+ * If the requested file request does not exist, send a 400 error with a short
+ * error information.
  *
  * @param req The HTTP request object
  * @param res The HTTP response object
@@ -135,7 +135,6 @@ const first = (param: unknown): string|undefined => {
     return undefined;
   }
 };
-
 
 /**
  * Helper at the end of each test to call this function to delete any
