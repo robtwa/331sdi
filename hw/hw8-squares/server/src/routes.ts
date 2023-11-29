@@ -7,7 +7,7 @@ type SafeRequest = Request<ParamsDictionary, {}, Record<string, unknown>>;
 type SafeResponse = Response;  // only writing, so no need to check
 
 // Storing all files with the map data structure
-const files: Map<string, object> = new Map();
+const files: Map<string, unknown> = new Map();
 
 /**
  * Returns the saved square file name.
@@ -136,8 +136,11 @@ const first = (param: unknown): string|undefined => {
   }
 };
 
-// Helper at the end of each test to call this function to delete any
-// all files saved.
+
+/**
+ * Helper at the end of each test to call this function to delete any
+ * all files saved.
+ */
 export const resetForTesting  = ():void => {
   files.clear();
 }
