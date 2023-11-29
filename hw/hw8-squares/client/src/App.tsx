@@ -25,7 +25,7 @@ export class App extends Component<{}, AppState> {
       file_open:false,
       file_list:[],
       sq:solid("green"),
-      message: undefined
+      message: undefined,
     };
   }
 
@@ -43,9 +43,14 @@ export class App extends Component<{}, AppState> {
     if (this.state.filename !== undefined && this.state.file_open) {
       // Render the UI the square Editor
       return <>
-        <Editor key="editor" initialState={this.state.sq} color={"green"}
+        <Editor key="editor"
+                initialState={this.state.sq}
+                color={"green"}
                 saveFileFunc={this.doSaveClick}
                 closeFileFunc={this.doCloseClick}
+                colorList={["white" , "red" , "orange" , "yellow" , "green" ,
+                            "blue" , "purple"]}
+                dirToIdx={{NW: 0, NE: 1, SW: 2, SE: 3}}
                 message={this.state.message}/>
         <label key="label_filename"><b>File name</b>: {this.state.filename}</label>
       </>
@@ -72,7 +77,7 @@ export class App extends Component<{}, AppState> {
   // Render the saved file list
   renderFileList = (): JSX.Element[] => {
     const links: JSX.Element[] = [];
-    // Invariant: links is the list of the links in this.state.file_list[0:i]
+    // Inv: links is the list of the links in this.state.file_list[0:i]
     for (const name of this.state.file_list) {
       links.push(<li key={"file_list_"+name}>
             <a href="#" onClick={()=>this.doLoadClick(name)} >{name}</a>
@@ -225,14 +230,28 @@ export class App extends Component<{}, AppState> {
 
   // Called when the response JSON has been parsed.
   doLoadJson = (data: unknown, filename: string): void => {
-    if (Array.isArray(data)) {
-      this.setState({
-        filename: filename,
-        file_open: true,
-        sq:fromJson(data)})
+    // Prevent program from terminating due to exception
+    try {
+      // try to convert the json data to squares
+      const sq = fromJson(data);
+      if (isRecord(sq)) {  // If the data is a valid square or squares
+        this.setState({
+          filename: filename,
+          file_open: true,
+          sq: sq})
+      }
+      else {
+        this.doLoadError("Bad data. The returned data is invalid.", filename);
+      }
     }
-    else {
-      this.doLoadError("Bad data. The returned data is invalid.", filename);
+    catch (e:unknown){
+      // Capture exceptions that may occur during data conversion
+      if (e instanceof Error) {
+        this.doLoadError(e.message, filename);
+      }
+      else if (typeof e === "string") {
+        this.doLoadError(e, filename);
+      }
     }
   };
 
