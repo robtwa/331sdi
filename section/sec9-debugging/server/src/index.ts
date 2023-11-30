@@ -1,16 +1,13 @@
 import express, { Express } from "express";
-import {save, list, load, remove} from './routes';
 import bodyParser from 'body-parser';
+import { listItems, addItem, completeItem } from './routes';
 
 
 // Configure and start the HTTP server.
 const port: number = 8088;
 const app: Express = express();
 app.use(bodyParser.json());
-app.post("/api/save", save);
-app.get("/api/list", list);
-app.get("/api/load", load);
-app.post("/api/delete", remove);
-
-
+app.get("/api/list", listItems);
+app.post("/api/add", addItem);
+app.post("/api/complete", completeItem);
 app.listen(port, () => console.log(`Server listening on ${port}`));

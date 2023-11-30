@@ -154,7 +154,7 @@ describe('routes', function() {
 
     // 1st branch /////////////////////////////////////////////////////////////
     let req = httpMocks.createRequest(
-      {method: 'GET', url: '/api/delete', query: {}});
+      {method: 'POST', url: '/api/delete', body: {}});
     let res = httpMocks.createResponse();
     remove(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -162,7 +162,7 @@ describe('routes', function() {
 
     // 2nd branch /////////////////////////////////////////////////////////////
     req = httpMocks.createRequest(
-      {method: 'GET', url: '/api/delete', query: {filename: 'donotexist'}});
+      {method: 'GET', url: '/api/delete', body: {filename: 'donotexist'}});
     res = httpMocks.createResponse();
     remove(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -179,7 +179,7 @@ describe('routes', function() {
 
     // delete the 1st saved file
     req = httpMocks.createRequest(
-      {method: 'GET', url: '/api/delete', query: {filename: filename}});
+      {method: 'GET', url: '/api/delete', body: {filename: filename}});
     res = httpMocks.createResponse();
     remove(req, res);
     assert.strictEqual(res._getStatusCode(), 200);
@@ -204,7 +204,7 @@ describe('routes', function() {
 
     // delete the 2nd saved file
     req = httpMocks.createRequest(
-      {method: 'GET', url: '/api/delete', query: {filename: filename}});
+      {method: 'POST', url: '/api/delete', body: {filename: filename}});
     res = httpMocks.createResponse();
     remove(req, res);
     assert.strictEqual(res._getStatusCode(), 200);
@@ -213,7 +213,7 @@ describe('routes', function() {
     // additional test for testing filename is an array
     // delete the 1st saved file
     req = httpMocks.createRequest(
-      {method: 'GET', url: '/api/delete', query: {filename: [filename1, filename]}});
+      {method: 'POST', url: '/api/delete', body: {filename: [filename1, filename]}});
     res = httpMocks.createResponse();
     remove(req, res);
     assert.strictEqual(res._getStatusCode(), 200);

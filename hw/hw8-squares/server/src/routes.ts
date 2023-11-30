@@ -105,7 +105,7 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
  * @param res The HTTP response object
  */
 export const remove = (req: SafeRequest, res: SafeResponse): void => {
-  const filename = first(req.query.filename);
+  const filename = first(req.body.filename);
   if (filename === undefined) {
     res.status(400).send('missing "filename" parameter');
     return;

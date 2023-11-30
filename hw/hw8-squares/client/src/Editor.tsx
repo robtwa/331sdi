@@ -108,7 +108,7 @@ export class Editor extends Component<EditorProps, EditorState> {
     // Task: implement
     const path: Path | undefined = this.state.selected;
     const tree = this.doSplitSquareClick(path, toJson(this.state.root));
-    this.setState({root: fromJson(tree)})
+    this.setState({root: fromJson(tree), selected: undefined})
   };
 
   /**
@@ -161,7 +161,7 @@ export class Editor extends Component<EditorProps, EditorState> {
     const path: Path | undefined = this.state.selected;
     const tree = toJson(this.state.root);
     const data = this.doMergeClick(path, tree);
-    this.setState({root: fromJson(data)})
+    this.setState({root: fromJson(data), selected: undefined})
   };
 
   /**
@@ -224,7 +224,7 @@ export class Editor extends Component<EditorProps, EditorState> {
     const path: Path | undefined = this.state.selected;  //
     const tree = toJson(this.state.root);
     const data = this.doColorChange(color, path, tree);
-    this.setState({root: fromJson(data), color: color})
+    this.setState({root: fromJson(data), color: color, selected: undefined})
   };
 
   /**

@@ -281,7 +281,14 @@ export class App extends Component<{}, AppState> {
    * @param filename The string filename
    */
   doDeleteClick = (filename:string): void => {
-    fetch("/api/delete?filename="+filename)
+    const payload = {
+      filename: filename,
+    }
+
+    fetch("/api/delete",
+      {method: "POST",
+        body: JSON.stringify(payload),
+        headers: {"Content-Type": "application/json"}})
       .then((res: Response) => this.doDeleteResp(res, filename))
       .catch(()=>this.doDeleteError("failed to connect to server", filename));
   };
