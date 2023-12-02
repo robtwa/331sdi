@@ -120,8 +120,9 @@ export class TodoApp extends Component<{}, TodoState> {
   };
 
   // Called to refresh our list of items from the server.
+  // Todo 1
   doRefreshTimeout = (): void => {
-    fetch("/api/lists")
+    fetch("/api/list")
         .then(this.doListResp)
         .catch(() => this.doListError("failed to connect to server"));
   };
@@ -166,7 +167,7 @@ export class TodoApp extends Component<{}, TodoState> {
     const item = this.state.items[index];
     if (DEBUG) console.log(`marking item ${item.name} as completed`);
 
-    const body = {itemName: item.name};
+    const body = {name: item.name};  // Todo 3
     fetch("/api/complete", {
         method: "POST", body: JSON.stringify(body),
         headers: {"Content-Type": "application/json"} })
@@ -207,7 +208,8 @@ export class TodoApp extends Component<{}, TodoState> {
     this.setState({items: items});
 
     // Refresh our list after this item has been removed.
-    setTimeout(this.doRefreshTimeout, 4900);
+    // Todo 4
+    setTimeout(this.doRefreshTimeout, 5100);
   };
 
   // Called when we fail trying to complete an item
@@ -256,6 +258,17 @@ export class TodoApp extends Component<{}, TodoState> {
     }
 
     if (DEBUG) console.log(`added new item ${data.name}`);
+
+    // Todo 2
+    if (this.state.items === undefined) {
+      throw Error('impossible: items is undefined');
+    }
+    const items = this.state.items.concat([ {name: data.name, completed: false} ]);
+    this.setState({items: items, newName: ""});
+
+    // Todo 5
+    // Add a message about the added item.
+    this.setState({message: `Added ${data.name} List now contains ${items.length} items.`});
   };
 
   // Called when we fail trying to add an item
