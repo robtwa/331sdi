@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { PollsApp } from './PollsApp';
-
+import "./index.css";
 
 const main: HTMLElement|null = document.getElementById('main');
 if (main === null)
