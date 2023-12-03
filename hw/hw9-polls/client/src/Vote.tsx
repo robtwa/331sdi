@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, ChangeEvent, FormEvent } from "react";
 import { isRecord } from './record';
 import {addMinutesFunc, diffTimeFunc, poll} from "./lib";
 
@@ -13,6 +13,9 @@ type VoteState = {
   minutes?: number;             // Voting duration
   options?: string[];             // Voting options
   createdAt?:Date;             // Poll's created date and time
+
+  selectedOption?:string;
+  voter?:string;
   msg?: string | undefined;
 }
 
@@ -31,68 +34,72 @@ export class Vote extends Component<VoteProps, VoteState> {
   render = (): JSX.Element | JSX.Element[] => {
     console.log(this.state)
     if(this.state.dataLoaded){ // Data is loaded from the server
-
       if (this.state.createdAt === undefined) {
         return <>Corrupted data: Mission poll's creation time.</>
       }
       else if (this.state.minutes === undefined) {
         return <>Corrupted data: Mission poll's minutes.</>
       }
-      else if (this.state.minutes === undefined) {
-        return <>Corrupted data: Mission poll's minutes.</>
+      else if (this.state.options === undefined) {
+        return <>Corrupted data: Mission poll's options.</>
       }
       else {
         const end = addMinutesFunc(this.state.minutes, this.state.createdAt);
         const remainMinutes = diffTimeFunc(end, new Date());
 
         const retEles: JSX.Element[] = [];
+        retEles.push(<h1 key="h1_vote">{this.state.name}</h1>);
+
         if (remainMinutes > 0) {  // Poll is active
-          retEles.push(<div>
-            <h1>{this.state.name}</h1>
-            <p>Closes in {Math.abs(remainMinutes).toFixed(2)} minutes</p>
+          retEles.push(<p key="p_vote_active" >Closes in {Math.abs(remainMinutes).toFixed(2)} minutes</p>);
+          for (const option of this.state.options) {
+            retEles.push(<label key={"label_"+option} className="voteOption">
+              <input type="radio"
+                     name="option"
+                     key={"radio_"+option}
+                     value={option}
+                     required
+                     checked={this.state.selectedOption === option}
+                     onChange={this.doOptionChange}/>{option}</label>);
+          }
+
+          retEles.push(<div key={"p_voter"}>
+            <label htmlFor="voter">Voter Name:</label>
+            <input type="text" id="voter" value={this.state.voter} required={true}
+                   onChange={this.doVoterNameChange}></input>
           </div>);
         }
         else {  // Poll is closed
-          retEles.push(<div>
-            <h1>{this.state.name}</h1>
-            <p>Closed in {Math.abs(remainMinutes).toFixed(2)} minutes</p>
-          </div>);
+          retEles.push(<p key="p_vote_closed">Closed in {Math.abs(remainMinutes).toFixed(2)} minutes ago</p>);
         }
 
-        retEles.push(<div className="buttonArea">
-          <button type="button" onClick={this.props.backFunc} className="button">Back</button>
-          <button type="button" onClick={this.doRefreshClick} className="button" >Refresh</button>
-          <button type="button" onClick={this.props.backFunc} className="button">Vote</button>
+        retEles.push(<div key="div_btnarea_vote" className="buttonArea">
+          <button type="button" key="btn_back" onClick={this.props.backFunc} className="button">Back</button>
+          <button type="button" key="btn_refresh" onClick={this.doRefreshClick} className="button" >Refresh</button>
+          <button type="submit" key="btn_vote" className="button">Vote</button>
         </div>);
-        return retEles;
+
+        return <form onSubmit={this.doVoteSubmit} >{retEles}</form>;
       }
     }
     else {  // Loading data from the server
       return <div>Data loading...</div>
     }
-
   };
 
+  doOptionChange = (evt: ChangeEvent<HTMLInputElement>): void => {
+    this.setState({selectedOption: evt.target.value});
+  };
 
+  doVoterNameChange = (evt: ChangeEvent<HTMLInputElement>): void => {
+    this.setState({voter: evt.target.value});
+  };
 
-  // doNameChange = (evt: ChangeEvent<HTMLInputElement>): void => {
-  //   this.setState({name: evt.target.value});
-  // };
-  //
-  // doMinutesChange = (evt: ChangeEvent<HTMLInputElement>): void => {
-  //   this.setState({minutes: parseInt(evt.target.value)});
-  // };
-  //
-  // doOptionsChange = (evt: ChangeEvent<HTMLTextAreaElement>): void => {
-  //   this.setState({options: evt.target.value});
-  // };
-  //
-  // doNewPollSubmit = (_evt: FormEvent): void => {
-  //   _evt.preventDefault();
-  //   console.log("doNewPollSubmit")
-  //
-  // };
-  //
+  doVoteSubmit = (_evt: FormEvent): void => {
+    _evt.preventDefault();
+    console.log("doVoteSubmit")
+  };
+
 
 
   // Send a request to the server to loads the poll data
