@@ -1,43 +1,41 @@
 import React, { Component, MouseEvent } from "react";
-import {model, action, poll, diffTimeFunc, addMinutesFunc} from './lib'
+import {comp, poll, diffTimeFunc, addMinutesFunc} from './lib'
 import {PollEditor} from "./PollEditor"
 import {Vote} from "./Vote"
 import {PollResult} from "./PollResult";
 
 type PollsAppState = {
-  model: model                        // UI to display
-  action?: action;              // Action performed by user
-  polls?:poll[],                // Poll list
-  name?: string;                // Poll name
-  minutes?: number;             // Voting duration
-  options?: string;             // Voting options
-  createdAt?:Date;             // Poll's created date and time
-  msg?: string;                 // Message sent from server
+  comp: comp                    // Components
+  polls:poll[],                // Poll list
+  name: string;                // Poll name
+  msg: string;                  // Message sent from server
 }
+
+// Enable debug mode in this class.
+const DEBUG_MODE: boolean = true;
 
 /** Displays the UI of the Polls application. */
 export class PollsApp extends Component<{}, PollsAppState> {
   constructor(props: {}) {
     super(props);
-
-    this.state = {model:"polls"};
+    this.state = {comp:"polls", polls:[], name: "", msg:""};  // Init the state
   }
 
-  componentDidMount() {
-    console.log("App: componentDidMount(")
+  componentDidMount = ():void => {
+    // When the component is mounted, call the doListRequestClick func to get
+    // a list of all polls
     this.doListRequestClick()
   }
 
-
+  // Render the UI
   render = (): JSX.Element => {
-    console.log("this.state = ", this.state)
-    if (this.state.model === "newPoll") {
+    if (this.state.comp === "newPoll") {
       return <PollEditor backFunc={this.doBackClick}/>;
     }
-    else if (this.state.model === "vote" && this.state.name !== undefined) {
+    else if (this.state.comp === "vote" && this.state.name !== undefined) {
       return <Vote backFunc={this.doBackClick} name={this.state.name}/>;
     }
-    else if (this.state.model === "results" && this.state.name !== undefined) {
+    else if (this.state.comp === "results" && this.state.name !== undefined) {
       return <PollResult backFunc={this.doBackClick} name={this.state.name}/>;
     }
     else {  // Show the default UI
@@ -45,12 +43,16 @@ export class PollsApp extends Component<{}, PollsAppState> {
     }
   };
 
-  doBackClick = (): void => {
-    this.setState({model: "polls"})
-    // this.doListRequestClick()
+  // Render the message
+  renderMessage = (): JSX.Element => {
+    if (this.state.msg === "") {
+      return <div></div>;
+    } else {
+      return <p className={"message"}>{this.state.msg}</p>;
+    }
   };
 
-  // Current Polls /////////////////////////////////////////////////////////////
+  // Render the UI of all saved polls
   renderPolls = (): JSX.Element => {
     return (<div>
       <h1>Current Polls</h1>
@@ -65,48 +67,66 @@ export class PollsApp extends Component<{}, PollsAppState> {
         <button onClick={this.doListRequestClick} className="button">Refresh</button>
         <button onClick={this.doNewPollClick} className="button">New Poll</button>
       </div>
+
+      {this.renderMessage()}
     </div>);
   };
-  renderPollList = (showOpenOrClosed: boolean): JSX.Element |JSX.Element[] => {
-    if (this.state.polls === undefined || this.state.polls.length < 1) {
-      return <></>;
-    }
 
+  /**
+   * Render the open or closed poll list
+   * @param showOpen used to render the open or closed polls; true for open
+   *        polls, false for closed polls
+   */
+  renderPollList = (showOpen: boolean): JSX.Element |JSX.Element[] => {
     const links: JSX.Element[] = [];
     for (const poll of this.state.polls) {
       const end = addMinutesFunc(poll.minutes, poll.createAt);
-      // const end = addMinutesFunc(new Date(), -2);
       const timeDiff = diffTimeFunc(end, new Date());
-      // Show polls that have not been closed yet
-      if (showOpenOrClosed && timeDiff > 0) {
-        links.push(<li key={"active_poll_"+poll.name}>
-          <a href="#" onClick={()=>this.doOpenVoteClick(poll.name)} >{poll.name} </a>
-          - {timeDiff.toFixed(2)} {timeDiff === 1?"minute":"minutes"} remaining
-
-          <a href="#" onClick={()=>this.doViewResultClick(poll.name)} >results</a>
-        </li>)
+      if (showOpen && timeDiff > 0) {
+        // Show polls that have not been closed yet
+        if (DEBUG_MODE) {
+          links.push(<li key={"active_poll_"+poll.name}>
+            <a href="#" onClick={()=>this.doOpenVoteClick(poll.name)} >{poll.name} </a>
+            - {timeDiff.toFixed(2)} {timeDiff === 1?"minute":"minutes"} remaining
+            <a href="#" onClick={()=>this.doViewResultClick(poll.name)} className={"gap"}>results</a>
+          </li>)
+        }
+        else {
+          links.push(<li key={"active_poll_"+poll.name}>
+            <a href="#" onClick={()=>this.doOpenVoteClick(poll.name)} >{poll.name} </a>
+            - {timeDiff.toFixed(2)} {timeDiff === 1?"minute":"minutes"} remaining
+          </li>)
+        }
       }
-      // Show closed polls
-      if (!showOpenOrClosed && timeDiff <= 0) {
+
+      if (!showOpen && timeDiff <= 0) {
+        // Show closed polls
         links.push(<li key={"active_poll_"+poll.name}>
           <a href="#" onClick={()=>this.doViewResultClick(poll.name)} >{poll.name} </a>
           - closed {Math.abs(timeDiff).toFixed(2)} {timeDiff === 1?"minute":"minutes"} ago
         </li>)
       }
     }
+    console.log(links.length)
+    if (links.length < 1) {
+      links.push(<p className={"gap gray"}>No data.</p>)
+    }
     return links;
   };
 
+  // Event handler for creating a new poll.
   doNewPollClick = (_evt: MouseEvent<HTMLButtonElement>): void => {
-    this.setState({model: "newPoll"})
+    this.setState({comp: "newPoll"})
   };
 
+  // Event handler for opening a poll.
   doOpenVoteClick = (name: string): void => {
-    this.setState({model: "vote", name})
+    this.setState({comp: "vote", name})
   };
 
+  // Event handler for viewing a poll results.
   doViewResultClick = (name: string): void => {
-    this.setState({model: "results", name})
+    this.setState({comp: "results", name})
   };
 
   /**
@@ -115,12 +135,15 @@ export class PollsApp extends Component<{}, PollsAppState> {
    * data is valid, update the list to the component’s state object.
    */
   doListRequestClick = (): void => {
+    // Clear previous "msg" before submitting data
+    this.setState({msg:""});
+
     fetch("/api/list")
       .then(this.doListRequestResp)
       .catch(()=>this.doListRequestError("failed to connect to server"));
   };
 
-  // Called when the server responds with a file list.
+  // Called when the server responds with a poll list.
   doListRequestResp = (res:Response):void => {
     if (res.status === 200) {
       res.json().then(this.doListRequestJson)
@@ -143,23 +166,14 @@ export class PollsApp extends Component<{}, PollsAppState> {
     }
   };
 
-  // Called if an error occurs trying to get the file list
+  // Called if an error occurs trying to get the poll list
   doListRequestError = (msg: string): void => {
-    console.error(`Error fetching /api/list: ${msg}`);
+    this.setState({msg: `Error fetching /api/list: ${msg}`});
   };
 
-
-  renderMessage = (): JSX.Element => {
-    if (this.state.msg === "") {
-      return <div></div>;
-    } else {
-      return <p>Server says: {this.state.msg}</p>;
-    }
+  // Called when backing to this PollsApp UI
+  doBackClick = (): void => {
+    this.setState({comp:"polls", polls:[], name: "", msg:""})
+    this.doListRequestClick();  // Retrieve a poll list from the server
   };
-
-
-
-
-
-
 }
