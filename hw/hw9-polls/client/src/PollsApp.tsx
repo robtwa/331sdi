@@ -1,12 +1,12 @@
 import React, { Component, MouseEvent } from "react";
-import {comp, poll, diffTimeFunc, addMinutesFunc} from './lib'
+import {Comp, Poll, diffTimeFunc, addMinutesFunc} from './lib'
 import {PollEditor} from "./PollEditor"
 import {Vote} from "./Vote"
 import {PollResult} from "./PollResult";
 
 type PollsAppState = {
-  comp: comp                    // Components
-  polls:poll[],                // Poll list
+  comp: Comp                    // Components
+  polls: Poll[],                // Poll list
   name: string;                // Poll name
   msg: string;                  // Message sent from server
 }
