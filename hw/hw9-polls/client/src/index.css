@@ -1,45 +1,68 @@
-body{
-    font-family: Arial;
-    background-color: #effff7;
+body {
+  font-family: Arial;
+  background-color: #effff7;
 }
-h1{
-    font-size: 22px;
+
+h1 {
+  font-size: 22px;
 }
-h2{
-    font-size: 16px;
+
+h2 {
+  font-size: 16px;
 }
-label{
-    font-size: 18px;
-    padding: 1px;
-    margin: 0;
+
+label {
+  font-size: 18px;
+  padding: 1px;
+  margin: 0;
 }
+
 li {
-    display: list-item;
-    padding: 4px 1px;
-    font-size: 16px;
+  display: list-item;
+  padding: 4px 1px;
+  font-size: 16px;
 }
+
 .buttonArea {
-    padding: 1em 0;
+  padding: 1em 0;
 }
+
 .button {
-    padding: 1px 1em;
-    margin-right: 5px;
-    min-width: 80px;
+  padding: 1px 1em;
+  margin-right: 5px;
+  min-width: 80px;
 }
+
 .select {
-    padding: 5px 1em;
-    margin-right: 5px;
-    min-width: 80px;
+  padding: 5px 1em;
+  margin-right: 5px;
+  min-width: 80px;
 }
+
 .input {
-    margin-right: 5px;
+  margin-right: 5px;
 }
+
 .message {
-    padding: 1em 5px;
-    color: #000000;
+  padding: 1em 5px;
+  color: #000000;
 }
-.voteOption{
-    padding: 4px 0px;
-    display: block;
-    font-size: 16px;
+
+.voteOption {
+  padding: 4px 0px;
+  display: block;
+  font-size: 16px;
+}
+
+.gap {
+  margin-left: 1em;
+}
+
+.gray {
+  color: darkgrey;
+}
+
+.message {
+  color: chocolate;
+  padding: 2px 0;
 }
