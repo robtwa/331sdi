@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {addMinutesFunc, diffTimeFunc, voteResult} from "./lib";
+import {addMinutesFunc, diffTimeFunc, VoteResult} from "./lib";
 
 
 
@@ -26,7 +26,7 @@ export class PollResult extends Component<VoteProps, VoteState> {
     this.state = {dataLoaded:false};
   }
 
-  componentDidMount() {
+  componentDidMount = ():void => {
     console.log("PollResult ///////////////////////////////////")
     this.doRefreshClick()
   }
@@ -112,7 +112,7 @@ export class PollResult extends Component<VoteProps, VoteState> {
   }
 
   // Called when the save file response JSON has been parsed.
-  doRefreshJson = (data: voteResult): void => {
+  doRefreshJson = (data: VoteResult): void => {
     console.log("data = ", data)
     this.setState({
       dataLoaded: true,
@@ -127,8 +127,6 @@ export class PollResult extends Component<VoteProps, VoteState> {
 
   // Called if an error occurs trying to save file
   doRefreshError = (msg: string): void => {
-    console.error(`Error fetching /api/save: ${msg}`);
+    this.setState({msg: `Error fetching /api/save: ${msg}`});
   };
-
-
 }
