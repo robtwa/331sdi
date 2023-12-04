@@ -33,8 +33,8 @@ const polls: Map<PollName, Poll> = new Map();
 const votes: Map<PollName, Voters> = new Map();
 
 /**
- * Create a new poll with the given list of options and closing in the given
- * number of minutes. Returns a unique ID for the poll.
+ * Saves new polls sent by the client and sends the corresponding http response
+ * to the client.
  * @param req The request object
  * @param res The response object
  */
@@ -48,7 +48,7 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('missing "name" parameter');
     return;
   }
-  else if (name === null || name === "") {
+  else if (name === "") {
     res.status(400).send('The "name" parameter cannot be empty.');
     return;
   }
@@ -64,22 +64,23 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('missing "options" parameter');
     return;
   }
-  else if (options === null) {
-    res.status(400).send('The "options" parameter cannot be null');
-    return;
-  }
   else if (options.length < 2) {
     res.status(400).send('The "options" parameter must contain at ' +
       'least 2 different options');
     return;
   }
   else {
-    if (parseInt(minutes) < 0) {
-      res.status(400).send('The "minutes" parameter cannot less than 0.');
+    if (parseInt(minutes) < 1) {
+      res.status(400).send('The "minutes" parameter cannot less than 1.');
       return;
     }
 
-    // Add to polls
+    if (parseInt(minutes) > 60 * 24 * 365) {
+      res.status(400).send(`The "minutes" parameter cannot greater than ${60 * 24 * 365}.`);
+      return;
+    }
+
+    // Save to the map of the polls
     polls.set(name.trim().toLowerCase(),
               {name, minutes: parseInt(minutes), options, createAt: new Date()});
     res.send({msg: `${name} saved.`});
