@@ -17,9 +17,11 @@ type PollEditorState = {
 export class PollEditor extends Component<PollEditorProps, PollEditorState> {
   constructor(props: PollEditorProps) {
     super(props);
+    // Default values
     this.state = {
       name:"",
-      options:""
+      options:"",
+      minutes:10,
     };
   }
 
