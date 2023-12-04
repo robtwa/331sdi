@@ -2,8 +2,7 @@ import React, { Component, MouseEvent } from "react";
 import {model, action, poll, diffTimeFunc, addMinutesFunc} from './lib'
 import {PollEditor} from "./PollEditor"
 import {Vote} from "./Vote"
-
-
+import {PollResult} from "./PollResult";
 
 type PollsAppState = {
   model: model                        // UI to display
@@ -38,8 +37,8 @@ export class PollsApp extends Component<{}, PollsAppState> {
     else if (this.state.model === "vote" && this.state.name !== undefined) {
       return <Vote backFunc={this.doBackClick} name={this.state.name}/>;
     }
-    else if (this.state.model === "results") {
-      return this.renderViewPollResults();
+    else if (this.state.model === "results" && this.state.name !== undefined) {
+      return <PollResult backFunc={this.doBackClick} name={this.state.name}/>;
     }
     else {  // Show the default UI
       return this.renderPolls();
@@ -78,14 +77,16 @@ export class PollsApp extends Component<{}, PollsAppState> {
       const end = addMinutesFunc(poll.minutes, poll.createAt);
       // const end = addMinutesFunc(new Date(), -2);
       const timeDiff = diffTimeFunc(end, new Date());
-      // Show polls still active
+      // Show polls that have not been closed yet
       if (showOpenOrClosed && timeDiff > 0) {
         links.push(<li key={"active_poll_"+poll.name}>
           <a href="#" onClick={()=>this.doOpenVoteClick(poll.name)} >{poll.name} </a>
           - {timeDiff.toFixed(2)} {timeDiff === 1?"minute":"minutes"} remaining
+
+          <a href="#" onClick={()=>this.doViewResultClick(poll.name)} >results</a>
         </li>)
       }
-      // Show polls closed
+      // Show closed polls
       if (!showOpenOrClosed && timeDiff <= 0) {
         links.push(<li key={"active_poll_"+poll.name}>
           <a href="#" onClick={()=>this.doViewResultClick(poll.name)} >{poll.name} </a>
@@ -147,12 +148,6 @@ export class PollsApp extends Component<{}, PollsAppState> {
     console.error(`Error fetching /api/list: ${msg}`);
   };
 
-
-  renderViewPollResults = (): JSX.Element => {
-    return (<div>
-      <h1>Poll Results</h1>
-    </div>);
-  };
 
   renderMessage = (): JSX.Element => {
     if (this.state.msg === "") {
