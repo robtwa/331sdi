@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent, FormEvent } from "react";
-import { isRecord } from './record';
+import {ServerResponse} from "./lib";
 
 type PollEditorProps = {
   backFunc:  () => void;
@@ -25,14 +25,10 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
     };
   }
 
-  componentDidMount() {
-    console.log("PollEditor")
-  }
-
-  // New Poll /////////////////////////////////////////////////////////////////
+  // Render the editor UI
   render = (): JSX.Element => {
     return (<div>
-      <form onSubmit={this.doNewPollSubmit}>
+      <form onSubmit={this.doSubmitPollClick}>
         <h1>New Poll</h1>
         <div>
           <label htmlFor="name">Name:</label>
@@ -57,25 +53,41 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
           <button type="button" onClick={this.props.backFunc} className="button">Back</button>
         </div>
       </form>
+
+      {this.renderMessage()}
     </div>);
   };
 
+  // Render the message
+  renderMessage = (): JSX.Element => {
+    if (this.state.msg === "") {
+      return <div></div>;
+    } else {
+      return <p className={"message"}>{this.state.msg}</p>;
+    }
+  };
+
+  // Handle the event for the name change.
   doNameChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     this.setState({name: evt.target.value});
   };
 
+  // Handle the event for the minutes change.
   doMinutesChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     this.setState({minutes: parseInt(evt.target.value)});
   };
 
+  // Handle the event for the options change.
   doOptionsChange = (evt: ChangeEvent<HTMLTextAreaElement>): void => {
     this.setState({options: evt.target.value});
   };
 
-  doNewPollSubmit = (_evt: FormEvent): void => {
+  // Handle the event for submitting the poll form.
+  doSubmitPollClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
-    console.log("doNewPollSubmit")
-    // Let the backend do data integrity checks
+    // Clear previous "msg" before submitting data
+    this.setState({msg:""});
+
     const payload = {
       name: this.state.name,
       minutes: this.state.minutes,
@@ -90,7 +102,7 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
       .catch(()=>this.doSaveError("failed to connect to server"));
   };
 
-  // Called when the server responds to the save file request.
+  // Called when the server responds to the save poll request.
   doSaveResp = (res:Response):void => {
     if (res.status === 200) {
       res.json().then(this.doSaveJson)
@@ -103,20 +115,13 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
     }
   }
 
-  // Called when the save file response JSON has been parsed.
-  doSaveJson = (data: unknown): void => {
-    if (isRecord(data)) {
-      this.props.backFunc();
-    }
-    else {
-      this.doSaveError("Bad data. The returned data is not a json.");
-    }
+  // Called when parsing the JSON is complete.
+  doSaveJson = (_: ServerResponse): void => {
+    this.props.backFunc();
   };
 
   // Called if an error occurs trying to save file
   doSaveError = (msg: string): void => {
-    console.error(`Error fetching /api/save: ${msg}`);
+    this.setState({msg: `${msg}`});
   };
-
-
 }
