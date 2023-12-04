@@ -4,22 +4,37 @@ import {results, save, vote} from './routes';
 
 
 describe('routes', function() {
-
-  // TODO: remove the tests for the dummy route
-
   it('save', function() {
-    const payload = {
+
+    // Additional test 1
+    let payload = {
       name: 'What do I eat for dinner?',
       minute: 10,
       options: "Dim Sum\nPizza\nPha",
     };
-    const req1 = httpMocks.createRequest(
+    let req = httpMocks.createRequest(
         {method: 'POST', url: '/api/save',
           body: payload });
-    const res1 = httpMocks.createResponse();
-    save(req1, res1);
-    assert.strictEqual(res1._getStatusCode(), 200);
-    assert.deepStrictEqual(res1._getData(), {msg: `${payload.name} saved.`});
+    let res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+
+    // Additional test 2
+    payload = {
+      name: 'Lunch?',
+      minute: 10,
+      options: "Dim Sum\nDim Sum\nDiM SuM",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.strictEqual(res._getData(), 'The "options" parameter must ' +
+      'contain at least 2 different options');
+
   });
 
   it('vote', function() {
