@@ -1,6 +1,6 @@
 import React, { Component, ChangeEvent, FormEvent } from "react";
 import { isRecord } from './record';
-import {addMinutesFunc, diffTimeFunc, poll} from "./lib";
+import {addMinutesFunc, diffTimeFunc, Poll, ServerResponse} from "./lib";
 
 type VoteProps = {
   backFunc:  () => void;
@@ -16,16 +16,16 @@ type VoteState = {
 
   selectedOption?:string;
   voter:string;
-  msg?: string | undefined;
+  msg: string | undefined;
 }
 
 export class Vote extends Component<VoteProps, VoteState> {
   constructor(props: VoteProps) {
     super(props);
-    this.state = {dataLoaded:false, voter:""};
+    this.state = {dataLoaded:false, voter:"", msg:""};
   }
 
-  componentDidMount() {
+  componentDidMount = ():void => {
     console.log("Vote")
     this.doRefreshClick()
   }
@@ -79,11 +79,22 @@ export class Vote extends Component<VoteProps, VoteState> {
           <button type="submit" key="btn_vote" className="button">Vote</button>
         </div>);
 
-        return <form onSubmit={this.doVoteSubmit} >{retEles}</form>;
+        retEles.push(this.renderMessage());
+
+        return <form onSubmit={this.doSubmitVoteClick} >{retEles}</form>;
       }
     }
     else {  // Loading data from the server
       return <div>Data loading...</div>
+    }
+  };
+
+  // Render the message
+  renderMessage = (): JSX.Element => {
+    if (this.state.msg === "") {
+      return <div></div>;
+    } else {
+      return <p className={"message"}>{this.state.msg}</p>;
     }
   };
 
@@ -96,9 +107,8 @@ export class Vote extends Component<VoteProps, VoteState> {
   };
 
   // Vote //////////////////////////////////////////////////////////////////////
-  doVoteSubmit = (_evt: FormEvent): void => {
+  doSubmitVoteClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
-    console.log("doVoteSubmit")
 
     // Let the backend do data integrity checks
     const payload = {
@@ -129,18 +139,13 @@ export class Vote extends Component<VoteProps, VoteState> {
   }
 
   // Called when the save file response JSON has been parsed.
-  doVoteJson = (data: unknown): void => {
-    if (isRecord(data)) {
-      this.props.backFunc();
-    }
-    else {
-      this.doVoteError("Bad data. The returned data is not a json.");
-    }
+  doVoteJson = (data: ServerResponse): void => {
+    this.setState({msg: data.msg})
   };
 
   // Called if an error occurs trying to save file
   doVoteError = (msg: string): void => {
-    console.error(`Error fetching /api/save: ${msg}`);
+    this.setState({msg: `Error fetching /api/save: ${msg}`});
   };
 
   // Refresh //////////////////////////////////////////////////////////////////
@@ -164,9 +169,8 @@ export class Vote extends Component<VoteProps, VoteState> {
   }
 
   // Called when the save file response JSON has been parsed.
-  doRefreshJson = (data: poll): void => {
+  doRefreshJson = (data: Poll): void => {
     if (isRecord(data)) {
-      console.log("data = ", data)
       this.setState({
         dataLoaded: true,
         name: data.name,
@@ -182,8 +186,6 @@ export class Vote extends Component<VoteProps, VoteState> {
 
   // Called if an error occurs trying to save file
   doRefreshError = (msg: string): void => {
-    console.error(`Error fetching /api/save: ${msg}`);
+    this.setState({msg: `Error fetching /api/save: ${msg}`});
   };
-
-
 }
