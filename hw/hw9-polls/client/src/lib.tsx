@@ -8,6 +8,12 @@ export type poll = {
   createAt: Date
 };
 
+export type voteResult = {
+  poll: poll,
+  result: Map<string, number>,
+  totalVotes: number
+}
+
 /**
  * Return the difference between two dates in minutes
  * @param src
