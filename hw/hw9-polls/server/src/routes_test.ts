@@ -5,37 +5,154 @@ import {results, save, vote} from './routes';
 
 describe('routes', function() {
   it('save', function() {
-
-    // Additional test 1
-    let payload = {
-      name: 'What do I eat for dinner?',
+    // Branch 1
+    let payloadBad:object = {
       minute: 10,
       options: "Dim Sum\nPizza\nPha",
     };
     let req = httpMocks.createRequest(
-        {method: 'POST', url: '/api/save',
-          body: payload });
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
     let res = httpMocks.createResponse();
     save(req, res);
-    assert.strictEqual(res._getStatusCode(), 200);
-    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'missing "name" parameter');
 
-    // Additional test 2
-    payload = {
-      name: 'Lunch?',
+    // Branch 2
+    payloadBad = {
+      name: "",
       minute: 10,
-      options: "Dim Sum\nDim Sum\nDiM SuM",
+      options: "Dim Sum\nPizza\nPha",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'The "name" parameter cannot be empty.');
+
+    // Successfully save a poll
+    let payload = {
+      name: 'What do I eat for dinner?',
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPha",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
         body: payload });
     res = httpMocks.createResponse();
     save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+
+    // Branch 3 - A poll with the same "name" already exists.
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'A poll with the same "name" already exists.');
+
+    // Branch 4
+    payloadBad = {
+      name: "Lunch",
+      options: "Dim Sum\nPizza\nPha",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'missing "minutes" parameter');
+
+    // Branch 5
+    payloadBad = {
+      name: "Lunch",
+      minutes: 10,
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'missing "options" parameter');
+
+    // Branch 6
+    payloadBad = {
+      name: 'Lunch?',
+      minutes: 10,
+      options: "Dim Sum\nDim Sum\nDiM SuM",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.strictEqual(res._getData(), 'The "options" parameter must ' +
       'contain at least 2 different options');
 
+    // Branch 7
+    payloadBad = {
+      name: 'Lunch?',
+      minutes: 0,
+      options: "Dim Sum\nPizza",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.strictEqual(res._getData(), 'The "minutes" parameter cannot less than 1.');
+
+    // Branch 8
+    payloadBad = {
+      name: 'Lunch?',
+      minutes: 60 * 24 * 365 + 1,
+      options: "Dim Sum\nPizza",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.strictEqual(res._getData(), `The "minutes" parameter cannot greater than ${60 * 24 * 365}.`);
+
+    // branch 9 - 1st
+    payload = {
+      name: 'What do I eat for lunch?',
+      minutes: 60 * 24 * 365,
+      options: "Dim Sum\nPizza\nPha",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+
+    // branch 9 - 2nd
+    payload = {
+      name: 'What do I eat for breakfast?',
+      minutes: 1,
+      options: "Dim Sum\nPizza\nPha\nBurgers",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
   });
+
 
   it('vote', function() {
     const payload = {
@@ -48,7 +165,6 @@ describe('routes', function() {
         body: payload });
     const res1 = httpMocks.createResponse();
     vote(req1, res1);
-    console.log(res1._getData())
     assert.strictEqual(res1._getStatusCode(), 200);
     assert.deepStrictEqual(res1._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
   });
@@ -86,13 +202,8 @@ describe('routes', function() {
       {method: 'GET', url: `/api/vote?name=${encodeURIComponent(payload.name)}` });
     const res3 = httpMocks.createResponse();
     results(req3, res3);
-    const data = JSON.parse(res3._getData());
-    console.log("data = ", data)
     assert.strictEqual(res3._getStatusCode(), 200);
-    const result = new Map(data.result);
-    console.log("result = ", result)
-
-    // assert.deepStrictEqual(res3._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
+    //assert.deepStrictEqual(res3._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
   });
 
 });
