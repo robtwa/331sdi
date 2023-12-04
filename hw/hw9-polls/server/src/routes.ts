@@ -5,123 +5,32 @@ import { ParamsDictionary } from "express-serve-static-core";
 type SafeRequest = Request<ParamsDictionary, {}, Record<string, unknown>>;
 type SafeResponse = Response;  // only writing, so no need to check
 
-// Storing all polls with the map data structure
-type pollName = string;
-type poll = {
+// Type for the name of the poll
+type PollName = string;
+
+// Type for the poll
+type Poll = {
   name: string,
   minutes: number,
   options: string[],
   createAt: Date
 };
-const polls: Map<pollName, poll> = new Map();
 
-// Storing all votes with the map data structure
-type vote = {
+// Type for the vote
+type Vote = {
   voter: string,
   option: string,
   createdAt: Date
 };
-type voters = Map<string, vote>;
 
-const votes: Map<pollName, voters> = new Map();
+// Type for the voters
+type Voters = Map<string, Vote>;
 
-export const vote = (req: SafeRequest, res: SafeResponse): void => {
-  const name = req.body.name?.toString();
-  const voter = req.body.voter?.toString();
-  const option = req.body.option?.toString();
+// Storing all polls with the map data structure
+const polls: Map<PollName, Poll> = new Map();
 
-  // validation
-  if (name === undefined) {
-    res.status(400).send('missing "name" parameter');
-    return;
-  }
-  else if (name === null || name === "") {
-    res.status(400).send('The "name" parameter cannot be empty.');
-    return;
-  }
-  else if (voter === undefined) {
-    res.status(400).send('missing "voter" parameter');
-    return;
-  }
-  else if (voter === null || voter === "") {
-    res.status(400).send('The "voter" parameter cannot be empty.');
-    return;
-  }
-  else if (option === undefined) {
-    res.status(400).send('missing "option" parameter');
-    return;
-  }
-  else if (option === null) {
-    res.status(400).send('The "option" parameter cannot be null');
-    return;
-  }
-  else {
-    // Todo: Check if the poll has closed
-    const createdAt = new Date();
-    const vote: vote = {voter, option, createdAt};
-    const voters = votes.get(name);
-    if (voters !== undefined) {
-      console.log(voters.size)
-      voters.set(voter, vote);
-      votes.set(name, voters)
-    }
-    else {
-      const data:voters = new Map();
-      data.set(voter, vote);
-      votes.set(name, data)
-    }
-    console.log(votes)
-    res.send({msg: `Recorded vote of "${name}" as "${option}"`});
-  }
-};
-
-export const results = (req: SafeRequest, res: SafeResponse): void => {
-  console.log(`result ///////////////////////////////////////`)
-  const name:string | undefined = first(req.query.name);
-  console.log("result: name = " + name);
-
-  if (name === undefined) {
-    res.status(400).send('missing "name" parameter');
-    return;
-  }
-  else {
-    const poll:poll | undefined = polls.get(name);
-    let totalVotes:number = 0;
-    if (poll === undefined) {
-      res.status(400).send('There is no poll with the given name.');
-      return;
-    }
-
-    // Init the map of the voting result
-    const result:Map<string, number> = new Map();
-    for (const option of poll.options) {
-      result.set(option, 0);
-    }
-    console.log("result = ", result)
-
-    // Compute the voting result
-    const voters = votes.get(name);
-    if (voters !== undefined) {
-      console.log(voters.size)
-      for (const [_, vote] of voters) {
-        console.log("vote.option = " + vote.option)
-        const count = result.get(vote.option);
-        console.log("count = " + count)
-        if (count !== undefined) {
-          result.set(vote.option, count + 1);
-        }
-
-        totalVotes = totalVotes + 1;
-      }
-    }
-
-    console.log("result = ", result)
-
-    res.send(JSON.stringify({poll, result: [...result], totalVotes}));
-
-
-  }
-};
+// Storing all votes with the map data structure
+const votes: Map<PollName, Voters> = new Map();
 
 /**
  * Create a new poll with the given list of options and closing in the given
@@ -131,9 +40,8 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
  */
 export const save = (req: SafeRequest, res: SafeResponse): void => {
   const name = req.body.name?.toString();
-  console.log("save: name = " + name);
-  const minutes = parseInt(<string> req.body.minutes);
-  const options = req.body.options?.toString().split("\n");
+  const minutes:string|undefined = req.body.minutes?.toString();
+  const options = processOptions(req.body.options?.toString());
 
   // validation
   if (name === undefined) {
@@ -144,12 +52,12 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('The "name" parameter cannot be empty.');
     return;
   }
-  else if (minutes === undefined) {
-    res.status(400).send('missing "minutes" parameter');
+  else if (polls.has(recognizableStr(name))) {
+    res.status(400).send('A poll with the same "name" already exists.');
     return;
   }
-  else if (minutes < 0) {
-    res.status(400).send('The "minutes" parameter cannot less than 0.');
+  else if (minutes === undefined) {
+    res.status(400).send('missing "minutes" parameter');
     return;
   }
   else if (options === undefined) {
@@ -161,13 +69,19 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     return;
   }
   else if (options.length < 2) {
-    res.status(400).send('The "options" parameter must contain 2 ' +
-      'options');
+    res.status(400).send('The "options" parameter must contain at ' +
+      'least 2 different options');
     return;
   }
   else {
+    if (parseInt(minutes) < 0) {
+      res.status(400).send('The "minutes" parameter cannot less than 0.');
+      return;
+    }
+
     // Add to polls
-    polls.set(name, {name, minutes, options, createAt: new Date()});
+    polls.set(name.trim().toLowerCase(),
+              {name, minutes: parseInt(minutes), options, createAt: new Date()});
     res.send({msg: `${name} saved.`});
   }
 };
@@ -200,14 +114,121 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('missing "name" parameter');
     return;
   }
-  else if (!polls.has(name)) {
-    res.status(400).send('There is no poll with the given name.');
-    return;
+  else {
+    const nameClean = recognizableStr(name);
+    if (!polls.has(nameClean)) {
+      res.status(400).send('There is no poll with the given name.');
+      return;
+    }
+    const data = polls.get(nameClean);
+    res.send(JSON.stringify(data));
   }
-  const data = polls.get(name);
-  res.send(JSON.stringify(data));
 };
 
+/**
+ * Save a vote sent by a client.
+ * @param req
+ * @param res
+ */
+export const vote = (req: SafeRequest, res: SafeResponse): void => {
+  const name = req.body.name?.toString();
+  const voter = req.body.voter?.toString();
+  const option = req.body.option?.toString();
+
+  // validation
+  if (name === undefined) {
+    res.status(400).send('missing "name" parameter');
+    return;
+  }
+  else if (name === null || name === "") {
+    res.status(400).send('The "name" parameter cannot be empty.');
+    return;
+  }
+  else if (voter === undefined) {
+    res.status(400).send('missing "voter" parameter');
+    return;
+  }
+  else if (voter === null || voter === "") {
+    res.status(400).send('The "voter" parameter cannot be empty.');
+    return;
+  }
+  else if (option === undefined) {
+    res.status(400).send('missing "option" parameter');
+    return;
+  }
+  else if (option === null) {
+    res.status(400).send('The "option" parameter cannot be null');
+    return;
+  }
+  else {
+    // Todo: Check if the poll has closed
+    const nameClean = recognizableStr(name);
+    const createdAt = new Date();
+    const vote: Vote = {voter, option, createdAt};
+    const voters = votes.get(nameClean);
+    if (voters !== undefined) {
+      console.log(voters.size)
+      voters.set(voter, vote);
+      votes.set(nameClean, voters)
+    }
+    else {
+      const data:Voters = new Map();
+      data.set(voter, vote);
+      votes.set(nameClean, data)
+    }
+    res.send({msg: `Recorded vote of "${voter}" as "${option}"`});
+  }
+};
+/**
+ * Sends a http response containing the results of the saved results of a poll
+ * in JSON string format. If there are no saved result, send an empty array in
+ * JSON string format.
+ *
+ * @param req
+ * @param res
+ */
+export const results = (req: SafeRequest, res: SafeResponse): void => {
+  const name:string | undefined = first(req.query.name);
+
+  if (name === undefined) {
+    res.status(400).send('missing "name" parameter');
+    return;
+  }
+  else {
+    const nameClean = recognizableStr(name);
+    const poll:Poll | undefined = polls.get(nameClean);
+    let totalVotes:number = 0;
+    if (poll === undefined) {
+      res.status(400).send('There is no poll with the given name.');
+      return;
+    }
+
+    // Init the map of the voting result
+    const result:Map<string, number> = new Map();
+    for (const option of poll.options) {
+      result.set(option, 0);
+    }
+    console.log("result = ", result)
+
+    // Compute the voting result
+    const voters = votes.get(nameClean);
+    if (voters !== undefined) {
+      console.log(voters.size)
+      for (const [_, vote] of voters) {
+        console.log("vote.option = " + vote.option)
+        const count = result.get(vote.option);
+        console.log("count = " + count)
+        if (count !== undefined) {
+          result.set(vote.option, count + 1);
+        }
+
+        totalVotes = totalVotes + 1;
+      }
+    }
+
+    res.send(JSON.stringify({poll, result: Array.from(result), totalVotes}));
+  }
+};
 
 
 // Helper functions ***********************************************************
@@ -224,3 +245,28 @@ const first = (param: unknown): string|undefined => {
     return undefined;
   }
 };
+
+/**
+ * Returns a trimmed string in lowercase.
+ * @param str The input string.
+ */
+const recognizableStr = (str: string):string =>{
+  return str.trim().toLowerCase();
+}
+
+/**
+ * Processing the polling options to avoid duplicates due to case differences
+ * @param options The polling options in string or undefined.
+ */
+const processOptions = (options:string|undefined):string[]|undefined =>{
+  if (options === undefined) {
+    return undefined;
+  }
+
+  const om:Map<string, string> = new Map();
+  for (const option of options.split("\n")) {
+    om.set(recognizableStr(option), option);
+  }
+
+  return Array.from(om.values());
+}
