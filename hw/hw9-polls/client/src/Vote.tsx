@@ -11,18 +11,18 @@ type VoteState = {
   dataLoaded: boolean;          // Indicates the state of data loading
   name?: string;                // Poll name
   minutes?: number;             // Voting duration
-  options?: string[];             // Voting options
-  createdAt?:Date;             // Poll's created date and time
+  options?: string[];           // Voting options
+  createdAt?:Date;              // Poll's created date and time
 
   selectedOption?:string;
-  voter?:string;
+  voter:string;
   msg?: string | undefined;
 }
 
 export class Vote extends Component<VoteProps, VoteState> {
   constructor(props: VoteProps) {
     super(props);
-    this.state = {dataLoaded:false};
+    this.state = {dataLoaded:false, voter:""};
   }
 
   componentDidMount() {
@@ -95,13 +95,55 @@ export class Vote extends Component<VoteProps, VoteState> {
     this.setState({voter: evt.target.value});
   };
 
+  // Vote //////////////////////////////////////////////////////////////////////
   doVoteSubmit = (_evt: FormEvent): void => {
     _evt.preventDefault();
     console.log("doVoteSubmit")
+
+    // Let the backend do data integrity checks
+    const payload = {
+      name: this.state.name,
+      option: this.state.selectedOption,
+      voter: this.state.voter,
+    }
+
+    fetch("/api/vote",
+      {method: "POST",
+        body: JSON.stringify(payload),
+        headers: {"Content-Type": "application/json"}})
+      .then(this.doVoteResp)
+      .catch(()=>this.doVoteError("failed to connect to server"));
   };
 
+  // Called when the server responds to the save file request.
+  doVoteResp = (res:Response):void => {
+    if (res.status === 200) {
+      res.json().then(this.doVoteJson)
+        .catch(() => this.doVoteError("200 response is not valid JSON"));
+    } else if (res.status === 400) {
+      res.text().then((res:string)=>this.doVoteError(res))
+        .catch(() => this.doVoteError("400 response is not text"));
+    } else {
+      this.doVoteError(`bad status code: ${res.status}`);
+    }
+  }
 
+  // Called when the save file response JSON has been parsed.
+  doVoteJson = (data: unknown): void => {
+    if (isRecord(data)) {
+      this.props.backFunc();
+    }
+    else {
+      this.doVoteError("Bad data. The returned data is not a json.");
+    }
+  };
 
+  // Called if an error occurs trying to save file
+  doVoteError = (msg: string): void => {
+    console.error(`Error fetching /api/save: ${msg}`);
+  };
+
+  // Refresh //////////////////////////////////////////////////////////////////
   // Send a request to the server to loads the poll data
   doRefreshClick = ():void =>{
     fetch("/api/load?name="+this.props.name)
