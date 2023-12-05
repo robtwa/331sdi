@@ -26,6 +26,13 @@ type Vote = {
 // Type for the voters
 type Voters = Map<string, Vote>;
 
+// Type for the voting result
+export type VotingResults = {
+  poll: Poll,
+  result: any [],
+  totalVotes: number
+}
+
 // Storing all polls with the map data structure
 const polls: Map<PollName, Poll> = new Map();
 
@@ -207,10 +214,9 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
     res.send({msg: `Recorded vote of "${voter}" as "${option}"`});
   }
 };
+
 /**
- * Sends a http response containing the results of the saved results of a poll
- * in JSON string format. If there are no saved result, send an empty array in
- * JSON string format.
+ * Returns a list of all saved votes by sending a http response.
  *
  * @param req
  * @param res
@@ -234,27 +240,25 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
     // Init the map of the voting result
     const result:Map<string, number> = new Map();
     for (const option of poll.options) {
-      result.set(option, 0);
+      result.set(cleanString(option), 0);
     }
-    console.log("result = ", result)
 
     // Compute the voting result
     const voters = votes.get(nameClean);
     if (voters !== undefined) {
-      console.log(voters.size)
       for (const [_, vote] of voters) {
-        console.log("vote.option = " + vote.option)
-        const count = result.get(vote.option);
-        console.log("count = " + count)
+        const cleanOption = cleanString(vote.option);
+        const count = result.get(cleanOption);
         if (count !== undefined) {
-          result.set(vote.option, count + 1);
+          result.set(cleanOption, count + 1);
         }
 
         totalVotes = totalVotes + 1;
       }
     }
 
-    res.send(JSON.stringify({poll, result: Array.from(result), totalVotes}));
+    const data:VotingResults = {poll, result: Array.from(result), totalVotes};
+    res.send(data);
   }  // end if
 };
 
