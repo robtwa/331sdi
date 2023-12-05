@@ -36,13 +36,13 @@ export class Vote extends Component<VoteProps, VoteState> {
   render = (): JSX.Element | JSX.Element[] => {
     if(this.state.dataLoaded){ // Data is loaded from the server
       if (this.state.createdAt === undefined) {
-        return <>Corrupted data: Mission poll's creation time.</>
+        return <p key={"p_corrupted_data"}>Corrupted data: Mission poll's creation time.</p>
       }
       else if (this.state.minutes === undefined) {
-        return <>Corrupted data: Mission poll's minutes.</>
+        return <p key={"p_corrupted_data"}>Corrupted data: Mission poll's minutes.</p>
       }
       else if (this.state.options === undefined) {
-        return <>Corrupted data: Mission poll's options.</>
+        return <p key={"p_corrupted_data"}>Corrupted data: Mission poll's options.</p>
       }
       else {
         const end = addMinutesFunc(this.state.minutes, this.state.createdAt);
@@ -52,7 +52,8 @@ export class Vote extends Component<VoteProps, VoteState> {
         retEles.push(<h1 key="h1_vote">{this.state.name}</h1>);
 
         if (remainMinutes > 0) {  // Poll is active
-          retEles.push(<p key="p_vote_active" >Closes in {Math.abs(remainMinutes).toFixed(2)} minutes</p>);
+          retEles.push(<p key="p_vote_active" >Closes in {
+            Math.abs(remainMinutes).toFixed(2)} minutes</p>);
           for (const option of this.state.options) {
             retEles.push(<label key={"label_"+option} className="voteOption">
               <input type="radio"
@@ -65,8 +66,8 @@ export class Vote extends Component<VoteProps, VoteState> {
           }
 
           retEles.push(<div key={"p_voter"}>
-            <label htmlFor="voter">Voter Name:</label>
-            <input type="text" id="voter" value={this.state.voter} required={true}
+            <label key="label_voter" htmlFor="voter">Voter Name:</label>
+            <input key="input_voter" type="text" id="voter" value={this.state.voter} required={true}
                    onChange={this.doVoterNameChange}></input>
           </div>);
         }
@@ -82,18 +83,18 @@ export class Vote extends Component<VoteProps, VoteState> {
 
         retEles.push(this.renderMessage());
 
-        return <form onSubmit={this.doSubmitVoteClick} >{retEles}</form>;
+        return <form key={"form_vote"} onSubmit={this.doSubmitVoteClick} >{retEles}</form>;
       }
     }
     else {  // Loading data from the server
-      return <div>Data loading...</div>
+      return <div key={"div_data_loading"}>Data loading...</div>
     }
   };
 
   // Render the message
   renderMessage = (): JSX.Element => {
     if (this.state.msg === "") {
-      return <div></div>;
+      return <div key={"div_message"}></div>;
     } else {
       return <p className={"message"}>{this.state.msg}</p>;
     }
