@@ -5,8 +5,11 @@ import {list, resetForTesting, results, save, vote, Poll, VotingResults} from '.
 
 describe('routes', function() {
   it('save', function() {
+    // Delete all saved polls and votes.
+    resetForTesting();
+
     // Branch 1: 'missing "name" parameter'
-    let payloadBad:object = {
+    let payloadBad = {
       minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
@@ -19,14 +22,14 @@ describe('routes', function() {
     assert.deepStrictEqual(res._getData(), 'missing "name" parameter');
 
     // Branch 2: 'The "name" parameter cannot be empty.'
-    payloadBad = {
+    let payloadBad2 = {
       name: "",
       minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad2 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -56,40 +59,40 @@ describe('routes', function() {
     assert.deepStrictEqual(res._getData(), 'A poll with the same "name" already exists.');
 
     // Branch 4: 'missing "minutes" parameter'
-    payloadBad = {
+    let payloadBad3 = {
       name: "Lunch",
       options: "Dim Sum\nPizza\nPha",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad3 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'missing "minutes" parameter');
 
     // Branch 5: 'missing "options" parameter'
-    payloadBad = {
+    let payloadBad4 = {
       name: "Lunch",
       minutes: 10,
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad4 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'missing "options" parameter');
 
     // Branch 6: 'The "options" parameter must contain at least 2 different options'
-    payloadBad = {
+    const payloadBad5 = {
       name: 'Lunch?',
       minutes: 10,
       options: "Dim Sum\nDim Sum\nDiM SuM",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad5 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -97,28 +100,28 @@ describe('routes', function() {
       'contain at least 2 different options');
 
     // Branch 7: 'The "minutes" parameter cannot less than 0.'
-    payloadBad = {
+    const payloadBad6 = {
       name: 'Lunch?',
       minutes: -1,
       options: "Dim Sum\nPizza",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad6 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.strictEqual(res._getData(), 'The "minutes" parameter cannot less than 0.');
 
     // Branch 8
-    payloadBad = {
+    const payloadBad7 = {
       name: 'Lunch?',
       minutes: 60 * 24 * 365 + 1,
       options: "Dim Sum\nPizza",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payloadBad });
+        body: payloadBad7 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -157,6 +160,9 @@ describe('routes', function() {
   });
 
   it('list', function() {
+    // Delete all saved polls and votes.
+    resetForTesting();
+
     // Gets an empty list of saved polls ///////////////////////////////////////
     let req = httpMocks.createRequest(
       {method: 'GET', url: '/api/list'});
@@ -221,87 +227,88 @@ describe('routes', function() {
     assert.deepStrictEqual(data[1].options, ['Noddles', 'Burgers']);
     assert.deepStrictEqual(data[1].createAt instanceof Date, true);
 
-    // Delete all saved polls and votes.
-    resetForTesting();
   });
 
   it('vote', function() {
+    // Delete all saved polls and votes.
+    resetForTesting();
+
     // Branch 1: missing "name" parameter
-    let payloadBad:object = {
+    const payloadBad1 = {
         voter: "voter1",
         option: "Dim Sum",
     };
     let req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad1 });
     let res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'missing "name" parameter');
 
     // Branch 2: The "name" parameter cannot be empty.
-    payloadBad = {
+    const payloadBad2 = {
       name: "",
       voter: "voter1",
       option: "Dim Sum",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad2 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'The "name" parameter cannot be empty.');
 
     // Branch 3: missing "option" parameter
-    payloadBad = {
+    const payloadBad3 = {
       name: "lunch",
       voter: "voter1",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad3 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'missing "option" parameter');
 
     // Branch 4: 'The "option" parameter cannot be empty'
-    payloadBad = {
+    const payloadBad4 = {
       name: "lunch",
       voter: "voter1",
       option: "",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad4 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'The "option" parameter cannot be empty');
 
     // Branch 5: 'missing "voter" parameter'
-    payloadBad = {
+    const payloadBad5 = {
       name: "lunch",
       option: "Dim Sum",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad5 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'missing "voter" parameter');
 
     // Branch 6: 'The "voter" parameter cannot be empty.'
-    payloadBad = {
+    const payloadBad6 = {
       name: "lunch",
       option: "Dim Sum",
       voter: "",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad6 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -310,7 +317,7 @@ describe('routes', function() {
 
     // Create a poll first ////////////////////////////////////////////////////
     let payloadPoll = {
-      name: 'dinner',
+      name: 'dinner1',
       minutes: 0,
       options: "Dim Sum\nPizza\nBurgers\nPho",
     };
@@ -323,14 +330,14 @@ describe('routes', function() {
     assert.deepEqual(res._getData(), {msg: `${payloadPoll.name} saved.`});
 
     // Branch 7: 'There is no poll with the given name'
-    payloadBad = {
+    const payloadBad7 = {
       name: "lunch",
       option: "Dim Sum",
       voter: "voter1",
     };
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
-        body: payloadBad });
+        body: payloadBad7 });
     res = httpMocks.createResponse();
     vote(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -339,7 +346,7 @@ describe('routes', function() {
 
     // Branch 8: 'Voting closed.'
     let payload = {
-      name: 'dinner',
+      name: 'dinner1',
       voter: "voter1",
       option: "Dim Sum",
     };
@@ -409,14 +416,14 @@ describe('routes', function() {
     assert.deepStrictEqual(res1._getData(),
       {msg: `Recorded vote of "${payload.voter}" as "${payload.option}"`});
 
-
-    // Delete all saved polls and votes.
-    resetForTesting();
   });
 
   it('result', function() {
+    // Delete all saved polls and votes.
+    resetForTesting();
+
     // Branch 1: missing "name" parameter
-    let payloadBad:object = {
+    let payloadBad = {
     };
     let req = httpMocks.createRequest(
       {method: 'POST', url: '/api/results',
@@ -441,7 +448,7 @@ describe('routes', function() {
 
     // Branch 2: 'There is no poll with the given name.'
     req = httpMocks.createRequest(
-      {method: 'POST', url: `/api/results?name=lunch`});
+      {method: 'POST', url: "/api/results?name=lunch"});
     res = httpMocks.createResponse();
     results(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
@@ -449,7 +456,7 @@ describe('routes', function() {
 
     // Bottom Branch: no votes
     req = httpMocks.createRequest(
-      {method: 'POST', url: `/api/results?name=dinner`});
+      {method: 'POST', url: "/api/results?name=dinner"});
     res = httpMocks.createResponse();
     results(req, res);
     assert.strictEqual(res._getStatusCode(), 200);
@@ -629,9 +636,6 @@ describe('routes', function() {
     assert.strictEqual(resultMap.get("pizza"), 2);
     assert.strictEqual(resultMap.get("pho"), 0);
 
-
-    // Delete all saved polls and votes.
-    resetForTesting();
   });
 
 });
