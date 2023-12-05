@@ -46,7 +46,7 @@ const votes: Map<PollName, Voters> = new Map();
  * @param res The response object
  */
 export const save = (req: SafeRequest, res: SafeResponse): void => {
-  const name = req.body.name?.toString();
+  const name = first(req.body.name) ;
   const minutes:string|undefined = req.body.minutes?.toString();
   const options = processOptions(req.body.options?.toString());
 
@@ -137,7 +137,7 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
  * @param res
  */
 export const vote = (req: SafeRequest, res: SafeResponse): void => {
-  const name = req.body.name?.toString();
+  const name = first(req.body.name);
   const voter = req.body.voter?.toString();
   const option = req.body.option?.toString();
   const createdAt = new Date();
@@ -222,7 +222,7 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
  * @param res
  */
 export const results = (req: SafeRequest, res: SafeResponse): void => {
-  const name:string | undefined = first(req.query.name);
+  const name = first(req.query.name);
 
   if (name === undefined) {
     res.status(400).send('missing "name" parameter');
