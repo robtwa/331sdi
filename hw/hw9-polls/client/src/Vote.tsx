@@ -25,6 +25,9 @@ export class Vote extends Component<VoteProps, VoteState> {
     this.state = {dataLoaded:false, voter:"", msg:""};
   }
 
+  /**
+   * When a component is mounted
+   */
   componentDidMount = ():void => {
     this.doRefreshClick()
   }
@@ -157,7 +160,7 @@ export class Vote extends Component<VoteProps, VoteState> {
 
   // Called if an error occurs trying to save file
   doVoteError = (msg: string): void => {
-    this.setState({msg: `Error fetching /api/save: ${msg}`});
+    this.setState({msg: `Error fetching /api/vote: ${msg}`});
   };
 
   /**
@@ -205,6 +208,6 @@ export class Vote extends Component<VoteProps, VoteState> {
 
   // Called if an error occurs trying to save file
   doRefreshError = (msg: string): void => {
-    this.setState({msg: `Error fetching /api/save: ${msg}`});
+    this.setState({msg: `Error fetching /api/load?name=${encodeURIComponent(this.props.name)}: ${msg}`});
   };
 }
