@@ -1,6 +1,15 @@
 import * as assert from 'assert';
 import * as httpMocks from 'node-mocks-http';
-import {list, resetForTesting, results, save, vote, Poll, VotingResults} from './routes';
+import {
+  list,
+  resetForTesting,
+  results,
+  save,
+  vote,
+  Poll,
+  VotingResults,
+  load
+} from './routes';
 
 
 describe('routes', function() {
@@ -155,6 +164,20 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 200);
     assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
 
+    // Additional test
+    let payloadBad10 = {
+      name: ["dinner", "lunch"],
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPha",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad10 });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: "dinner saved."});
+
     // Delete all saved polls and votes.
     resetForTesting();
   });
@@ -226,6 +249,79 @@ describe('routes', function() {
     assert.strictEqual(data[1].minutes, payload2.minutes);
     assert.deepStrictEqual(data[1].options, ['Noddles', 'Burgers']);
     assert.deepStrictEqual(data[1].createAt instanceof Date, true);
+
+  });
+
+  it('load', function() {
+    // Delete all saved polls and votes.
+    resetForTesting();
+
+    // branch 1: 'missing "name" parameter'
+    let req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/load'});
+    let res = httpMocks.createResponse();
+    load(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'missing "name" parameter');
+
+    // create a poll
+    let payload = {
+      name: 'dinner',
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPha",
+    };
+    let req1 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save', body: payload });
+    let res1 = httpMocks.createResponse();
+    save(req1, res1);
+    assert.strictEqual(res1._getStatusCode(), 200);
+    assert.deepStrictEqual(res1._getData(), {msg: `${payload.name} saved.`});
+
+    // branch 2: There is no poll with the given name.
+    req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/load?name=lunch'});
+    res = httpMocks.createResponse();
+    load(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'There is no poll with the given name.');
+
+    // branch 3: 1st
+    req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/load?name=dinner'});
+    res = httpMocks.createResponse();
+    load(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    const data:Poll = res._getData();
+    assert.strictEqual(data.name, 'dinner');
+    assert.strictEqual(data.minutes, 10);
+    assert.deepStrictEqual(data.options, [ 'Dim Sum', 'Pizza', 'Pha' ]);
+    assert.strictEqual(data.createAt instanceof Date, true);
+
+    // create the second poll
+    let payload2 = {
+      name: 'What do I eat for dinner?',
+      minutes: 30,
+      options: "Dim Sum1\nPizza1\nPho1",
+    };
+    req1 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save', body: payload2 });
+    res1 = httpMocks.createResponse();
+    save(req1, res1);
+    assert.strictEqual(res1._getStatusCode(), 200);
+    assert.deepStrictEqual(res1._getData(), {msg: `${payload2.name} saved.`});
+
+
+    // branch 3: 2nd
+    req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/load?name='+encodeURIComponent(payload2.name)});
+    res = httpMocks.createResponse();
+    load(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    const data2:Poll = res._getData();
+    assert.strictEqual(data2.name, payload2.name);
+    assert.strictEqual(data2.minutes, 30);
+    assert.deepStrictEqual(data2.options, [ 'Dim Sum1', 'Pizza1', 'Pho1' ]);
+    assert.strictEqual(data2.createAt instanceof Date, true);
 
   });
 
