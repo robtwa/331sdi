@@ -9,7 +9,7 @@ type SafeResponse = Response;  // only writing, so no need to check
 type PollName = string;
 
 // Type for the poll
-type Poll = {
+export type Poll = {
   name: string,
   minutes: number,
   options: string[],
@@ -33,8 +33,8 @@ const polls: Map<PollName, Poll> = new Map();
 const votes: Map<PollName, Voters> = new Map();
 
 /**
- * Saves new polls sent by the client and sends the corresponding http response
- * to the client.
+ * Save a new poll and send the corresponding http response based on the saved
+ * state.
  * @param req The request object
  * @param res The response object
  */
@@ -52,7 +52,7 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('The "name" parameter cannot be empty.');
     return;
   }
-  else if (polls.has(recognizableStr(name))) {
+  else if (polls.has(cleanString(name))) {
     res.status(400).send('A poll with the same "name" already exists.');
     return;
   }
@@ -70,8 +70,8 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     return;
   }
   else {
-    if (parseInt(minutes) < 1) {
-      res.status(400).send('The "minutes" parameter cannot less than 1.');
+    if (parseInt(minutes) < 0) {
+      res.status(400).send('The "minutes" parameter cannot less than 0.');
       return;
     }
 
@@ -81,53 +81,51 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     }
 
     // Save to the map of the polls
-    polls.set(name.trim().toLowerCase(),
+    polls.set(cleanString(name),
               {name, minutes: parseInt(minutes), options, createAt: new Date()});
     res.send({msg: `${name} saved.`});
   }
 };
 
 /**
- * Sends a http response containing the names of all saved polls in JSON string
- * format. If there are no saved polls, send an empty array in JSON string
- * format.
- * @param _ The HTTP request object
- * @param res The HTTP response object
+ * Returns a list of all saved polls by sending a http response.
+ * @param _
+ * @param res The response object
  */
 export const list = (_: SafeRequest, res: SafeResponse): void => {
   const data = Array.from(polls.values());
-  res.send(JSON.stringify(data));
+  res.send(data);
 };
 
 /**
- * Sends a http response with the data of the requested square file a JSON
- * string containing.
- * If the request does not specify a filename, send a 400 error with a short
- * error information.
- * If the request file does not exist, send a 400 error with a short error
- * information.
+ * Returns the data of the requested poll by sending a http response.
  * @param req The HTTP request object
  * @param res The HTTP response object
  */
 export const load = (req: SafeRequest, res: SafeResponse): void => {
-  const name:string | undefined = first(req.query.name);
-  if (name === undefined) {
+  const name:string | undefined = first(req.query.name);  // The poll name
+  // Check if poll name is undefined.
+  if (name === undefined) {  // If the poll name is undefined
     res.status(400).send('missing "name" parameter');
     return;
   }
-  else {
-    const nameClean = recognizableStr(name);
-    if (!polls.has(nameClean)) {
+  else {  // If the poll name is not undefined
+    const nameClean = cleanString(name); // Clean the poll name
+    // Check whether there is a poll with this name in the saved polls
+    if (!polls.has(nameClean)) {  // If there is not
       res.status(400).send('There is no poll with the given name.');
       return;
     }
-    const data = polls.get(nameClean);
-    res.send(JSON.stringify(data));
+
+    // If there is a poll with the requested name
+    const data = polls.get(nameClean);  // Get the poll's data
+    res.send(data);  // Return the poll data by sending a http response.
   }
 };
 
 /**
- * Save a vote sent by a client.
+ * Save a vote and send the corresponding http response based on the saved
+ * state.
  * @param req
  * @param res
  */
@@ -135,48 +133,77 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
   const name = req.body.name?.toString();
   const voter = req.body.voter?.toString();
   const option = req.body.option?.toString();
+  const createdAt = new Date();
 
   // validation
   if (name === undefined) {
     res.status(400).send('missing "name" parameter');
     return;
   }
-  else if (name === null || name === "") {
+  else if (name === "") {
     res.status(400).send('The "name" parameter cannot be empty.');
-    return;
-  }
-  else if (voter === undefined) {
-    res.status(400).send('missing "voter" parameter');
-    return;
-  }
-  else if (voter === null || voter === "") {
-    res.status(400).send('The "voter" parameter cannot be empty.');
     return;
   }
   else if (option === undefined) {
     res.status(400).send('missing "option" parameter');
     return;
   }
-  else if (option === null) {
-    res.status(400).send('The "option" parameter cannot be null');
+  else if (option === "") {
+    res.status(400).send('The "option" parameter cannot be empty');
+    return;
+  }
+  else if (voter === undefined) {
+    res.status(400).send('missing "voter" parameter');
+    return;
+  }
+  else if (voter === "") {
+    res.status(400).send('The "voter" parameter cannot be empty.');
     return;
   }
   else {
-    // Todo: Check if the poll has closed
-    const nameClean = recognizableStr(name);
-    const createdAt = new Date();
-    const vote: Vote = {voter, option, createdAt};
+    // Checks if a poll with the given name exists
+    const nameClean = cleanString(name);  // Convert to a clean name
+    const poll = polls.get(nameClean);
+    if (poll === undefined) {
+      res.status(400).send('There is no poll with the given name');
+      return;
+    }
+
+    // Checks if the poll has been closed based on the time received by the
+    // server
+    const endDate = addMinutesFunc(poll.minutes, poll.createAt);
+    const remainTime = diffTimeFunc(endDate, createdAt);
+    if (remainTime < 0) {
+      res.status(400).send('Voting closed.');
+      return;
+    }
+
+    // Make a map of the poll's voting options used for validation.
+    const optionsMap = new Map();
+    for (const key of poll.options) {
+      optionsMap.set(cleanString(key), key);
+    }
+    // Check if the voted option is valid
+    if (!optionsMap.has(cleanString(option))) {  // Invalid voting option
+      res.status(400).send('Invalid voting option');
+      return;
+    }
+
+    const vote: Vote = {voter, option, createdAt};  // Make a voting data
+    // Get saved voter records
     const voters = votes.get(nameClean);
-    if (voters !== undefined) {
-      console.log(voters.size)
-      voters.set(voter, vote);
-      votes.set(nameClean, voters)
+    if (voters === undefined)  {  // If there is no saved voter records
+      const data:Voters = new Map();  // Create the data of voters
+      data.set(voter, vote);  // Write the vote record
+      votes.set(nameClean, data); // Write the voters data
     }
-    else {
-      const data:Voters = new Map();
-      data.set(voter, vote);
-      votes.set(nameClean, data)
+    else {  // If there are saved voter records
+      voters.set(voter, vote); // Write the vote record
+      votes.set(nameClean, voters)  // Write the voters data
     }
+
+
+    // Send the http response
     res.send({msg: `Recorded vote of "${voter}" as "${option}"`});
   }
 };
@@ -196,7 +223,7 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
     return;
   }
   else {
-    const nameClean = recognizableStr(name);
+    const nameClean = cleanString(name);
     const poll:Poll | undefined = polls.get(nameClean);
     let totalVotes:number = 0;
     if (poll === undefined) {
@@ -228,16 +255,15 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
     }
 
     res.send(JSON.stringify({poll, result: Array.from(result), totalVotes}));
-  }
+  }  // end if
 };
-
 
 // Helper functions ***********************************************************
 
 // Helper to return the (first) value of the parameter if any was given.
 // (This is mildly annoying because the client can also give mutiple values,
 // in which case, express puts them into an array.)
-const first = (param: unknown): string|undefined => {
+export const first = (param: unknown): string|undefined => {
   if (Array.isArray(param)) {
     return first(param[0]);
   } else if (typeof param === 'string') {
@@ -251,23 +277,52 @@ const first = (param: unknown): string|undefined => {
  * Returns a trimmed string in lowercase.
  * @param str The input string.
  */
-const recognizableStr = (str: string):string =>{
+export const cleanString = (str: string):string =>{
   return str.trim().toLowerCase();
-}
+};
 
 /**
  * Processing the polling options to avoid duplicates due to case differences
  * @param options The polling options in string or undefined.
  */
-const processOptions = (options:string|undefined):string[]|undefined =>{
+export const processOptions = (options:string|undefined): string[] | undefined =>{
   if (options === undefined) {
     return undefined;
   }
 
   const om:Map<string, string> = new Map();
-  for (const option of options.split("\n")) {
-    om.set(recognizableStr(option), option);
+  for (const option of options.trim().split("\n")) {
+    om.set(cleanString(option), option);
   }
 
   return Array.from(om.values());
+};
+
+/**
+ * Return the minute difference between two dates
+ * @param src The source date for comparing
+ * @param tar the target date for comparing
+ */
+export const diffTimeFunc = (src: Date, tar: Date):number =>{
+  return (src.getTime() - tar.getTime()) / 1000 / 60
 }
+/**
+ * Add minutes to a Date
+ * @param minutes The minutes in number
+ * @param date The target date to add minutes
+ */
+export const addMinutesFunc = (minutes: number, date: Date, ): Date => {
+  const newDate = new Date(date);
+  newDate.setMinutes(newDate.getMinutes() + minutes);
+  return newDate;
+}
+
+
+/**
+   * Helper that at the end of each test to call this function to delete all
+   * saved polls.
+   */
+  export const resetForTesting = ():void => {
+    polls.clear();
+    votes.clear();
+  }
