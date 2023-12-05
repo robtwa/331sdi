@@ -5,17 +5,17 @@ import {Vote} from "./Vote"
 import {PollResult} from "./PollResult";
 
 type PollsAppState = {
-  comp: Comp                    // Components
-  polls: Poll[],                // Poll list
-  name: string;                // Poll name
-  msg: string;                  // Message sent from server
+  comp: Comp                    // Which component to display
+  polls: Poll[],                // The list of polls
+  name: string;                 // The name of a poll
+  msg: string;                  // The message
 }
 
-// Enable the debug mode if you want to see the voting results of not closed
+// Enable the debug mode if you want to see the voting results of the not closed
 // polls.
-const DEBUG_MODE: boolean = false;
+const DEBUG_MODE: boolean = true;
 
-/** Displays the UI of the Polls application. */
+/** Top level component that displays the UI of the Polls application. */
 export class PollsApp extends Component<{}, PollsAppState> {
   constructor(props: {}) {
     super(props);
@@ -24,22 +24,34 @@ export class PollsApp extends Component<{}, PollsAppState> {
 
   componentDidMount = ():void => {
     // When the component is mounted, call the doListRequestClick func to get
-    // a list of all polls
+    // a list of all saved polls
     this.doListRequestClick()
   }
 
   // Render the UI
   render = (): JSX.Element => {
-    if (this.state.comp === "newPoll") {
+    if (this.state.comp === "newPoll") {  // Show the UI of new poll
       return <PollEditor backFunc={this.doBackClick}/>;
     }
-    else if (this.state.comp === "vote" && this.state.name !== undefined) {
-      return <Vote backFunc={this.doBackClick} name={this.state.name}/>;
+    else if (this.state.comp === "vote") {
+      if (this.state.name !== undefined) {
+        return <Vote backFunc={this.doBackClick} name={this.state.name}/>;
+      }
+      else {
+        this.setState({msg: 'Poll "name" is missing when showing vote UI.'});
+        return this.renderPolls();
+      }
     }
-    else if (this.state.comp === "results" && this.state.name !== undefined) {
-      return <PollResult backFunc={this.doBackClick} name={this.state.name}/>;
+    else if (this.state.comp === "results") {
+      if (this.state.name !== undefined) {
+        return <PollResult backFunc={this.doBackClick} name={this.state.name}/>;
+      }
+      else {
+        this.setState({msg: 'Poll "name" is missing when showing result UI.'});
+        return this.renderPolls();
+      }
     }
-    else {  // Show the default UI
+    else {  // Show the default UI - the poll list
       return this.renderPolls();
     }
   };
@@ -49,7 +61,7 @@ export class PollsApp extends Component<{}, PollsAppState> {
     if (this.state.msg === "") {
       return <div></div>;
     } else {
-      return <p className={"message"}>{this.state.msg}</p>;
+      return <p key="p-msg" className={"message"}>{this.state.msg}</p>;
     }
   };
 
@@ -74,7 +86,7 @@ export class PollsApp extends Component<{}, PollsAppState> {
   };
 
   /**
-   * Render the open or closed poll list
+   * Render the poll list.
    * @param showOpen used to render the open or closed polls; true for open
    *        polls, false for closed polls
    */
@@ -108,9 +120,8 @@ export class PollsApp extends Component<{}, PollsAppState> {
         </li>)
       }
     }
-    console.log(links.length)
     if (links.length < 1) {
-      links.push(<p className={"gap gray"}>No data.</p>)
+      links.push(<p key="p_list_nodata" className={"gap gray"}>No data.</p>)
     }
     return links;
   };
@@ -125,7 +136,7 @@ export class PollsApp extends Component<{}, PollsAppState> {
     this.setState({comp: "vote", name})
   };
 
-  // Event handler for viewing a poll results.
+  // Event handler for viewing a poll's results.
   doViewResultClick = (name: string): void => {
     this.setState({comp: "results", name})
   };
@@ -136,9 +147,10 @@ export class PollsApp extends Component<{}, PollsAppState> {
    * data is valid, update the list to the component’s state object.
    */
   doListRequestClick = (): void => {
-    // Clear previous "msg" before submitting data
-    this.setState({msg:""});
+    // Note: Let the server do the data integrity checks. Have all such checks
+    //       done in one place, and the backend is more secure.
 
+    // Call the server
     fetch("/api/list")
       .then(this.doListRequestResp)
       .catch(()=>this.doListRequestError("failed to connect to server"));
@@ -175,6 +187,6 @@ export class PollsApp extends Component<{}, PollsAppState> {
   // Called when backing to this PollsApp UI
   doBackClick = (): void => {
     this.setState({comp:"polls", polls:[], name: "", msg:""})
-    this.doListRequestClick();  // Retrieve a poll list from the server
+    this.doListRequestClick();  // Retrieve the poll list from the server
   };
 }
