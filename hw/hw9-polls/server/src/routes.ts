@@ -29,7 +29,7 @@ type Voters = Map<string, Vote>;
 // Type for the voting result
 export type VotingResults = {
   poll: Poll,
-  result: any [],
+  result: Array<[string, number]>,
   totalVotes: number
 }
 
@@ -180,7 +180,7 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
     // server
     const endDate = addMinutesFunc(poll.minutes, poll.createAt);
     const remainTime = diffTimeFunc(endDate, createdAt);
-    if (remainTime < 0) {
+    if (remainTime <= 0) {  //  If voting closed
       res.status(400).send('Voting closed.');
       return;
     }
@@ -264,9 +264,13 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
 
 // Helper functions ***********************************************************
 
-// Helper to return the (first) value of the parameter if any was given.
-// (This is mildly annoying because the client can also give mutiple values,
-// in which case, express puts them into an array.)
+
+/**
+ * Helper to return the (first) value of the parameter if any was given. (This
+ * is mildly annoying because the client can also give mutiple values, in which
+ * case, express puts them into an array.)
+ * @param param
+ */
 export const first = (param: unknown): string|undefined => {
   if (Array.isArray(param)) {
     return first(param[0]);
