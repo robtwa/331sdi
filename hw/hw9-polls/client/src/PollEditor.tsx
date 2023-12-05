@@ -2,26 +2,27 @@ import React, { Component, ChangeEvent, FormEvent } from "react";
 import {ServerResponse} from "./lib";
 
 type PollEditorProps = {
-  backFunc:  () => void;
+  backFunc:  () => void;            // The function back to the poll list
 };
 
 type PollEditorState = {
-  name: string;                // Poll name
-  minutes?: number;             // Voting duration
-  options: string;             // Voting options
-  createdAt?:Date;             // Poll's created date and time
-  msg?: string | undefined;
+  name: string;                     // Poll name
+  minutes?: number | string;        // Voting duration
+  options: string;                  // Voting options
+  createdAt?:Date;                  // Poll's created date and time
+  msg?: string | undefined;         // The message
 }
 
-/** Displays the UI of the Polls application. */
+// Displays the editor of the poll.
 export class PollEditor extends Component<PollEditorProps, PollEditorState> {
   constructor(props: PollEditorProps) {
     super(props);
+
     // Default values
     this.state = {
-      name:"",
-      options:"",
-      minutes:10,
+      name: "",
+      options: "",
+      minutes: 10,      // Default to 10 minutes
     };
   }
 
@@ -61,9 +62,9 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
   // Render the message
   renderMessage = (): JSX.Element => {
     if (this.state.msg === "") {
-      return <div></div>;
+      return <div key={"div_empty"} ></div>;
     } else {
-      return <p className={"message"}>{this.state.msg}</p>;
+      return <p key="p_message" className={"message"}>{this.state.msg}</p>;
     }
   };
 
@@ -74,7 +75,12 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
 
   // Handle the event for the minutes change.
   doMinutesChange = (evt: ChangeEvent<HTMLInputElement>): void => {
-    this.setState({minutes: parseInt(evt.target.value)});
+    if (evt.target.value === "") {
+      this.setState({minutes: evt.target.value });
+    }
+    else {
+      this.setState({minutes: parseInt(evt.target.value) });
+    }
   };
 
   // Handle the event for the options change.
@@ -82,18 +88,24 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
     this.setState({options: evt.target.value});
   };
 
-  // Handle the event for submitting the poll form.
+  /**
+   * Handle the event for submitting the poll form.
+   * @param _evt
+   */
   doSubmitPollClick = (_evt: FormEvent): void => {
-    _evt.preventDefault();
-    // Clear previous "msg" before submitting data
-    this.setState({msg:""});
+    _evt.preventDefault();  // to prevent default behavior
 
+    // Note: Let the server do the data integrity checks. Have all such checks
+    //       done in one place, and the backend is more secure to so.
+
+    // the payload
     const payload = {
       name: this.state.name,
       minutes: this.state.minutes,
       options: this.state.options,
     }
 
+    // call the server
     fetch("/api/save",
       {method: "POST",
         body: JSON.stringify(payload),
@@ -117,11 +129,11 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
 
   // Called when parsing the JSON is complete.
   doSaveJson = (_: ServerResponse): void => {
-    this.props.backFunc();
+    this.props.backFunc();  // Back to the poll list after poll saved
   };
 
   // Called if an error occurs trying to save file
   doSaveError = (msg: string): void => {
-    this.setState({msg: `${msg}`});
+    this.setState({msg: `Error fetching /api/save: ${msg}`});
   };
 }
