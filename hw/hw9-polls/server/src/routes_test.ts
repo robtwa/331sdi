@@ -59,9 +59,15 @@ describe('routes', function() {
     assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
 
     // Branch 3 - A poll with the same "name" already exists.
+    let payloadBad9 = {
+      name: 'What do I eat for dInNeR?',
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPha",
+    };
+
     req = httpMocks.createRequest(
       {method: 'POST', url: '/api/save',
-        body: payload });
+        body: payloadBad9 });
     res = httpMocks.createResponse();
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 400);
