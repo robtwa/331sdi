@@ -17,6 +17,8 @@ describe('routes', function() {
     // Delete all saved polls and votes.
     resetForTesting();
 
+    // Separate domain for each branch:
+
     // Branch 1: 'missing "name" parameter'
     let payloadBad = {
       minutes: 10,
@@ -44,7 +46,7 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 400);
     assert.deepStrictEqual(res._getData(), 'The "name" parameter cannot be empty.');
 
-    // Successfully save a poll
+    // Successfully save a poll first
     let payload = {
       name: 'What do I eat for dinner?',
       minutes: 10,
@@ -60,7 +62,7 @@ describe('routes', function() {
 
     // Branch 3 - A poll with the same "name" already exists.
     let payloadBad9 = {
-      name: 'What do I eat for dInNeR?',
+      name: 'wHat do I eat for dInNeR?',
       minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
@@ -114,7 +116,21 @@ describe('routes', function() {
     assert.strictEqual(res._getData(), 'The "options" parameter must ' +
       'contain at least 2 different options');
 
-    // Branch 7: 'The "minutes" parameter cannot less than 0.'
+    // Branch 7: 'The "minutes" parameter must be an integer.'
+    const payloadBad6a = {
+      name: 'Lunch?',
+      minutes: "",
+      options: "Dim Sum\nPizza",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payloadBad6a });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.strictEqual(res._getData(), 'The "minutes" parameter must be an integer.');
+
+    // Branch 8: 'The "minutes" parameter cannot less than 0.'
     const payloadBad6 = {
       name: 'Lunch?',
       minutes: -1,
@@ -128,7 +144,7 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 400);
     assert.strictEqual(res._getData(), 'The "minutes" parameter cannot less than 0.');
 
-    // Branch 8
+    // Branch 9: The "minutes" parameter cannot greater than ${60 * 24 * 365}.
     const payloadBad7 = {
       name: 'Lunch?',
       minutes: 60 * 24 * 365 + 1,
@@ -142,7 +158,7 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 400);
     assert.strictEqual(res._getData(), `The "minutes" parameter cannot greater than ${60 * 24 * 365}.`);
 
-    // branch 9 - 1st
+    // branch 10 - correctly add: 1st
     payload = {
       name: 'What do I eat for lunch?',
       minutes: 60 * 24 * 365,
@@ -156,7 +172,7 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 200);
     assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
 
-    // branch 9 - 2nd
+    // branch 10 - correctly add: 2nd
     payload = {
       name: 'What do I eat for breakfast?',
       minutes: 0,
@@ -170,7 +186,7 @@ describe('routes', function() {
     assert.strictEqual(res._getStatusCode(), 200);
     assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
 
-    // Additional test
+    // branch 10 - correctly add: 3rd
     let payloadBad10 = {
       name: ["dinner", "lunch"],
       minutes: 10,
@@ -183,9 +199,6 @@ describe('routes', function() {
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 200);
     assert.deepStrictEqual(res._getData(), {msg: "dinner saved."});
-
-    // Delete all saved polls and votes.
-    resetForTesting();
   });
 
   it('list', function() {
