@@ -40,8 +40,17 @@ const polls: Map<PollName, Poll> = new Map();
 const votes: Map<PollName, Voters> = new Map();
 
 /**
- * Save a new poll and send the corresponding http response based on the saved
- * state.
+ * Returns a list of all saved polls by sending a http response.
+ * @param _
+ * @param res The response object
+ */
+export const list = (_: SafeRequest, res: SafeResponse): void => {
+  const data = Array.from(polls.values());
+  res.send(data);
+};
+
+/**
+ * Add a new poll to the list of polls.
  * @param req The request object
  * @param res The response object
  */
@@ -55,53 +64,52 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
     res.status(400).send('missing "name" parameter');
     return;
   }
-  else if (name === "") {
+
+  if (name === "") {
     res.status(400).send('The "name" parameter cannot be empty.');
     return;
   }
-  else if (polls.has(cleanString(name))) {
+
+  if (polls.has(cleanString(name))) {
     res.status(400).send('A poll with the same "name" already exists.');
     return;
   }
-  else if (minutes === undefined) {
+
+  if (minutes === undefined) {
     res.status(400).send('missing "minutes" parameter');
     return;
   }
-  else if (options === undefined) {
+
+  if (options === undefined) {
     res.status(400).send('missing "options" parameter');
     return;
   }
-  else if (options.length < 2) {
+
+  if (options.length < 2) {
     res.status(400).send('The "options" parameter must contain at ' +
       'least 2 different options');
     return;
   }
-  else {
-    if (parseInt(minutes) < 0) {
-      res.status(400).send('The "minutes" parameter cannot less than 0.');
-      return;
-    }
 
-    if (parseInt(minutes) > 60 * 24 * 365) {
-      res.status(400).send(`The "minutes" parameter cannot greater than ${60 * 24 * 365}.`);
-      return;
-    }
-
-    // Save to the map of the polls
-    polls.set(cleanString(name),
-              {name, minutes: parseInt(minutes), options, createAt: new Date()});
-    res.send({msg: `${name} saved.`});
+  if (isNaN(parseInt(minutes))) {
+    res.status(400).send('The "minutes" parameter must be an integer.');
+    return;
   }
-};
 
-/**
- * Returns a list of all saved polls by sending a http response.
- * @param _
- * @param res The response object
- */
-export const list = (_: SafeRequest, res: SafeResponse): void => {
-  const data = Array.from(polls.values());
-  res.send(data);
+  if (parseInt(minutes) < 0) {
+    res.status(400).send('The "minutes" parameter cannot less than 0.');
+    return;
+  }
+
+  if (parseInt(minutes) > 60 * 24 * 365) {
+    res.status(400).send(`The "minutes" parameter cannot greater than ${60 * 24 * 365}.`);
+    return;
+  }
+
+  // Save to the map of the polls
+  polls.set(cleanString(name),
+    {name, minutes: parseInt(minutes), options, createAt: new Date()});
+  res.send({msg: `${name} saved.`});
 };
 
 /**
@@ -131,10 +139,9 @@ export const load = (req: SafeRequest, res: SafeResponse): void => {
 };
 
 /**
- * Save a vote and send the corresponding http response based on the saved
- * state.
- * @param req
- * @param res
+ * Add a vote the list of votes.
+ * @param req The HTTP request object
+ * @param res The HTTP response object
  */
 export const vote = (req: SafeRequest, res: SafeResponse): void => {
   const name = first(req.body.name);
@@ -217,9 +224,8 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
 
 /**
  * Returns a list of all saved votes by sending a http response.
- *
- * @param req
- * @param res
+ * @param req The HTTP request object
+ * @param res The HTTP response object
  */
 export const results = (req: SafeRequest, res: SafeResponse): void => {
   const name = first(req.query.name);
@@ -269,7 +275,7 @@ export const results = (req: SafeRequest, res: SafeResponse): void => {
  * Helper to return the (first) value of the parameter if any was given. (This
  * is mildly annoying because the client can also give mutiple values, in which
  * case, express puts them into an array.)
- * @param param
+ * @param param The given parameter.
  */
 export const first = (param: unknown): string|undefined => {
   if (Array.isArray(param)) {
@@ -314,6 +320,7 @@ export const processOptions = (options:string|undefined): string[] | undefined =
 export const diffTimeFunc = (src: Date, tar: Date):number =>{
   return (src.getTime() - tar.getTime()) / 1000 / 60
 }
+
 /**
  * Add minutes to a Date
  * @param minutes The minutes in number
@@ -325,12 +332,10 @@ export const addMinutesFunc = (minutes: number, date: Date, ): Date => {
   return newDate;
 }
 
-
 /**
-   * Helper that at the end of each test to call this function to delete all
-   * saved polls.
-   */
-  export const resetForTesting = ():void => {
-    polls.clear();
-    votes.clear();
-  }
+ * Testing function to delete all saved polls and votes.
+ */
+export const resetForTesting = ():void => {
+  polls.clear();
+  votes.clear();
+}
