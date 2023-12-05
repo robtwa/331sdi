@@ -26,13 +26,11 @@ export class Vote extends Component<VoteProps, VoteState> {
   }
 
   componentDidMount = ():void => {
-    console.log("Vote")
     this.doRefreshClick()
   }
 
-  // New Poll /////////////////////////////////////////////////////////////////
+  // Display the voting UI of a poll
   render = (): JSX.Element | JSX.Element[] => {
-    console.log(this.state)
     if(this.state.dataLoaded){ // Data is loaded from the server
       if (this.state.createdAt === undefined) {
         return <>Corrupted data: Mission poll's creation time.</>
