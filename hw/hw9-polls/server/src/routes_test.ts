@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as httpMocks from 'node-mocks-http';
-import {list, resetForTesting, results, save, vote, Poll} from './routes';
+import {list, resetForTesting, results, save, vote, Poll, VotingResults} from './routes';
 
 
 describe('routes', function() {
   it('save', function() {
     // Branch 1: 'missing "name" parameter'
     let payloadBad:object = {
-      minute: 10,
+      minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
     let req = httpMocks.createRequest(
@@ -21,7 +21,7 @@ describe('routes', function() {
     // Branch 2: 'The "name" parameter cannot be empty.'
     payloadBad = {
       name: "",
-      minute: 10,
+      minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
     req = httpMocks.createRequest(
@@ -405,7 +405,6 @@ describe('routes', function() {
         body: payload });
     res1 = httpMocks.createResponse();
     vote(req1, res1);
-    console.log(res1._getData())
     assert.strictEqual(res1._getStatusCode(), 200);
     assert.deepStrictEqual(res1._getData(),
       {msg: `Recorded vote of "${payload.voter}" as "${payload.option}"`});
@@ -416,24 +415,66 @@ describe('routes', function() {
   });
 
   it('result', function() {
+    // Branch 1: missing "name" parameter
+    let payloadBad:object = {
+    };
+    let req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/results',
+        body: payloadBad });
+    let res = httpMocks.createResponse();
+    results(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'missing "name" parameter');
+
     // create a poll
-    const payload = {
-      name: 'What do I eat for dinner?',
-      minute: 10,
+    let payload = {
+      name: 'dinner',
+      minutes: 10,
       options: "Dim Sum\nPizza\nPha",
     };
-    const req1 = httpMocks.createRequest(
+    let req1 = httpMocks.createRequest(
       {method: 'POST', url: '/api/save', body: payload });
-    const res1 = httpMocks.createResponse();
+    let res1 = httpMocks.createResponse();
     save(req1, res1);
     assert.strictEqual(res1._getStatusCode(), 200);
     assert.deepStrictEqual(res1._getData(), {msg: `${payload.name} saved.`});
 
-    // Make a vote
-    const payload2 = {
-      name: payload.name,
-      voter: "voter1",
+    // Branch 2: 'There is no poll with the given name.'
+    req = httpMocks.createRequest(
+      {method: 'POST', url: `/api/results?name=lunch`});
+    res = httpMocks.createResponse();
+    results(req, res);
+    assert.strictEqual(res._getStatusCode(), 400);
+    assert.deepStrictEqual(res._getData(), 'There is no poll with the given name.');
+
+    // Bottom Branch: no votes
+    req = httpMocks.createRequest(
+      {method: 'POST', url: `/api/results?name=dinner`});
+    res = httpMocks.createResponse();
+    results(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    let data: VotingResults = res._getData();
+    assert.strictEqual(data.totalVotes, 0);
+
+    // Test branch 3 that has votes: 1st
+    // create another poll
+    payload = {
+      name: 'lunch2',
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPho",
+    };
+    req1 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save', body: payload });
+    res1 = httpMocks.createResponse();
+    save(req1, res1);
+    assert.strictEqual(res1._getStatusCode(), 200);
+    assert.deepStrictEqual(res1._getData(), {msg: `${payload.name} saved.`});
+
+    // Make the first vote
+    let payload2 = {
+      name: "lunch2",
       option: "Dim Sum",
+      voter: "voter1",
     };
     let req2 = httpMocks.createRequest(
       {method: 'POST', url: '/api/vote',
@@ -441,15 +482,153 @@ describe('routes', function() {
     let res2 = httpMocks.createResponse();
     vote(req2, res2);
     assert.strictEqual(res2._getStatusCode(), 200);
-    assert.deepStrictEqual(res2._getData(), {msg: `Recorded vote of "${payload2.name}" as "${payload2.option}"`});
+    assert.deepStrictEqual(res2._getData(),
+      {msg: `Recorded vote of "${payload2.voter}" as "${payload2.option}"`});
 
-    // Get the voting result
-    const req3 = httpMocks.createRequest(
-      {method: 'GET', url: `/api/vote?name=${encodeURIComponent(payload.name)}` });
-    const res3 = httpMocks.createResponse();
+    // Branch 3: has 1 vote
+    let req3 = httpMocks.createRequest(
+      {method: 'GET', url: `/api/vote?name=${encodeURIComponent("lunch2")}` });
+    let res3 = httpMocks.createResponse();
     results(req3, res3);
     assert.strictEqual(res3._getStatusCode(), 200);
-    //assert.deepStrictEqual(res3._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
+    data = res3._getData();
+    let resultMap = new Map(data.result);
+    assert.strictEqual(data.poll.name, "lunch2");
+    assert.strictEqual(data.poll.minutes, 10);
+    assert.deepStrictEqual(data.poll.options, [ 'Dim Sum', 'Pizza', 'Pho' ]);
+    assert.strictEqual(data.totalVotes, 1);
+    assert.strictEqual(resultMap.get("dim sum"), 1);
+    assert.strictEqual(resultMap.get("pizza"), 0);
+    assert.strictEqual(resultMap.get("pho"), 0);
+
+    // Test branch 3 that has votes: 2nd //////////////////////////////////////
+    // Make the second vote that the voting option in an irregular case
+    payload2 = {
+      name: "lunch2",
+      option: "dIm sUm",
+      voter: "voter2",
+    };
+    req2 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/vote',
+        body: payload2 });
+    res2 = httpMocks.createResponse();
+    vote(req2, res2);
+    assert.strictEqual(res2._getStatusCode(), 200);
+    assert.deepStrictEqual(res2._getData(),
+      {msg: `Recorded vote of "${payload2.voter}" as "${payload2.option}"`});
+
+    // Branch 3: has 2 votes
+    req3 = httpMocks.createRequest(
+      {method: 'GET', url: `/api/vote?name=${encodeURIComponent("lunch2")}` });
+    res3 = httpMocks.createResponse();
+    results(req3, res3);
+    assert.strictEqual(res3._getStatusCode(), 200);
+    data = res3._getData();
+    resultMap = new Map(data.result);
+    assert.strictEqual(data.poll.name, "lunch2");
+    assert.strictEqual(data.poll.minutes, 10);
+    assert.deepStrictEqual(data.poll.options, [ 'Dim Sum', 'Pizza', 'Pho' ]);
+    assert.strictEqual(data.totalVotes, 2);
+    assert.strictEqual(resultMap.get("dim sum"), 2);
+    assert.strictEqual(resultMap.get("pizza"), 0);
+    assert.strictEqual(resultMap.get("pho"), 0);
+
+    // Test branch 3 that has votes: 3rd //////////////////////////////////////
+    // Make the 3rd vote
+    payload2 = {
+      name: "lunch2",
+      option: "pizza",
+      voter: "voter3",
+    };
+    req2 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/vote',
+        body: payload2 });
+    res2 = httpMocks.createResponse();
+    vote(req2, res2);
+    assert.strictEqual(res2._getStatusCode(), 200);
+    assert.deepStrictEqual(res2._getData(),
+      {msg: `Recorded vote of "${payload2.voter}" as "${payload2.option}"`});
+
+    // Branch 3: has 3 votes
+    req3 = httpMocks.createRequest(
+      {method: 'GET', url: `/api/vote?name=${encodeURIComponent("lunch2")}` });
+    res3 = httpMocks.createResponse();
+    results(req3, res3);
+    assert.strictEqual(res3._getStatusCode(), 200);
+    data = res3._getData();
+    resultMap = new Map(data.result);
+    assert.strictEqual(data.poll.name, "lunch2");
+    assert.strictEqual(data.poll.minutes, 10);
+    assert.deepStrictEqual(data.poll.options, [ 'Dim Sum', 'Pizza', 'Pho' ]);
+    assert.strictEqual(data.totalVotes, 3);
+    assert.strictEqual(resultMap.get("dim sum"), 2);
+    assert.strictEqual(resultMap.get("pizza"), 1);
+    assert.strictEqual(resultMap.get("pho"), 0);
+
+    // Test branch 3 that has votes: 4th //////////////////////////////////////
+    // Make the 4th vote
+    payload2 = {
+      name: "lunch2",
+      option: "pho",
+      voter: "voter4",
+    };
+    req2 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/vote',
+        body: payload2 });
+    res2 = httpMocks.createResponse();
+    vote(req2, res2);
+    assert.strictEqual(res2._getStatusCode(), 200);
+    assert.deepStrictEqual(res2._getData(),
+      {msg: `Recorded vote of "${payload2.voter}" as "${payload2.option}"`});
+
+    // Branch 3: has 4 votes
+    req3 = httpMocks.createRequest(
+      {method: 'GET', url: `/api/vote?name=${encodeURIComponent("lunch2")}` });
+    res3 = httpMocks.createResponse();
+    results(req3, res3);
+    assert.strictEqual(res3._getStatusCode(), 200);
+    data = res3._getData();
+    resultMap = new Map(data.result);
+    assert.strictEqual(data.poll.name, "lunch2");
+    assert.strictEqual(data.poll.minutes, 10);
+    assert.deepStrictEqual(data.poll.options, [ 'Dim Sum', 'Pizza', 'Pho' ]);
+    assert.strictEqual(data.totalVotes, 4);
+    assert.strictEqual(resultMap.get("dim sum"), 2);
+    assert.strictEqual(resultMap.get("pizza"), 1);
+    assert.strictEqual(resultMap.get("pho"), 1);
+
+    // Test branch 3 that has votes: 5th //////////////////////////////////////
+    // Make the 4th vote - a voter change mind
+    payload2 = {
+      name: "lunch2",
+      option: "pizza",
+      voter: "voter4",
+    };
+    req2 = httpMocks.createRequest(
+      {method: 'POST', url: '/api/vote',
+        body: payload2 });
+    res2 = httpMocks.createResponse();
+    vote(req2, res2);
+    assert.strictEqual(res2._getStatusCode(), 200);
+    assert.deepStrictEqual(res2._getData(),
+      {msg: `Recorded vote of "${payload2.voter}" as "${payload2.option}"`});
+
+    // Branch 3: has 4 votes
+    req3 = httpMocks.createRequest(
+      {method: 'GET', url: `/api/vote?name=${encodeURIComponent("lunch2")}` });
+    res3 = httpMocks.createResponse();
+    results(req3, res3);
+    assert.strictEqual(res3._getStatusCode(), 200);
+    data = res3._getData();
+    resultMap = new Map(data.result);
+    assert.strictEqual(data.poll.name, "lunch2");
+    assert.strictEqual(data.poll.minutes, 10);
+    assert.deepStrictEqual(data.poll.options, [ 'Dim Sum', 'Pizza', 'Pho' ]);
+    assert.strictEqual(data.totalVotes, 4);
+    assert.strictEqual(resultMap.get("dim sum"), 2);
+    assert.strictEqual(resultMap.get("pizza"), 2);
+    assert.strictEqual(resultMap.get("pho"), 0);
+
 
     // Delete all saved polls and votes.
     resetForTesting();
