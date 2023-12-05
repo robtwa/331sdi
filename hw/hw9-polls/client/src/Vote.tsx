@@ -151,7 +151,7 @@ export class Vote extends Component<VoteProps, VoteState> {
   // Refresh //////////////////////////////////////////////////////////////////
   // Send a request to the server to loads the poll data
   doRefreshClick = ():void =>{
-    fetch("/api/load?name="+this.props.name)
+    fetch("/api/load?name="+encodeURIComponent(this.props.name))
       .then(this.doRefreshResp)
       .catch(()=>this.doRefreshError("failed to connect to server"));
   }
