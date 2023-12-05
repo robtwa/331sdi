@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as httpMocks from 'node-mocks-http';
-import {results, save, vote} from './routes';
+import {list, resetForTesting, results, save, vote, Poll} from './routes';
 
 
 describe('routes', function() {
@@ -151,6 +151,79 @@ describe('routes', function() {
     save(req, res);
     assert.strictEqual(res._getStatusCode(), 200);
     assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+
+    // Delete all saved polls and votes.
+    resetForTesting();
+  });
+
+  it('list', function() {
+    // Gets an empty list of saved polls
+    let req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/list'});
+    let res = httpMocks.createResponse();
+    list(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), []);
+
+    // Get a nonempty list of saved polls: 1st
+    // 1. Save a new poll
+    const payload = {
+      name: 'What do I eat for dinner?',
+      minutes: 10,
+      options: "Dim Sum\nPizza\nPha",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload.name} saved.`});
+
+    // 2. Get the list
+    req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/list'});
+    res = httpMocks.createResponse();
+    list(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    let data:Poll[] = res._getData();
+    assert.strictEqual(data.length, 1);
+    assert.strictEqual(data[0].name, payload.name);
+    assert.strictEqual(data[0].minutes, payload.minutes);
+    assert.deepStrictEqual(data[0].options, ['Dim Sum', 'Pizza', 'Pha']);
+    assert.deepStrictEqual(data[0].createAt instanceof Date, true);
+
+    // Get a nonempty list of saved polls: 2nd
+    // 1. Save a new poll
+    const payload2 = {
+      name: 'What do I eat for lunch?',
+      minutes: 10,
+      options: "Noddles\nBurgers",
+    };
+    req = httpMocks.createRequest(
+      {method: 'POST', url: '/api/save',
+        body: payload2 });
+    res = httpMocks.createResponse();
+    save(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    assert.deepStrictEqual(res._getData(), {msg: `${payload2.name} saved.`});
+
+    // 2. Get the list
+    req = httpMocks.createRequest(
+      {method: 'GET', url: '/api/list'});
+    res = httpMocks.createResponse();
+    list(req, res);
+    assert.strictEqual(res._getStatusCode(), 200);
+    data = res._getData();
+    assert.strictEqual(data.length, 2);
+    assert.strictEqual(data[1].name, payload2.name);
+    assert.strictEqual(data[1].minutes, payload2.minutes);
+    assert.deepStrictEqual(data[1].options, ['Noddles', 'Burgers']);
+    assert.deepStrictEqual(data[1].createAt instanceof Date, true);
+
+
+    // Delete all saved polls and votes.
+    resetForTesting();
   });
 
 
@@ -167,6 +240,9 @@ describe('routes', function() {
     vote(req1, res1);
     assert.strictEqual(res1._getStatusCode(), 200);
     assert.deepStrictEqual(res1._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
+
+    // Delete all saved polls and votes.
+    resetForTesting();
   });
 
   it('result', function() {
@@ -204,6 +280,9 @@ describe('routes', function() {
     results(req3, res3);
     assert.strictEqual(res3._getStatusCode(), 200);
     //assert.deepStrictEqual(res3._getData(), {msg: `Recorded vote of "${payload.name}" as "${payload.option}"`});
+
+    // Delete all saved polls and votes.
+    resetForTesting();
   });
 
 });
