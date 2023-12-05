@@ -3,20 +3,20 @@ import { isRecord } from './record';
 import {addMinutesFunc, diffTimeFunc, Poll, ServerResponse} from "./lib";
 
 type VoteProps = {
-  backFunc:  () => void;
-  name: string;             // The name of the poll
+  backFunc:  () => void;        // The function to back to the main UI
+  name: string;                 // The name of the poll
 };
 
 type VoteState = {
-  dataLoaded: boolean;          // Indicates the state of data loading
-  name?: string;                // Poll name
+  dataLoaded: boolean;          // Indicates the state of data loaded
+  name?: string;                // The name of the poll
   minutes?: number;             // Voting duration
   options?: string[];           // Voting options
-  createdAt?:Date;              // Poll's created date and time
+  createdAt?:Date;              // What date and time the poll was created
 
-  selectedOption?:string;
-  voter:string;
-  msg: string | undefined;
+  selectedOption?:string;       // User selected voting option
+  voter:string;                 // Voter's name
+  msg: string | undefined;      // The message
 }
 
 export class Vote extends Component<VoteProps, VoteState> {
@@ -95,16 +95,26 @@ export class Vote extends Component<VoteProps, VoteState> {
       return <p className={"message"}>{this.state.msg}</p>;
     }
   };
-
+  /**
+   * Even handler for changing the option.
+   * @param evt The change event.
+   */
   doOptionChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     this.setState({selectedOption: evt.target.value});
   };
 
+  /**
+   * Even handler for changing the name of the voter.
+   * @param evt the change event
+   */
   doVoterNameChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     this.setState({voter: evt.target.value});
   };
 
-  // Vote //////////////////////////////////////////////////////////////////////
+  /**
+   * Even handler for submitting the vote form.
+   * @param _evt The FormEvent
+   */
   doSubmitVoteClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
 
@@ -123,7 +133,7 @@ export class Vote extends Component<VoteProps, VoteState> {
       .catch(()=>this.doVoteError("failed to connect to server"));
   };
 
-  // Called when the server responds to the save file request.
+  // Called when the server responds to the vote request.
   doVoteResp = (res:Response):void => {
     if (res.status === 200) {
       res.json().then(this.doVoteJson)
@@ -146,14 +156,16 @@ export class Vote extends Component<VoteProps, VoteState> {
     this.setState({msg: `Error fetching /api/save: ${msg}`});
   };
 
-  // Refresh //////////////////////////////////////////////////////////////////
-  // Send a request to the server to loads the poll data
+  /**
+   * Even handler for refreshing/loading the poll data
+   */
   doRefreshClick = ():void =>{
     fetch("/api/load?name="+encodeURIComponent(this.props.name))
       .then(this.doRefreshResp)
       .catch(()=>this.doRefreshError("failed to connect to server"));
   }
 
+  // Called when the server responds to the load request.
   doRefreshResp = (res:Response):void => {
     if (res.status === 200) {
       res.json().then(this.doRefreshJson)
@@ -166,7 +178,7 @@ export class Vote extends Component<VoteProps, VoteState> {
     }
   }
 
-  // Called when the save file response JSON has been parsed.
+  // Called when the response JSON has been parsed.
   doRefreshJson = (data: Poll): void => {
     if (isRecord(data)) {
       this.setState({
