@@ -11,8 +11,9 @@ type PollsAppState = {
   msg: string;                  // Message sent from server
 }
 
-// Enable debug mode in this class.
-const DEBUG_MODE: boolean = true;
+// Enable the debug mode if you want to see the voting results of not closed
+// polls.
+const DEBUG_MODE: boolean = false;
 
 /** Displays the UI of the Polls application. */
 export class PollsApp extends Component<{}, PollsAppState> {
