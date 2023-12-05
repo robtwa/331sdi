@@ -195,6 +195,7 @@ export class Vote extends Component<VoteProps, VoteState> {
         minutes: data.minutes,
         options: data.options,
         createdAt: new Date(data.createAt),
+        msg: ""
       })
     }
     else {
