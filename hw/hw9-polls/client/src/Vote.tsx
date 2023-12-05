@@ -118,13 +118,17 @@ export class Vote extends Component<VoteProps, VoteState> {
   doSubmitVoteClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
 
-    // Let the backend do data integrity checks
+    // Note: Let the server do the data integrity checks. Have all such checks
+    //       done in one place, and the backend is more secure.
+
+    // The payload
     const payload = {
       name: this.state.name,
       option: this.state.selectedOption,
       voter: this.state.voter,
-    }
+    };
 
+    // Call the server
     fetch("/api/vote",
       {method: "POST",
         body: JSON.stringify(payload),
@@ -160,6 +164,10 @@ export class Vote extends Component<VoteProps, VoteState> {
    * Even handler for refreshing/loading the poll data
    */
   doRefreshClick = ():void =>{
+    // Note: Let the server do the data integrity checks. Have all such checks
+    //       done in one place, and the backend is more secure.
+
+    // Call the server
     fetch("/api/load?name="+encodeURIComponent(this.props.name))
       .then(this.doRefreshResp)
       .catch(()=>this.doRefreshError("failed to connect to server"));
