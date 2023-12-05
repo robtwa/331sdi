@@ -208,6 +208,7 @@ export class Vote extends Component<VoteProps, VoteState> {
 
   // Called if an error occurs trying to save file
   doRefreshError = (msg: string): void => {
-    this.setState({msg: `Error fetching /api/load?name=${encodeURIComponent(this.props.name)}: ${msg}`});
+    this.setState({msg: `Error fetching /api/load?name=
+                              ${encodeURIComponent(this.props.name)}: ${msg}`});
   };
 }
