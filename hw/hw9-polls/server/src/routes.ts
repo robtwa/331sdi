@@ -304,9 +304,13 @@ export const processOptions = (options:string|undefined): string[] | undefined =
     return undefined;
   }
 
+  // Remove duplicate or empty voting options
   const om:Map<string, string> = new Map();
-  for (const option of options.trim().split("\n")) {
-    om.set(cleanString(option), option);
+  for (const option of options.split("\n")) {
+    const optionClean = cleanString(option);
+    if (optionClean !== "") {
+      om.set(optionClean, option.trim());
+    }
   }
 
   return Array.from(om.values());
