@@ -96,7 +96,7 @@ export class Vote extends Component<VoteProps, VoteState> {
     if (this.state.msg === "") {
       return <div key={"div_message"}></div>;
     } else {
-      return <p className={"message"}>{this.state.msg}</p>;
+      return <p key={"p_message"} className={"message"}>{this.state.msg}</p>;
     }
   };
   /**
