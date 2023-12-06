@@ -11,9 +11,9 @@ type PollsAppState = {
   msg: string;                  // The message
 }
 
-// Enable the debug mode if you want to see the voting results of the not closed
-// polls.
-const DEBUG_MODE: boolean = true;
+// Enable the debug mode if you want to see the voting results for the not
+// closed polls.
+const DEBUG_MODE: boolean = false;
 
 /** Top level component that displays the UI of the Polls application. */
 export class PollsApp extends Component<{}, PollsAppState> {
@@ -59,7 +59,7 @@ export class PollsApp extends Component<{}, PollsAppState> {
   // Render the message
   renderMessage = (): JSX.Element => {
     if (this.state.msg === "") {
-      return <div></div>;
+      return <div key={"div_message"}></div>;
     } else {
       return <p key="p-msg" className={"message"}>{this.state.msg}</p>;
     }
