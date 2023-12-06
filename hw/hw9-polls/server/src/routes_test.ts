@@ -8,7 +8,10 @@ import {
   vote,
   Poll,
   VotingResults,
-  load
+  load,
+  addMinutesFunc,
+  diffTimeFunc, first, cleanString, processOptions,
+
 } from './routes';
 
 
@@ -753,4 +756,83 @@ describe('routes', function() {
 
   });
 
+  // Test the helper functions
+  it('first', function() {
+    // test 1: input is a string array
+    assert.strictEqual(first(['str1', 'str2']), 'str1');
+
+    // test 2: input is a string
+    assert.strictEqual(first('str2'), 'str2');
+
+    // test 3: input is undefined
+    assert.strictEqual(first(undefined), undefined);
+  });
+
+  it('cleanString', function() {
+    // 1st test
+    assert.strictEqual(cleanString("AbCdEfG "), "abcdefg");
+
+    // 2nd test
+    assert.strictEqual(cleanString(" AbCdEfG "), "abcdefg");
+
+    // 3rd test
+    assert.strictEqual(cleanString(" AbCd EfG "), "abcd efg");
+  });
+
+  it('processOptions', function() {
+    // 1st test
+    let input:string = "pizza\nPizza"
+    let output:string[] = ["Pizza"]
+    assert.deepStrictEqual(processOptions(input), output);
+
+    // 2nd test
+    input = "pizza\nPizza\nDim Sum"
+    output = ["Pizza", "Dim Sum"]
+    assert.deepStrictEqual(processOptions(input), output);
+
+    // 3rd test
+    input = "pizza\nPizza\n \nDim Sum"
+    output = ["Pizza", "Dim Sum"]
+    assert.deepStrictEqual(processOptions(input), output);
+
+    // 4th test
+    input = "pizza\nPizza\n \ndim sum\ndIm suM\nDim Sum\n"
+    output = ["Pizza", "Dim Sum"]
+    assert.deepStrictEqual(processOptions(input), output);
+  });
+
+  it('diffTimeFunc', function() {
+    // test 1: dateLeft and dateRight have the same date and time
+    const dateLeft = new Date();
+    const dateRight = dateLeft;
+    assert.strictEqual(diffTimeFunc(dateLeft, dateRight), 0);
+
+    // test 2: dateLeft2 is 10 minutes behind dateRight2
+    const dateLeft2 = new Date();
+    const dateRight2 = addMinutesFunc(10, dateLeft2);
+    assert.strictEqual(diffTimeFunc(dateLeft2, dateRight2), -10);
+
+    // test 3: dateLeft3 is 10 minutes ahead dateRight3
+    const dateRight3 = new Date();
+    const dateLeft3 = addMinutesFunc(10, dateRight3);
+    assert.strictEqual(diffTimeFunc(dateLeft3, dateRight3), 10);
+
+  });
+
+  it('addMinutesFunc', function() {
+    // test 1: add 0 minutes to dateRight
+    const dateLeft = new Date();
+    const dateRight = addMinutesFunc(0, dateLeft);
+    assert.strictEqual(diffTimeFunc(dateLeft, dateRight), 0);
+
+    // test 2: add 10 minutes to dateRight2
+    const dateLeft2 = new Date();
+    const dateRight2 = addMinutesFunc(10, dateLeft2);
+    assert.strictEqual(diffTimeFunc(dateLeft2, dateRight2), -10);
+
+    // test 2: add -10 minutes to dateRight3
+    const dateLeft3 = new Date();
+    const dateRight3 = addMinutesFunc(-10, dateLeft3);
+    assert.strictEqual(diffTimeFunc(dateLeft3, dateRight3), 10);
+  });
 });
