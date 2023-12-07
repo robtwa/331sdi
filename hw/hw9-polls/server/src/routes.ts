@@ -113,7 +113,7 @@ export const save = (req: SafeRequest, res: SafeResponse): void => {
 };
 
 /**
- * Returns the data of the requested poll by sending a http response.
+ * Returns the data of the requested poll.
  * @param req The HTTP request object
  * @param res The HTTP response object
  */
@@ -223,7 +223,7 @@ export const vote = (req: SafeRequest, res: SafeResponse): void => {
 };
 
 /**
- * Returns a list of all saved votes by sending a http response.
+ * Returns a list of all saved votes.
  * @param req The HTTP request object
  * @param res The HTTP response object
  */
@@ -288,7 +288,7 @@ export const first = (param: unknown): string|undefined => {
 };
 
 /**
- * Returns a trimmed string in lowercase.
+ * Returns a trimmed string in lowercase of the given input.
  * @param str The input string.
  */
 export const cleanString = (str: string):string =>{
@@ -296,7 +296,7 @@ export const cleanString = (str: string):string =>{
 };
 
 /**
- * Processing the polling options to avoid duplicates due to case differences
+ * Processing the polling options to avoid duplicates.
  * @param options The polling options in string or undefined.
  */
 export const processOptions = (options:string|undefined): string[] | undefined =>{
