@@ -100,7 +100,7 @@ export class Vote extends Component<VoteProps, VoteState> {
     }
   };
   /**
-   * Even handler for changing the option.
+   * Event handler for changing the option.
    * @param evt The change event.
    */
   doOptionChange = (evt: ChangeEvent<HTMLInputElement>): void => {
@@ -108,7 +108,7 @@ export class Vote extends Component<VoteProps, VoteState> {
   };
 
   /**
-   * Even handler for changing the name of the voter.
+   * Event handler for changing the name of the voter.
    * @param evt the change event
    */
   doVoterNameChange = (evt: ChangeEvent<HTMLInputElement>): void => {
@@ -116,14 +116,15 @@ export class Vote extends Component<VoteProps, VoteState> {
   };
 
   /**
-   * Even handler for submitting the vote form.
+   * Event handler for submitting the vote form.
    * @param _evt The FormEvent
    */
   doSubmitVoteClick = (_evt: FormEvent): void => {
     _evt.preventDefault();
 
-    // Note: Let the server do the data integrity checks. Have all such checks
-    //       done in one place, and the backend is more secure.
+    // Note: Let the server do the data integrity checks.
+    // Have all such checks done in one place, and the server is a safe place
+    // to perform such checks.
 
     // The payload
     const payload = {
@@ -165,12 +166,9 @@ export class Vote extends Component<VoteProps, VoteState> {
   };
 
   /**
-   * Even handler for refreshing/loading the poll data
+   * Event handler for refreshing/loading the poll data
    */
   doRefreshClick = ():void =>{
-    // Note: Let the server do the data integrity checks. Have all such checks
-    //       done in one place, and the backend is more secure.
-
     // Call the server
     fetch("/api/load?name="+encodeURIComponent(this.props.name))
       .then(this.doRefreshResp)
