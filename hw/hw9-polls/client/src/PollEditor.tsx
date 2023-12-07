@@ -95,8 +95,9 @@ export class PollEditor extends Component<PollEditorProps, PollEditorState> {
   doSubmitPollClick = (_evt: FormEvent): void => {
     _evt.preventDefault();  // to prevent default behavior
 
-    // Note: Let the server do the data integrity checks. Have all such checks
-    //       done in one place, and the backend is more secure to so.
+    // Note: Let the server do the data integrity checks.
+    // Have all such checks done in one place, and the server is a safe place
+    // to perform such checks.
 
     // the payload
     const payload = {
