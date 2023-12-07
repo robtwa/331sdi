@@ -143,12 +143,11 @@ export class PollsApp extends Component<{}, PollsAppState> {
 
   /**
    * Requests a list of all saved files from the server.
-   * If the request is successful and the status code is 200 and the returned
-   * data is valid, update the list to the component’s state object.
    */
   doListRequestClick = (): void => {
-    // Note: Let the server do the data integrity checks. Have all such checks
-    //       done in one place, and the backend is more secure.
+    // Note: Let the server do the data integrity checks.
+    // Have all such checks done in one place, and the server is a safe place
+    // to perform such checks.
 
     // Call the server
     fetch("/api/list")
